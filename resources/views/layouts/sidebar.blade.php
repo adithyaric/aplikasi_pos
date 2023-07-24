@@ -12,7 +12,9 @@
         </div>
 
         <ul class="sidebar-menu">
-            <li class=""><a href="/dashboard"><i class="fa fa-tachometer"></i> <span>Dashboard</span></a></li>
+            <li class="{{ (request()->is('dashboard*')) ? 'active' : '' }}"><a href="/dashboard"><i class="fa fa-tachometer"></i><span>Dashboard</span></a></li>
+            <li class="{{ (request()->is('admin*')) ? 'active' : '' }}"><a href="/admin"><i class="fa fa-users"></i><span>Admin</span></a></li>
+            <li class="{{ (request()->is('customer*')) ? 'active' : '' }}"><a href="/customer"><i class="fa fa-users"></i><span>Customer</span></a></li>
         </ul>
     </section>
 </aside>
