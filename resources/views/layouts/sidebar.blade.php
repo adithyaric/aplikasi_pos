@@ -54,6 +54,12 @@
                     <span>Category</span>
                 </a>
             </li>
+            <li class="{{ request()->is('product*') ? 'active' : '' }}">
+                <a href="/product">
+                    <i class="fa fa-archive"></i>
+                    <span>Products</span>
+                </a>
+            </li>
         </ul>
     </section>
 </aside>
