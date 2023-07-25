@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OutletController;
@@ -25,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/bank', BankController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
+    Route::resource('/category', CategoryController::class);
 });
 
 require __DIR__.'/auth.php';
