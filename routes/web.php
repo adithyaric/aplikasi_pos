@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/customer', CustomerController::class);
     Route::resource('/bank', BankController::class);
     Route::resource('/outlet', OutletController::class);
+    Route::resource('/supplier', SupplierController::class);
 });
 
 require __DIR__.'/auth.php';
