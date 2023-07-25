@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -19,6 +20,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/admin', AdminController::class);
     Route::resource('/customer', CustomerController::class);
+    Route::resource('/bank', BankController::class);
 });
 
 require __DIR__.'/auth.php';
