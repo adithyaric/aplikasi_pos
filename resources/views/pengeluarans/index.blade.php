@@ -1,12 +1,12 @@
 @extends('layouts.master')
 
-@section('title', 'Category')
+@section('title', 'Pengeluaran')
 
 @section('container')
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            Data Category
+            Data Pengeluaran
         </h1>
     </section>
 
@@ -16,26 +16,27 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <a href="{{ route('category.create') }}" class="btn btn-md bg-green">Tambah</a>
+                        <a href="{{ route('pengeluaran.create') }}" class="btn btn-md bg-green">Tambah</a>
                     </div><!-- /.box-header -->
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <td>No</td>
-                                    <td>Nama</td>
-                                    <td>Tipe</td>
+                                    <td>Nama Kategori</td>
+                                    <td>Deskripsi</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
-                            @foreach ($categories as $value)
+                            @foreach ($pengeluarans as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->name }}</td>
-                                    <td>{{ $value->type }}</td>
+                                    <td>{{ $value->category->name }}</td>
+                                    <td>{{ $value->desc }}</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('category.edit', $value->id) }}">Edit</a>
-                                        <form action="{{ route('category.destroy', $value->id) }}" method="post"
+                                        <a class="btn btn-warning"
+                                            href="{{ route('pengeluaran.edit', $value->id) }}">Edit</a>
+                                        <form action="{{ route('pengeluaran.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')
                                             @csrf

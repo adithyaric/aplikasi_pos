@@ -26,6 +26,20 @@
                                     </div>
                                 @enderror
                             </div>
+                            <div class="form-group">
+                                <label>Tipe</label>
+                                <select class="form-control select2" name="type" data-placeholder="Pilih Tipe"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Tipe</option>
+                                    <option value="product">Product</option>
+                                    <option value="pengeluaran">Pengeluaran</option>
+                                </select>
+                                @error('type')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                         </div><!-- /.box-body -->
 
                         <div class="box-footer">

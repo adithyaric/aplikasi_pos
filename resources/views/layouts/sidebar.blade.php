@@ -66,6 +66,13 @@
                     <span>Vocuhers</span>
                 </a>
             </li>
+            <hr>
+            <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}">
+                <a href="/pengeluaran">
+                    <i class="fa fa-circle"></i>
+                    <span>Pengeluaran</span>
+                </a>
+            </li>
         </ul>
     </section>
 </aside>

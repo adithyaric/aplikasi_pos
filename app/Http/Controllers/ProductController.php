@@ -23,7 +23,7 @@ class ProductController extends Controller
         return view('products.create', [
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'categories' => Category::get(),
+            'categories' => Category::where('type', 'product')->get(),
         ]);
     }
 
@@ -62,7 +62,7 @@ class ProductController extends Controller
             'product' => $product,
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'categories' => Category::get(),
+            'categories' => Category::where('type', 'product')->get(),
         ]);
     }
 
