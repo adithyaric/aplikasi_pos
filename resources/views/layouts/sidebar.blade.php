@@ -60,6 +60,12 @@
                     <span>Products</span>
                 </a>
             </li>
+            <li class="{{ request()->is('stock*') ? 'active' : '' }}">
+                <a href="/stock">
+                    <i class="fa fa-anchor"></i>
+                    <span>Stocks</span>
+                </a>
+            </li>
             <li class="{{ request()->is('voucher*') ? 'active' : '' }}">
                 <a href="/voucher">
                     <i class="fa fa-file"></i>

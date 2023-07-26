@@ -9,6 +9,7 @@ use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Artisan;
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);
     Route::resource('/product', ProductController::class);
+    Route::resource('/stock', StockController::class);
     Route::resource('/voucher', VoucherController::class);
 
     Route::resource('/pengeluaran', PengeluaranController::class);

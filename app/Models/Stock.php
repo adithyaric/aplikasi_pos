@@ -20,4 +20,9 @@ class Stock extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'expired_at' => 'datetime',
+    ];
 }
