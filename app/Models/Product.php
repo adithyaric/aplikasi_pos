@@ -20,7 +20,7 @@ class Product extends Model
         'ukuran',
         'outlet_id',
         'supplier_id',
-        'harga_beli',
+        // 'harga_beli',
         'harga_jual',
         'diskon',
         'berat',

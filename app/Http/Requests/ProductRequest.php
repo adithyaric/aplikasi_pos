@@ -24,7 +24,7 @@ class ProductRequest extends FormRequest
             'ukuran' => 'nullable',
             'outlet_id' => 'required',
             'supplier_id' => 'required',
-            'harga_beli' => 'required',
+            // 'harga_beli' => 'required',
             'harga_jual' => 'required',
             'diskon' => 'nullable',
             'berat' => 'required',

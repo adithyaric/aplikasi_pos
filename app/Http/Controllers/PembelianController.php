@@ -56,16 +56,34 @@ class PembelianController extends Controller
     {
         return view('pembelians.edit', [
             'pembelian' => $pembelian,
+            'outlets' => Outlet::get(),
+            'suppliers' => Supplier::get(),
+            'products' => Product::get(),
         ]);
     }
 
     public function update(PembelianRequest $request, Pembelian $pembelian)
     {
         $data = $request->validated();
-
         $pembelian->update($data);
 
-        return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // Update related stocks
+        $pembelian->stocks->each(function ($stock) use ($request) {
+            // Find the matching product data in the request
+            $productData = collect($request->product)->firstWhere('product_id', $stock->product_id);
+
+            // Update the stock with the new data
+            if ($productData) {
+                $stock->update([
+                    'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
+                    'qty' => (int) $productData['qty'],
+                    'subtotal' => (int) $productData['subtotal'],
+                    'expired_at' => $productData['expired'],
+                ]);
+            }
+        });
+
+        return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Memperbarui Data!');
     }
 
     public function destroy(Pembelian $pembelian)
