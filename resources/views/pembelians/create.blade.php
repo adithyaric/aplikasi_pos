@@ -63,43 +63,50 @@
                                 @enderror
                             </div>
                             <hr>
-                            <div class="form-group">
-                                <div id="product-repeater">
-                                    <div class="row">
-                                        <div class="form-group col-sm-2">
-                                            <label>Product</label>
-                                            <select required class="form-control select2" name="product[0][product_id]"
-                                                data-placeholder="Pilih Product" style="width: 100%;">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>Nama Product</td>
+                                        <td>Qty</td>
+                                        <td>Expired</td>
+                                        <td>Harga Beli</td>
+                                        <td>Sub Total</td>
+                                        <td>Aksi</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-repeater">
+                                    <tr>
+                                        <td>
+                                            <select class="form-control select2" data-placeholder="Pilih Product"
+                                                name="product[0][product_id]" required style="width:100%">
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
                                             </select>
-                                        </div>
-                                        <div class="form-group col-sm-1">
-                                            <label>Qty</label>
-                                            <input type="text" required value="0" class="form-control qty" name="product[0][qty]">
-                                        </div>
-                                        <div class="form-group col-sm-2">
-                                            <label>Expired</label>
-                                            <input type="date" required class="form-control" name="product[0][expired]">
-                                        </div>
-                                        <div class="form-group col-sm-2">
-                                            <label>Harga Beli</label>
-                                            <input type="text" required value="0" class="form-control harga_beli numeral-mask"
-                                                name="product[0][harga_beli]">
-                                        </div>
-                                        <!-- Add a new div for the subtotal -->
-                                        <div class="form-group col-sm-2">
-                                            <label>Subtotal</label>
-                                            <input type="text" required class="form-control subtotal"
-                                                name="product[0][subtotal]" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-sm btn-primary" type="button" onclick="addBahanBaku()">Add</button>
-                                <button class="btn btn-sm btn-danger" onclick="removeBahanBaku()" type="button">Remove</button>
-                            </div>
-                            <!-- Add a new div for the total outside the repeater -->
+                                        </td>
+                                        <td>
+                                            <input class="form-control qty" name="product[0][qty]" required value="0">
+                                        </td>
+                                        <td>
+                                            <input class="form-control" name="product[0][expired]" required type="date">
+                                        </td>
+                                        <td>
+                                            <input class="form-control harga_beli numeral-mask"
+                                                name="product[0][harga_beli]" required value="0">
+                                        </td>
+                                        <td>
+                                            <input class="form-control subtotal" name="product[0][subtotal]" required
+                                                readonly>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)"
+                                                type="button">Remove</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">Add</button>
                             <hr>
                             <div class="form-group">
                                 <label>Total</label>
@@ -125,51 +132,33 @@
         function addBahanBaku() {
             productIndex++;
             let productTemplate = `
-        <div class="row">
-            <div class="form-group col-sm-2">
-                <label>Product</label>
-                <select required class="form-control select2" name="product[${productIndex}][product_id]"
-                    data-placeholder="Pilih Product" style="width: 100%;">
+        <tr>
+            <td>
+                <select required class="form-control select2" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
                     @foreach ($products as $product)
                         <option value="{{ $product->id }}">{{ $product->name }}</option>
                     @endforeach
                 </select>
-            </div>
-            <div class="form-group col-sm-1">
-                <label>Qty</label>
-                <input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]">
-            </div>
-            <div class="form-group col-sm-2">
-                <label>Expired</label>
-                <input type="date" required class="form-control" name="product[${productIndex}][expired]">
-            </div>
-            <div class="form-group col-sm-2">
-                <label>Harga Beli</label>
-                <input type="text" required value="0" class="form-control harga_beli numeral-mask"
-                    name="product[${productIndex}][harga_beli]">
-            </div>
-            <!-- Add a new div for the subtotal -->
-            <div class="form-group col-sm-2">
-                <label>Subtotal</label>
-                <input type= "text" required class= "form-control subtotal"
-                    name="product[${productIndex}][subtotal]" readonly >
-            </div >
-        </div >
-    `;
+            </td>
+            <td><input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]"></td>
+            <td><input type="date" required class="form-control" name="product[${productIndex}][expired]"></td>
+            <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
+            <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
+            <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+
+        </tr>`;
             $('#product-repeater').append(productTemplate);
             $('#product-repeater .select2').last().select2();
             updateSubtotalAndTotal();
         }
 
-        // Add event listeners to update the subtotal and total when the quantity or price changes
         $(document).on('change', '.qty, .harga_beli', function() {
             updateSubtotalAndTotal();
         });
 
-        // Function to update the subtotal and total
         function updateSubtotalAndTotal() {
             let total = 0;
-            $('.row').each(function() {
+            $('tbody tr').each(function() {
                 let qty = $(this).find('.qty').val();
                 let harga_beli = $(this).find('.harga_beli').cleanVal();
                 let subtotal = qty * harga_beli;
@@ -181,20 +170,16 @@
             });
             $('#total').val(total);
         }
+
         $('.numeral-mask').mask("#,##0", {
             reverse: true
         });
         updateSubtotalAndTotal();
 
-        function removeBahanBaku() {
-            // select all form inputs
-            let formInputs = document.querySelectorAll("#product-repeater .row");
-            // check if there is more than one form input
-            if (formInputs.length > 1) {
-                // select the last form input
-                let lastFormInput = formInputs[formInputs.length - 1];
-                // remove the last form input
-                lastFormInput.remove();
+        function removeBahanBaku(button) {
+            if ($('#example1 tbody tr').length > 1) {
+                $(button).closest('tr').remove();
+                updateSubtotalAndTotal();
             }
         }
     </script>
