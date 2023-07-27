@@ -75,9 +75,9 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="form-group col-sm-2">
+                                        <div class="form-group col-sm-1">
                                             <label>Qty</label>
-                                            <input type="text" required class="form-control qty" name="product[0][qty]">
+                                            <input type="text" required value="0" class="form-control qty" name="product[0][qty]">
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label>Expired</label>
@@ -85,7 +85,7 @@
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label>Harga Beli</label>
-                                            <input type="text" required class="form-control harga_beli numeral-mask"
+                                            <input type="text" required value="0" class="form-control harga_beli numeral-mask"
                                                 name="product[0][harga_beli]">
                                         </div>
                                         <!-- Add a new div for the subtotal -->
@@ -96,7 +96,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" onclick="addBahanBaku()">Add</button>
+                                <button class="btn btn-sm btn-primary" type="button" onclick="addBahanBaku()">Add</button>
+                                <button class="btn btn-sm btn-danger" onclick="removeBahanBaku()" type="button">Remove</button>
                             </div>
                             <!-- Add a new div for the total outside the repeater -->
                             <hr>
@@ -134,9 +135,9 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group col-sm-2">
+            <div class="form-group col-sm-1">
                 <label>Qty</label>
-                <input type="text" required class="form-control qty" name="product[${productIndex}][qty]">
+                <input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]">
             </div>
             <div class="form-group col-sm-2">
                 <label>Expired</label>
@@ -144,7 +145,7 @@
             </div>
             <div class="form-group col-sm-2">
                 <label>Harga Beli</label>
-                <input type="text" required class="form-control harga_beli numeral-mask"
+                <input type="text" required value="0" class="form-control harga_beli numeral-mask"
                     name="product[${productIndex}][harga_beli]">
             </div>
             <!-- Add a new div for the subtotal -->
@@ -184,5 +185,17 @@
             reverse: true
         });
         updateSubtotalAndTotal();
+
+        function removeBahanBaku() {
+            // select all form inputs
+            let formInputs = document.querySelectorAll("#product-repeater .row");
+            // check if there is more than one form input
+            if (formInputs.length > 1) {
+                // select the last form input
+                let lastFormInput = formInputs[formInputs.length - 1];
+                // remove the last form input
+                lastFormInput.remove();
+            }
+        }
     </script>
 @endsection

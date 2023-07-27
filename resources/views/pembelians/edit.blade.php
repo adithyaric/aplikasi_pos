@@ -68,6 +68,10 @@
                             @foreach ($pembelian->stocks as $key => $stock)
                                 <div class="row">
                                     <div class="form-group col-sm-2">
+                                        <a class="btn btn-group-sm btn-danger"
+                                            href="{{ route('stock.show', $stock->id) }}">
+                                            <li class="fa fa-trash"></li>
+                                        </a>
                                         <label>Product</label>
                                         <select required class="form-control select2"
                                             name="product[{{ $key }}][product_id]"
@@ -78,7 +82,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group col-sm-2">
+                                    <div class="form-group col-sm-1">
                                         <label>Qty</label>
                                         <input type="text" required class="form-control qty"
                                             name="product[{{ $key }}][qty]" value="{{ $stock->qty }}">
@@ -86,7 +90,8 @@
                                     <div class="form-group col-sm-2">
                                         <label>Expired</label>
                                         <input type="date" required class="form-control"
-                                            name="product[{{ $key }}][expired]" value="{{ $stock->expired_at->format('Y-m-d') }}">
+                                            name="product[{{ $key }}][expired]"
+                                            value="{{ $stock->expired_at->format('Y-m-d') }}">
                                     </div>
                                     <div class="form-group col-sm-2">
                                         <label>Harga Beli</label>
@@ -103,7 +108,9 @@
                             @endforeach
                             <div class="form-group">
                                 <div id="product-repeater"></div>
-                                <button type="button" onclick="addBahanBaku()">Add</button>
+                                <button class="btn btn-sm btn-primary" type="button" onclick="addBahanBaku()">Add</button>
+                                <button class="btn btn-sm btn-danger" onclick="removeBahanBaku()"
+                                    type="button">Remove</button>
                             </div>
                             <!-- Add a new div for the total outside the repeater -->
                             <hr>
@@ -126,9 +133,9 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        let productIndex = 2;
+        let productIndex = @json($key) + 1;
 
-        function addBahanBaku() {10
+        function addBahanBaku() {
             productIndex++;
             let productTemplate = `
         <div class="row">
@@ -141,7 +148,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group col-sm-2">
+            <div class="form-group col-sm-1">
                 <label>Qty</label>
                 <input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]">
             </div>
@@ -190,5 +197,12 @@
             reverse: true
         });
         updateSubtotalAndTotal();
+
+        function removeBahanBaku() {
+            // select the form input you want to remove
+            let formInput = document.querySelector("#product-repeater .row:last-child");
+            // remove the form input
+            formInput.remove();
+        }
     </script>
 @endsection
