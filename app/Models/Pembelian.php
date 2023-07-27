@@ -17,7 +17,7 @@ class Pembelian extends Model
         // 'qty',
         // 'expired',
         // 'harga_beli',
-        'subtotal',
+        // 'subtotal',
         'total',
     ];
 

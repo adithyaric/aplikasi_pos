@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::table('stocks', function (Blueprint $table) {
             $table->foreignIdFor(Pembelian::class)->constrained()->cascadeOnDelete();
             $table->integer('harga_beli')->nullable();
+            $table->string('subtotal')->nullable();
         });
     }
 

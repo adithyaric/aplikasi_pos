@@ -25,7 +25,7 @@ return new class extends Migration
             // $table->string('qty')->nullable();
             // $table->date('expired')->nullable();
             // $table->integer('harga_beli')->nullable();
-            $table->string('subtotal')->nullable();
+            // $table->string('subtotal')->nullable();
             $table->string('total')->nullable();
             $table->timestamps();
         });

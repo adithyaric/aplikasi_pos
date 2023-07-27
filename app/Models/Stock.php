@@ -11,6 +11,7 @@ class Stock extends Model
 
     protected $fillable = [
         'product_id',
+        'subtotal',
         'harga_beli',
         'qty',
         'created_at',

@@ -36,6 +36,7 @@ class PembelianController extends Controller
             $stock->product_id = $product['product_id'];
             $stock->harga_beli = str_replace(',', '', $product['harga_beli']);
             $stock->qty = $product['qty'];
+            $stock->subtotal = $product['subtotal'];
             $stock->created_at = now();
             $stock->expired_at = $product['expired'];
             $pembelian->stocks()->save($stock);
