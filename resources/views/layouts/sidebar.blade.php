@@ -79,6 +79,12 @@
                     <span>Pengeluaran</span>
                 </a>
             </li>
+            <li class="{{ request()->is('pembelian*') ? 'active' : '' }}">
+                <a href="/pembelian">
+                    <i class="fa fa-cart-arrow-down"></i>
+                    <span>Pembelian</span>
+                </a>
+            </li>
         </ul>
     </section>
 </aside>

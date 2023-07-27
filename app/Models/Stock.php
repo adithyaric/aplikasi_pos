@@ -11,10 +11,16 @@ class Stock extends Model
 
     protected $fillable = [
         'product_id',
+        'harga_beli',
         'qty',
         'created_at',
         'expired_at',
     ];
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class);
+    }
 
     public function product()
     {

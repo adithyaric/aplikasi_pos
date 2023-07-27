@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->string('name')->nullable();
             $table->foreignIdFor(Category::class)->nullable()->constrained()->cascadeOnDelete();
-            $table->date('expired')->nullable();
+            // $table->date('expired')->nullable();
             $table->text('desc')->nullable();
             $table->string('warna')->nullable();
             $table->string('ukuran')->nullable();
