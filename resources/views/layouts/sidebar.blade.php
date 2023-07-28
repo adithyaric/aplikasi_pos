@@ -85,6 +85,12 @@
                     <span>Pembelian</span>
                 </a>
             </li>
+            <li class="{{ request()->is('penjualan*') ? 'active' : '' }}">
+                <a href="/penjualan">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span>Penjualan</span>
+                </a>
+            </li>
         </ul>
     </section>
 </aside>

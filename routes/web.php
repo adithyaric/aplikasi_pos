@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranController;
+use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StockController;
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
+    Route::resource('/penjualan', PenjualanController::class);
 });
 
 require __DIR__.'/auth.php';

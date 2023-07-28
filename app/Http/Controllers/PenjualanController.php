@@ -2,78 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PenjualanRequest;
 use App\Models\Penjualan;
-use Illuminate\Http\Request;
 
 class PenjualanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return view('penjualan.index', [
+            'penjualan' => Penjualan::get(),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    // public function create()
+    // {
+    //     return view('penjualan.create', []);
+    // }
+
+    public function store(PenjualanRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        Penjualan::create($data);
+
+        return redirect(route('penjualan.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function show(Penjualan $penjualan)
     {
-        //
+        dd($penjualan->load(['kasir', 'customer', 'items.product'])->toArray());
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Penjualan $penjualan)
+    // public function edit(Penjualan $penjualan)
+    // {
+    //     return view('penjualan.edit', [
+    //         'penjualan' => $penjualan,
+    //     ]);
+    // }
+
+    public function update(PenjualanRequest $request, Penjualan $penjualan)
     {
-        //
+        $data = $request->validated();
+
+        $penjualan->update($data);
+
+        return redirect(route('penjualan.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Penjualan $penjualan)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Penjualan $penjualan)
     {
-        //
+        $penjualan->delete();
+
+        return redirect(route('penjualan.index'))->with('toast_success', 'Berhasil Menghapus Data!');
     }
 }
