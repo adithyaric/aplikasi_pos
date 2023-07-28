@@ -44,6 +44,7 @@
     <link rel="stylesheet" href="{{ asset('assets/zenTheme/css/_all-skins.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/zenTheme/css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/zenTheme/css/admin-style.css') }}">
+    @vite(['resources/js/app.js'])
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">

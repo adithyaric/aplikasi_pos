@@ -63,7 +63,7 @@
                                 @enderror
                             </div>
                             <hr>
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered table-striped" id="example">
                                 <thead>
                                     <tr>
                                         <td>Nama Product</td>
@@ -177,7 +177,7 @@
         updateSubtotalAndTotal();
 
         function removeBahanBaku(button) {
-            if ($('#example1 tbody tr').length > 1) {
+            if ($('#example tbody tr').length > 1) {
                 $(button).closest('tr').remove();
                 updateSubtotalAndTotal();
             }

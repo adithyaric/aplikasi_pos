@@ -1,4 +1,7 @@
 @extends('layouts.master')
+
+@section('title', 'Dashboard')
+
 @section('container')
     <section class="content-header">
         <h1>
@@ -8,7 +11,6 @@
 
     <section class="content">
         <div class="row">
-
             <div class="col-lg-12 col-xs-12">
                 <div class="small-box bg-yellow-gradient">
                     <div class="inner">
@@ -19,8 +21,8 @@
                         <i class="ion-android-contacts"></i>
                     </div>
                 </div>
+                <div id="example"></div>
             </div>
-
         </div>
     </section>
 @endsection
