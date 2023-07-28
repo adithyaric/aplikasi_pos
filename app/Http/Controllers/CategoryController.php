@@ -10,7 +10,7 @@ class CategoryController extends Controller
     public function index()
     {
         return view('categories.index', [
-            'categories' => Category::get(),
+            'categories' => Category::get()->sortBy('type'),
         ]);
     }
 

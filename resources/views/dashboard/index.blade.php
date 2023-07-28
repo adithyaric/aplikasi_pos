@@ -21,7 +21,6 @@
                         <i class="ion-android-contacts"></i>
                     </div>
                 </div>
-                <div id="example"></div>
             </div>
         </div>
     </section>

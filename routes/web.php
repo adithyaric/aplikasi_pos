@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -33,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);
-    Route::resource('/product', ProductController::class);
+    // Route::resource('/product', ProductController::class);
     Route::resource('/stock', StockController::class);
     Route::resource('/voucher', VoucherController::class);
 
@@ -43,6 +44,12 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+Route::resource('/product', ProductController::class);
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
+Route::delete('/cart/delete', [CartController::class, 'delete']);
+Route::delete('/cart/empty', [CartController::class, 'empty']);
 
 //* Artisan Commands
 Route::get('/optimize-clear', function () {

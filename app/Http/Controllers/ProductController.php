@@ -3,19 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
 use App\Models\Supplier;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('products.index', [
-            'products' => Product::get(),
-        ]);
+        $products = new Product();
+        if ($request->search) {
+            $products = $products->where('name', 'LIKE', "%{$request->search}%")
+                ->orWhere('harga_jual', 'LIKE', "%{$request->search}%");
+        }
+        if (request()->wantsJson()) {
+            $products = $products->latest()->paginate(10);
+
+            return ProductResource::collection($products);
+        }
+
+        return view('products.index', ['products' => $products->get()]);
     }
 
     public function create()

@@ -13,11 +13,6 @@ class Pembelian extends Model
         'code',
         'outlet_id',
         'supplier_id',
-        // 'product_id',
-        // 'qty',
-        // 'expired',
-        // 'harga_beli',
-        // 'subtotal',
         'total',
     ];
 

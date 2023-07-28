@@ -15,7 +15,6 @@ class Stock extends Model
         'subtotal',
         'harga_beli',
         'qty',
-        'created_at',
         'expired_at',
     ];
 
@@ -31,6 +30,7 @@ class Stock extends Model
 
     protected $casts = [
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'expired_at' => 'datetime',
     ];
 }

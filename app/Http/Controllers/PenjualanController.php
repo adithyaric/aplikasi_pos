@@ -14,10 +14,10 @@ class PenjualanController extends Controller
         ]);
     }
 
-    // public function create()
-    // {
-    //     return view('penjualan.create', []);
-    // }
+    public function create()
+    {
+        return view('penjualan.create', []);
+    }
 
     public function store(PenjualanRequest $request)
     {

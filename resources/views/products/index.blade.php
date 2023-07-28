@@ -25,6 +25,7 @@
                                     <td>No</td>
                                     <td>Nama</td>
                                     <td>Kategori</td>
+                                    <td>Kadaluwarsa</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -33,6 +34,14 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->category->name }}</td>
+                                    <td>
+                                        <ul>
+                                            @foreach ($value->stocks->sortBy('created_at') as $stock)
+                                                <li>{{ $stock->created_at->format('d-m-Y') }}</li>
+                                                <li>{{ $stock->expired_at->format('d-m-Y') }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('product.destroy', $value->id) }}" method="post"
