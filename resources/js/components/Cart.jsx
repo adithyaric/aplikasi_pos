@@ -15,6 +15,7 @@ const Cart = () => {
     const [barcode, setBarcode] = useState("");
     const [customerId, setCustomerId] = useState("");
     const [search, setSearch] = useState("");
+    const [discount, setDiscount] = useState(0);
 
     useEffect(() => {
         loadCart();
@@ -182,6 +183,50 @@ const Cart = () => {
         addToCart(barcode);
     };
 
+    const handleDiscountChange = (event) => {
+        const value = parseInt(event.target.value, 10);
+        if (!isNaN(value) && value >= 0) {
+            setDiscount(value);
+        }
+    };
+
+    const handleClickSubmit = (event) => {
+        Swal.fire({
+            title: "Received Amount",
+            input: "text",
+            inputValue: getTotal(cart) - discount,
+            showCancelButton: true,
+            confirmButtonText: "Send",
+            showLoaderOnConfirm: true,
+            preConfirm: (amount) => {
+                return axios
+                    .post("/penjualan", {
+                        customer_id: customerId,
+                        total: amount,
+                        discount: discount,
+                        cart: cart,
+                    })
+                    .then((res) => {
+                        loadCart();
+                        loadProducts();
+                        setBarcode("");
+                        setCustomerId("");
+                        setSearch("");
+                        setDiscount(0);
+                        Swal.fire(
+                            "Success!",
+                            "Pesanan berhasil dibuat",
+                            "success"
+                        );
+                    })
+                    .catch((err) => {
+                        Swal.showValidationMessage(err.response.data.message);
+                    });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        });
+    };
+
     return (
         <div className="row">
             <div className="col-md-6 col-lg-4">
@@ -196,12 +241,15 @@ const Cart = () => {
                 />
                 <CartTable
                     cart={cart}
+                    discount={discount}
                     handleChangeQty={handleChangeQty}
                     handleClickIncrease={handleClickIncrease}
                     handleClickDecrease={handleClickDecrease}
                     handleClickDelete={handleClickDelete}
-                    handleEmptyCart={handleEmptyCart}
+                    handleDiscountChange={handleDiscountChange}
                     getTotal={getTotal}
+                    handleEmptyCart={handleEmptyCart}
+                    handleClickSubmit={handleClickSubmit}
                 />
             </div>
             <div className="col-md-6 col-lg-8">

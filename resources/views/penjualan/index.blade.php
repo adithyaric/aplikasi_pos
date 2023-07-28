@@ -23,14 +23,34 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Kode Invoice</td>
+                                    <td>Customer</td>
+                                    <td>kasir</td>
+                                    <td>Detail</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
                             @foreach ($penjualan as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $value->code }}</td>
+                                    <td>{{ $value->customer->name }}</td>
+                                    <td>{{ $value->kasir->name }}</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('penjualan.edit', $value->id) }}">Edit</a>
+                                        <ul>
+                                            @foreach ($value->items as $item)
+                                                <li>
+                                                    {{ $item->product->name }}. Banyak : {{ $item->qty }}. Sub total
+                                                    @currency($item->qty * $item->price)
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        Total : @currency($value->total + $value->discount)
+                                        Diskon : @currency($value->discount)
+                                        Grand Total : @currency($value->total)
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-info" href="{{ route('penjualan.show', $value->id) }}">Show</a>
                                         <form action="{{ route('penjualan.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

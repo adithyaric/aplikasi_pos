@@ -8,7 +8,7 @@ const CartTableBody = ({
     handleClickDelete,
 }) => {
     return (
-        <tbody>
+        <>
             {cart.map((c) => (
                 <tr key={c.id}>
                     <td>{c.name}</td>
@@ -50,7 +50,7 @@ const CartTableBody = ({
                     </td>
                 </tr>
             ))}
-        </tbody>
+        </>
     );
 };
 export default CartTableBody;

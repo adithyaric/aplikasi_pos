@@ -14,7 +14,11 @@ class PenjualanRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'code' => 'nullable',
+            'customer_id' => 'nullable',
+            'kasir_id' => 'nullable',
+            'discount' => 'nullable',
+            'total' => 'nullable',
         ];
     }
 }
