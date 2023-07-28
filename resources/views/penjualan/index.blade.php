@@ -37,17 +37,29 @@
                                     <td>{{ $value->customer->name }}</td>
                                     <td>{{ $value->kasir->name }}</td>
                                     <td>
-                                        <ul>
+                                        <table class="table table-sm table-bordered">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Banyak</th>
+                                                <th>Harga Jual</th>
+                                                <th>Sub total</th>
+                                            </tr>
                                             @foreach ($value->items as $item)
-                                                <li>
-                                                    {{ $item->product->name }}. Banyak : {{ $item->qty }}. Sub total
-                                                    @currency($item->qty * $item->price)
-                                                </li>
+                                                <tr>
+                                                    <td>{{ $item->product->name }}</td>
+                                                    <td>{{ $item->qty }}</td>
+                                                    <td>@currency($item->price)</td>
+                                                    <td>@currency($item->qty * $item->price)</td>
+                                                </tr>
                                             @endforeach
-                                        </ul>
-                                        Total : @currency($value->total + $value->discount)
-                                        Diskon : @currency($value->discount)
-                                        Grand Total : @currency($value->total)
+                                            <tr>
+                                                <th>Diskon : @currency($value->discount)</th>
+                                                <th colspan="3" class="text-right">Total : @currency($value->total + $value->discount)</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="4" class="text-right">Grand Total : @currency($value->total)</th>
+                                            </tr>
+                                        </table>
                                     </td>
                                     <td>
                                         <a class="btn btn-info" href="{{ route('penjualan.show', $value->id) }}">Show</a>

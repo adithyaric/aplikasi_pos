@@ -147,7 +147,7 @@ const Cart = () => {
     //Delete 1 item
     const handleClickDelete = (product_id) => {
         axios
-            .post("/cart/delete", { product_id, _method: "DELETE" })
+            .post("/cart/destroy", { product_id, _method: "DELETE" })
             .then((res) => {
                 const updatedCart = cart.filter((c) => c.id !== product_id);
                 setCart(updatedCart);

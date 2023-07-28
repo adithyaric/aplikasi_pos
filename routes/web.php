@@ -12,6 +12,7 @@ use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RefundController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\VoucherController;
@@ -34,22 +35,21 @@ Route::middleware('auth')->group(function () {
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);
-    // Route::resource('/product', ProductController::class);
+    Route::resource('/product', ProductController::class);
     Route::resource('/stock', StockController::class);
     Route::resource('/voucher', VoucherController::class);
 
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
+    Route::resource('/refund', RefundController::class);
     Route::resource('/penjualan', PenjualanController::class);
+
+    Route::resource('/cart', CartController::class);
+    Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
+    Route::delete('/cart/empty', [CartController::class, 'empty']);
 });
 
 require __DIR__.'/auth.php';
-Route::resource('/product', ProductController::class);
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
-Route::delete('/cart/delete', [CartController::class, 'delete']);
-Route::delete('/cart/empty', [CartController::class, 'empty']);
 
 //* Artisan Commands
 Route::get('/optimize-clear', function () {

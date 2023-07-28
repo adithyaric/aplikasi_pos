@@ -39,13 +39,13 @@
             <li class="{{ request()->is('outlet*') ? 'active' : '' }}">
                 <a href="/outlet">
                     <i class="fa fa-home"></i>
-                    <span>Outlet</span>
+                    <span>Outlets</span>
                 </a>
             </li>
             <li class="{{ request()->is('supplier*') ? 'active' : '' }}">
                 <a href="/supplier">
-                    <i class="fa fa-dropbox"></i>
-                    <span>Supplier</span>
+                    <i class="fa fa-truck"></i>
+                    <span>Suppliers</span>
                 </a>
             </li>
             <li class="{{ request()->is('category*') ? 'active' : '' }}">
@@ -62,26 +62,26 @@
             </li>
             <li class="{{ request()->is('stock*') ? 'active' : '' }}">
                 <a href="/stock">
-                    <i class="fa fa-anchor"></i>
+                    <i class="fa fa-cubes"></i>
                     <span>Stocks</span>
                 </a>
             </li>
             <li class="{{ request()->is('voucher*') ? 'active' : '' }}">
                 <a href="/voucher">
-                    <i class="fa fa-file"></i>
+                    <i class="fa fa-newspaper-o"></i>
                     <span>Vocuhers</span>
                 </a>
             </li>
             <hr>
             <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}">
                 <a href="/pengeluaran">
-                    <i class="fa fa-circle"></i>
+                    <i class="fa fa-folder-open"></i>
                     <span>Pengeluaran</span>
                 </a>
             </li>
             <li class="{{ request()->is('pembelian*') ? 'active' : '' }}">
                 <a href="/pembelian">
-                    <i class="fa fa-cart-arrow-down"></i>
+                    <i class="fa fa-cube "></i>
                     <span>Pembelian</span>
                 </a>
             </li>
@@ -89,6 +89,12 @@
                 <a href="/penjualan">
                     <i class="fa fa-shopping-cart"></i>
                     <span>Penjualan</span>
+                </a>
+            </li>
+            <li class="{{ request()->is('refund*') ? 'active' : '' }}">
+                <a href="/refund">
+                    <i class="fa fa-refresh"></i>
+                    <span>Refund/Return Order</span>
                 </a>
             </li>
         </ul>

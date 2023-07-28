@@ -96,7 +96,7 @@ class CartController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function destroy(Request $request)
     {
         $request->validate([
             'product_id' => 'required|integer|exists:products,id',
