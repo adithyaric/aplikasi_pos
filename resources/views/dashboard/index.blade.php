@@ -22,6 +22,12 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-12 col-xs-12">
+                <h1 for="check-sliders">Sliders</h1>
+                @foreach ($sliders as $slider)
+                    <img class="img-thumbnail" src="{{ asset($slider->pic) }}" alt="">
+                @endforeach
+            </div>
         </div>
     </section>
 @endsection

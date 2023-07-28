@@ -13,6 +13,7 @@ use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\VoucherController;
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/product', ProductController::class);
     Route::resource('/stock', StockController::class);
     Route::resource('/voucher', VoucherController::class);
+    Route::resource('/slider', SliderController::class);
 
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);

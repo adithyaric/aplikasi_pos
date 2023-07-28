@@ -97,6 +97,12 @@
                     <span>Refund/Return Order</span>
                 </a>
             </li>
+            <li class="{{ request()->is('slider*') ? 'active' : '' }}">
+                <a href="/slider">
+                    <i class="fa fa-image"></i>
+                    <span>Sliders</span>
+                </a>
+            </li>
         </ul>
     </section>
 </aside>

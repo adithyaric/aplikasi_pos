@@ -43,6 +43,15 @@ class DatabaseSeeder extends Seeder
         ]);
 
         for ($i = 1; $i <= 3; $i++) {
+            Slider::create([
+                'status' => ($i % 2 == 0) ? 'active' : 'non-active',
+                'type' => ($i % 2 == 0) ? 'default' : 'link',
+                'desc' => 'Description '.$i,
+                'pic' => 'pic'.$i,
+            ]);
+        }
+
+        for ($i = 1; $i <= 3; $i++) {
             Bank::create([
                 'name' => 'Bank '.$i,
                 'name_rek' => 'Name Rek '.$i,
