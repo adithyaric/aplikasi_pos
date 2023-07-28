@@ -2,6 +2,8 @@
 
 @section('title', 'Open POS')
 
+@section('body_class', 'sidebar-collapse')
+
 @section('container')
     <section class="content-header">
         <h1>

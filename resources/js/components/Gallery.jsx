@@ -1,5 +1,6 @@
 import React from "react";
 import "../../css/Gallery.css";
+import { formatRupiah } from "../utils";
 
 const Gallery = ({ products, addProductToCart }) => {
     return (
@@ -20,7 +21,7 @@ const Gallery = ({ products, addProductToCart }) => {
                             <li> Kode {p.barcode}</li>
                             <li> Nama {p.name}</li>
                             <li> Stock {p.stocks}</li>
-                            <li>Rp.{p.harga_jual}</li>
+                            <li>{formatRupiah(p.harga_jual)}</li>
                         </ul>
                     </div>
                 </div>

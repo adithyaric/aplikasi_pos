@@ -1,12 +1,18 @@
 import React from "react";
-
-const CartTableBody = ({ cart, handleChangeQty, handleClickDelete }) => {
+import { formatRupiah } from "../utils";
+const CartTableBody = ({
+    cart,
+    handleChangeQty,
+    handleClickIncrease,
+    handleClickDecrease,
+    handleClickDelete,
+}) => {
     return (
         <tbody>
             {cart.map((c) => (
                 <tr key={c.id}>
                     <td>{c.name}</td>
-                    <td>
+                    <td className="col-2 col-sm-2">
                         <input
                             type="number"
                             className="form-control form-control-sm qty"
@@ -16,7 +22,22 @@ const CartTableBody = ({ cart, handleChangeQty, handleClickDelete }) => {
                             }
                         />
                     </td>
-                    <td>
+                    <td className="col-2 col-sm-2">
+                        {formatRupiah(c.harga_jual)}
+                    </td>
+                    <td className="col-3 col-sm-3">
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => handleClickIncrease(c.id)}
+                        >
+                            <i className="fa fa-plus"></i>
+                        </button>
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => handleClickDecrease(c.id)}
+                        >
+                            <i className="fa fa-minus"></i>
+                        </button>
                         <button
                             className="btn btn-danger btn-sm"
                             onClick={() => handleClickDelete(c.id)}
@@ -25,12 +46,11 @@ const CartTableBody = ({ cart, handleChangeQty, handleClickDelete }) => {
                         </button>
                     </td>
                     <td className="text-right">
-                        {(c.harga_jual * c.pivot.qty).toFixed(2)}
+                        {formatRupiah(c.harga_jual * c.pivot.qty)}
                     </td>
                 </tr>
             ))}
         </tbody>
     );
 };
-
 export default CartTableBody;

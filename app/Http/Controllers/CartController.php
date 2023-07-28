@@ -35,9 +35,7 @@ class CartController extends Controller
             $request->validate(['barcode' => 'required|exists:products,code']);
             $barcode = $request->barcode;
             $product = Product::where('code', $barcode)->first();
-            // Get the current date
             $now = Carbon::now();
-            // Get the total stock quantity for the product
             $stockQty = $product->stocks()
                 ->where('created_at', '<=', $now)
                 ->where('expired_at', '>=', $now)
@@ -58,10 +56,8 @@ class CartController extends Controller
 
             return response('success', 204);
         } catch (Exception $e) {
-            // Handle the exception here
-            // For example, you can log the error message:
             error_log($e->getMessage());
-            // And return a response with an error message:
+
             return response(['message' => 'An error occurred while processing your request.'], 500);
         }
     }
@@ -84,7 +80,6 @@ class CartController extends Controller
                     ->where('expired_at', '>=', $now)
                     ->sum('qty');
 
-                // Check if the requested quantity is greater than the available stock
                 if ($stockQty < $request->qty) {
                     return response(['message' => 'Product available only: '.$stockQty], 400);
                 } else {

@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->wantsJson()) {
+            return response(User::where('role', 'customer')->get());
+        }
+
         return view('customers.index', [
             'users' => User::where('role', 'customer')->get(),
         ]);

@@ -48,7 +48,7 @@
     @vite(['resources/js/app.js'])
 </head>
 
-<body class="hold-transition skin-purple sidebar-mini">
+<body class="hold-transition skin-purple sidebar-mini @yield('body_class')">
     <div class="wrapper">
         @include('sweetalert::alert')
 
@@ -112,7 +112,8 @@
         <!-- Main Footer -->
         <footer class="main-footer">
             <strong>
-                Copyright &copy; {{ date('Y') }} POS | Developed by <a href="#">PT. Decaaindo. Surya Persada</a>.
+                Copyright &copy; {{ date('Y') }} POS | Developed by <a href="#">PT. Decaaindo. Surya
+                    Persada</a>.
             </strong>
             <!-- Default to the left -->
 
