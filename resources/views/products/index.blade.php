@@ -1,3 +1,5 @@
+@inject('carbon', 'Carbon\Carbon')
+
 @extends('layouts.master')
 
 @section('title', 'Products')
@@ -25,7 +27,7 @@
                                     <td>No</td>
                                     <td>Nama</td>
                                     <td>Kategori</td>
-                                    <td>Kadaluwarsa</td>
+                                    <td>Qty</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -35,12 +37,7 @@
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->category->name }}</td>
                                     <td>
-                                        <ul>
-                                            @foreach ($value->stocks->sortBy('created_at') as $stock)
-                                                <li>{{ $stock->created_at->format('d-m-Y') }}</li>
-                                                <li>{{ $stock->expired_at->format('d-m-Y') }}</li>
-                                            @endforeach
-                                        </ul>
+                                        {{ $value->stocks()->where('created_at', '<=', $carbon::now())->where('expired_at', '>=', $carbon::now())->sum('qty') }}
                                     </td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>

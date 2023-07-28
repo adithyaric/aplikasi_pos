@@ -22,6 +22,7 @@
                                     <td>No</td>
                                     <td>Nama</td>
                                     <td>Qty</td>
+                                    <td>Harga Beli</td>
                                     <td>Created</td>
                                     <td>Expired</td>
                                 </tr>
@@ -30,9 +31,10 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->product->name }}</td>
+                                    <td>@currency($value->harga_beli)</td>
                                     <td>{{ $value->qty }}</td>
-                                    <td>{{ $value->created_at->format('h:i:s/d-m-Y') }}</td>
-                                    <td>{{ $value->expired_at->format('h:i:s/d-m-Y') }}</td>
+                                    <td>{{ $value->created_at->format('h:i a / d-M-Y') }}</td>
+                                    <td>{{ $value->expired_at->format('h:i a / d-M-Y') }}</td>
                                 </tr>
                             @endforeach
                         </table>

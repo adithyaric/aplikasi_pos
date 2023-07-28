@@ -30,4 +30,8 @@ class Refund extends Model
     {
         return $this->hasMany(RefundItem::class);
     }
+
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
 }

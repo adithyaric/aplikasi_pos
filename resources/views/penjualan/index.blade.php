@@ -15,9 +15,6 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
-                    <div class="box-header">
-                        <a href="{{ route('penjualan.create') }}" class="btn btn-md bg-green">Tambah</a>
-                    </div><!-- /.box-header -->
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
