@@ -7,6 +7,7 @@ import Barcodes from "./Barcodes.jsx";
 import Customers from "./Customers";
 import CartTable from "./CartTable";
 import Gallery from "./Gallery";
+import Wishlist from "./Wishlist";
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
@@ -16,11 +17,13 @@ const Cart = () => {
     const [customerId, setCustomerId] = useState("");
     const [search, setSearch] = useState("");
     const [discount, setDiscount] = useState(0);
+    const [wishlist, setWishlist] = useState([]);
 
     useEffect(() => {
         loadCart();
         loadProducts();
         loadCustomers();
+        loadWishlist();
     }, []);
 
     //Data Products
@@ -103,7 +106,7 @@ const Cart = () => {
         });
         setCart(updatedCart);
         axios
-            .post("/cart/change-qty", { product_id, qty: newQty })
+            .post("/cart-change-qty", { product_id, qty: newQty })
             .then((res) => {})
             .catch((err) => {
                 console.log("Error!", err.response.data.message, "error");
@@ -156,7 +159,7 @@ const Cart = () => {
 
     //Delete All item
     const handleEmptyCart = () => {
-        axios.post("/cart/empty", { _method: "DELETE" }).then((res) => {
+        axios.post("/cart-empty", { _method: "DELETE" }).then((res) => {
             setCart([]);
         });
     };
@@ -190,6 +193,59 @@ const Cart = () => {
         }
     };
 
+    //Hold
+    const loadWishlist = () => {
+        axios.get("/wishlist").then((res) => {
+            setWishlist(res.data);
+        });
+    };
+
+    const handleClickWishlist = () => {
+        Swal.fire({
+            title: "Wishlist Name",
+            input: "text",
+            showCancelButton: true,
+            confirmButtonText: "Send",
+            showLoaderOnConfirm: true,
+            preConfirm: (name) => {
+                return axios
+                    .post("/wishlist", {
+                        cart,
+                        customer_id: customerId,
+                        name: name,
+                    })
+                    .then((res) => {
+                        loadWishlist();
+                        setCart([]);
+                        Swal.fire(
+                            "Success!",
+                            "Items have been added to your wishlist",
+                            "success"
+                        );
+                    })
+                    .catch((err) => {
+                        console.log(
+                            "Error!",
+                            err.response.data.message,
+                            "error"
+                        );
+                        Swal.fire("Error!", err.response.data.message, "error");
+                    });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        });
+    };
+
+    const handleMoveToCart = (name, customer_id) => {
+        axios
+            .post("/wishlist/move-to-cart", { name, customer_id })
+            .then((res) => {
+                loadCart();
+                loadWishlist();
+            });
+    };
+
+    //Submit
     const handleClickSubmit = (event) => {
         Swal.fire({
             title: "Received Amount",
@@ -229,6 +285,12 @@ const Cart = () => {
 
     return (
         <div className="row">
+            <div className="col-12 col-sm-12">
+                <Wishlist
+                    wishlist={wishlist}
+                    handleMoveToCart={handleMoveToCart}
+                />
+            </div>
             <div className="col-md-6 col-lg-4">
                 <Barcodes
                     barcode={barcode}
@@ -249,9 +311,11 @@ const Cart = () => {
                     handleDiscountChange={handleDiscountChange}
                     getTotal={getTotal}
                     handleEmptyCart={handleEmptyCart}
+                    handleClickWishlist={handleClickWishlist}
                     handleClickSubmit={handleClickSubmit}
                 />
             </div>
+            <hr />
             <div className="col-md-6 col-lg-8">
                 <div className="form-group">
                     <input

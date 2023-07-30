@@ -6,6 +6,7 @@ use App\Http\Requests\PenjualanRequest;
 use App\Models\Penjualan;
 use App\Models\Stock;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -56,20 +57,34 @@ class PenjualanController extends Controller
                 ]);
 
                 $now = Carbon::now();
-                $stock = Stock::where('product_id', $item->id)
+                $stocks = Stock::where('product_id', $item->id)
                     ->where('created_at', '<=', $now)
                     ->where('expired_at', '>=', $now)
-                    ->first();
+                    ->orderBy('expired_at', 'asc')
+                    ->get();
 
-                if ($stock) {
-                    if ($stock->qty >= $item->pivot->qty) {
-                        $stock->qty -= $item->pivot->qty;
-                        $stock->save();
-                    } else {
-                        throw new Exception('Insufficient stock quantity');
-                    }
-                } else {
+                if ($stocks->isEmpty()) {
                     throw new Exception('Stock not found or expired');
+                }
+
+                $remainingQty = $item->pivot->qty;
+                foreach ($stocks as $stock) {
+                    if ($remainingQty <= 0) {
+                        break;
+                    }
+
+                    if ($stock->qty >= $remainingQty) {
+                        $stock->qty -= $remainingQty;
+                        $remainingQty = 0;
+                    } else {
+                        $remainingQty -= $stock->qty;
+                        $stock->qty = 0;
+                    }
+                    $stock->save();
+                }
+
+                if ($remainingQty > 0) {
+                    throw new Exception('Insufficient stock quantity');
                 }
             }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -94,6 +95,57 @@ class CartController extends Controller
 
             return response(['message' => 'An error occurred while processing your request.'], 500);
         }
+    }
+
+    public function addToWishlist(Request $request)
+    {
+        $request->validate([
+            'cart' => 'required|array',
+            'cart.*.id' => 'required|exists:products,id',
+            'cart.*.pivot.qty' => 'required|integer|min:1',
+            'customer_id' => 'required',
+            'name' => 'required',
+        ]);
+
+        foreach ($request->cart as $item) {
+            $product = Product::find($item['id']);
+            $request->user()->wishlist()->attach($product->id, [
+                'qty' => $item['pivot']['qty'],
+                'customer_id' => $request->customer_id,
+                'name' => $request->name,
+            ]);
+        }
+        $request->user()->cart()->detach();
+
+        return response(['success' => true]);
+    }
+
+    public function getWishlist(Request $request)
+    {
+        $wishlist = $request->user()->wishlist()->withPivot('name', 'customer_id')->get();
+        $grouped = $wishlist->groupBy(['pivot.name', 'pivot.customer_id']);
+
+        return response($grouped);
+    }
+
+    public function moveToCart(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'customer_id' => 'required',
+        ]);
+
+        $wishlistItems = $request->user()->wishlist()
+            ->wherePivot('name', $request->name)
+            ->wherePivot('customer_id', $request->customer_id)
+            ->get();
+
+        foreach ($wishlistItems as $item) {
+            $request->user()->wishlist()->detach($item->id);
+            $request->user()->cart()->attach($item->id, ['qty' => $item->pivot->qty]);
+        }
+
+        return response(['success' => true]);
     }
 
     public function destroy(Request $request)

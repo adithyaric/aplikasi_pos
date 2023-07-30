@@ -47,8 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('/penjualan', PenjualanController::class);
 
     Route::resource('/cart', CartController::class);
-    Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
-    Route::delete('/cart/empty', [CartController::class, 'empty']);
+    Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
+    Route::delete('/cart-empty', [CartController::class, 'empty']);
+    Route::get('/wishlist', [CartController::class, 'getWishlist']);
+    Route::post('/wishlist', [CartController::class, 'addToWishlist']);
+    Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
 });
 
 require __DIR__.'/auth.php';

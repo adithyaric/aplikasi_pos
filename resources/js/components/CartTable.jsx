@@ -12,6 +12,7 @@ const CartTable = ({
     handleEmptyCart,
     getTotal,
     handleDiscountChange,
+    handleClickWishlist,
     handleClickSubmit,
 }) => {
     return (
@@ -77,6 +78,7 @@ const CartTable = ({
                     <button
                         type="button"
                         className="btn btn-warning btn-block"
+                        onClick={handleClickWishlist}
                         disabled={!cart.length}
                     >
                         Hold

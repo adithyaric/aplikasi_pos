@@ -9,8 +9,8 @@ const CartTableBody = ({
 }) => {
     return (
         <>
-            {cart.map((c) => (
-                <tr key={c.id}>
+            {cart.map((c, index) => (
+                <tr key={index}>
                     <td>{c.name}</td>
                     <td className="col-2 col-sm-2">
                         <input
