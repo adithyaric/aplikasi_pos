@@ -24,6 +24,7 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
+                                    <td>Total</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -31,8 +32,8 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
+                                    <td>@currency($value->total)</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('refund.edit', $value->id) }}">Edit</a>
                                         <a class="btn btn-info" href="{{ route('refund.show', $value->id) }}">Show</a>
                                         <form action="{{ route('refund.destroy', $value->id) }}" method="post"
                                             style="display: inline;">

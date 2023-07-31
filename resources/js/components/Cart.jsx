@@ -131,7 +131,6 @@ const Cart = () => {
         updateCart(product_id, currentQty + 1);
     };
 
-    //Increase 1 qty
     const handleClickDecrease = (product_id) => {
         const currentQty = cart.find((c) => c.id === product_id).pivot.qty;
         if (currentQty > 1) {
@@ -139,7 +138,6 @@ const Cart = () => {
         }
     };
 
-    //Decrease 1 qty
     const handleChangeQty = (product_id, qty) => {
         const parsedQty = parseInt(qty, 10);
         if (!isNaN(parsedQty) && parsedQty >= 1) {
@@ -216,7 +214,13 @@ const Cart = () => {
                     })
                     .then((res) => {
                         loadWishlist();
-                        setCart([]);
+                        loadCart();
+                        loadWishlist();
+                        loadProducts();
+                        setBarcode("");
+                        setCustomerId("");
+                        setSearch("");
+                        setDiscount(0);
                         Swal.fire(
                             "Success!",
                             "Items have been added to your wishlist",
@@ -242,6 +246,11 @@ const Cart = () => {
             .then((res) => {
                 loadCart();
                 loadWishlist();
+                loadProducts();
+                setBarcode("");
+                setCustomerId(customer_id);
+                setSearch("");
+                setDiscount(0);
             });
     };
 
@@ -264,6 +273,7 @@ const Cart = () => {
                     })
                     .then((res) => {
                         loadCart();
+                        loadWishlist();
                         loadProducts();
                         setBarcode("");
                         setCustomerId("");
@@ -299,6 +309,7 @@ const Cart = () => {
                 />
                 <Customers
                     customers={customers}
+                    customerId={customerId}
                     setCustomerId={setCustomerId}
                 />
                 <CartTable

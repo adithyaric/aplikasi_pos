@@ -14,7 +14,12 @@ class RefundRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'code' => 'required',
+            'penjualan_id' => 'required',
+            'customer_id' => 'required',
+            'outlet_id' => 'required',
+            'tanggal' => 'required',
+            'total' => 'required',
         ];
     }
 }

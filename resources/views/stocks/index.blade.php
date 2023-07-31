@@ -21,8 +21,8 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
-                                    <td>Qty</td>
                                     <td>Harga Beli</td>
+                                    <td>Qty</td>
                                     <td>Created</td>
                                     <td>Expired</td>
                                 </tr>

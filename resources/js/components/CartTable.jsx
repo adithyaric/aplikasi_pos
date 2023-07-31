@@ -37,6 +37,12 @@ const CartTable = ({
                             handleClickDelete={handleClickDelete}
                         />
                         <tr>
+                            <td colSpan="4">Total</td>
+                            <td className="text-right">
+                                {formatRupiah(getTotal(cart))}
+                            </td>
+                        </tr>
+                        <tr>
                             <td colSpan="4">Discount</td>
                             <td>
                                 <input
@@ -46,12 +52,6 @@ const CartTable = ({
                                     value={discount}
                                     onChange={handleDiscountChange}
                                 />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colSpan="4">Total</td>
-                            <td className="text-right">
-                                {formatRupiah(getTotal(cart))}
                             </td>
                         </tr>
                         <tr>

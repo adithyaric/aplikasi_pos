@@ -12,8 +12,10 @@ class Refund extends Model
     protected $fillable = [
         'code',
         'customer_id',
-        'admin_id',
+        'penjualan_id',
+        'outlet_id',
         'tanggal',
+        'total',
     ];
 
     public function customer()
@@ -21,9 +23,14 @@ class Refund extends Model
         return $this->belongsTo(User::class, 'customer_id');
     }
 
-    public function admin()
+    public function outlet()
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(Outlet::class);
+    }
+
+    public function penjualan()
+    {
+        return $this->belongsTo(Penjualan::class);
     }
 
     public function refundItems()

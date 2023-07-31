@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerRequest;
+use App\Models\Penjualan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -10,6 +11,14 @@ use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
+    public function getCustomer($penjualan_id)
+    {
+        $penjualan = Penjualan::find($penjualan_id);
+        $customer = $penjualan->customer;
+
+        return response()->json($customer);
+    }
+
     public function index(Request $request)
     {
         if ($request->wantsJson()) {

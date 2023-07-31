@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/admin', AdminController::class);
     Route::resource('/customer', CustomerController::class);
+    Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
     Route::resource('/bank', BankController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);

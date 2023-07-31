@@ -7,6 +7,8 @@ use App\Models\Outlet;
 use App\Models\Penjualan;
 use App\Models\Product;
 use App\Models\Refund;
+use App\Models\RefundItem;
+use App\Models\User;
 
 class RefundController extends Controller
 {
@@ -21,47 +23,39 @@ class RefundController extends Controller
     {
         return view('refunds.create', [
             'outlets' => Outlet::get(),
-            'penjualan' => Penjualan::get(),
+            'customers' => User::where('role', 'customer')->get(),
+            'penjualans' => Penjualan::get(),
             'products' => Product::get(),
         ]);
+    }
+
+    public function show(Refund $refund)
+    {
+        dd($refund->load(['customer', 'outlet', 'penjualan', 'refundItems', 'refundItems.product'])->toArray());
     }
 
     public function store(RefundRequest $request)
     {
         $data = $request->validated();
+
+        $data['total'] = (int) str_replace(',', '', $data['total']);
         $refund = Refund::create($data);
-        $this->updateStock($request, $refund);
 
+        foreach ($request->product as $product) {
+            RefundItem::create([
+                'refund_id' => $refund->id,
+                'product_id' => $product['product_id'],
+                'qty' => $product['qty'],
+                'alasan' => $product['alasan'],
+            ]);
+        }
+
+        // Redirect to the refund index page with a success message
         return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-    }
-
-    public function edit(Refund $refund)
-    {
-        return view('refunds.edit', [
-            'refund' => $refund,
-            'outlets' => Outlet::get(),
-            'penjualan' => Penjualan::get(),
-            'products' => Product::get(),
-        ]);
-    }
-
-    public function update(RefundRequest $request, Refund $refund)
-    {
-        $data = $request->validated();
-        $refund->update($data);
-        $this->updateStock($request, $refund);
-
-        return redirect(route('refund.index'))->with('toast_success', 'Berhasil Memperbarui Data!');
-    }
-
-    private function updateStock($request, $refund)
-    {
-        dd($request->product, $refund);
     }
 
     public function destroy(Refund $refund)
     {
-        $refund->stocks()->delete();
         $refund->delete();
 
         return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menghapus Data!');

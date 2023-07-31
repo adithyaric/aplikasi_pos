@@ -1,10 +1,11 @@
 import React from "react";
-const Customers = ({ customers, setCustomerId }) => {
+const Customers = ({ customers, customerId, setCustomerId }) => {
     return (
         <div className="form-group row">
             <div className="col-sm-8">
                 <select
                     className="form-control"
+                    value={customerId}
                     onChange={(e) => setCustomerId(e.target.value)}
                 >
                     <option value="">Walking Customer</option>

@@ -8,6 +8,7 @@ use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\Pengeluaran;
 use App\Models\Product;
+use App\Models\Slider;
 use App\Models\Stock;
 use App\Models\Supplier;
 use App\Models\User;
