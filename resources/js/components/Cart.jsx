@@ -128,7 +128,7 @@ const Cart = () => {
 
     const handleClickIncrease = (product_id) => {
         const currentQty = cart.find((c) => c.id === product_id).pivot.qty;
-        updateCart(product_id, currentQty + 1);
+        updateCart(product_id, Number(currentQty) + 1);
     };
 
     const handleClickDecrease = (product_id) => {

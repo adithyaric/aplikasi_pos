@@ -40,7 +40,7 @@
                         <p>Jumlah Total Penjualan</p>
                     </div>
                     <div class="icon">
-                        <i class="fa fa-calculator"></i>
+                        <i class="fa fa-shopping-cart"></i>
                     </div>
                 </div>
             </div>
@@ -244,13 +244,7 @@
                     },
                     tooltip: {
                         formatter: function() {
-                            // Find the data item for the current point
-                            let item = productGraph.find(item => item.date === this.x && item
-                                .product_name === this.series.name);
-
-                            // Return the formatted tooltip text
-                            return '<b>' + this.x + '</b><br/>' + this.series.name + ': ' + this.y +
-                                '<br/>Product: ' + item.product_name;
+                            return '<b>' + this.x + '</b><br/>' + this.series.name + ': ' + this.y;
                         }
                     },
                     series: [{

@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranController;
@@ -53,6 +54,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/wishlist', [CartController::class, 'getWishlist']);
     Route::post('/wishlist', [CartController::class, 'addToWishlist']);
     Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
+
+    Route::get('/laporan/pembelian', [LaporanController::class, 'exportPembelian'])->name('laporan.pembelian');
+    Route::get('/laporan/penjualan', [LaporanController::class, 'exportPenjualan'])->name('laporan.penjualan');
+    Route::get('/laporan/penjualan-kasir', [LaporanController::class, 'exportPenjualanKasir'])->name('laporan.penjualan-kasir');
+    Route::get('/laporan/stock', [LaporanController::class, 'exportStock'])->name('laporan.stock');
+    Route::get('/laporan/pengeluaran', [LaporanController::class, 'exportPengeluaran'])->name('laporan.pengeluaran');
+    Route::get('/laporan/labarugi', [LaporanController::class, 'exportLabaRugi'])->name('laporan.labarugi');
 });
 
 require __DIR__.'/auth.php';

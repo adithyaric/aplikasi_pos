@@ -77,7 +77,7 @@ class DashboardController extends Controller
         return view('dashboard.index', [
             // 'users' => User::count(),
             'products' => Product::count(),
-            'stocks' => Stock::count(),
+            'stocks' => Stock::sum('qty'),
             'penjualans' => Penjualan::count(),
             'totalRevenue' => $monthlyRevenue->sum('total'),
             // 'sliders' => Slider::where('status', 'active')->get(),
