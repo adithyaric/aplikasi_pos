@@ -8,6 +8,7 @@ use App\Models\Pembelian;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Supplier;
+use PDF;
 
 class PembelianController extends Controller
 {
@@ -38,7 +39,11 @@ class PembelianController extends Controller
 
     public function show(Pembelian $pembelian)
     {
-        dd($pembelian->load(['stocks', 'stocks.product'])->toArray());
+        // dd($pembelian->load(['stocks', 'stocks.product'])->toArray());
+        // Generate and download the PDF file
+        $pdf = PDF::loadView('pembelians.pembelian_pdf', ['pembelian' => $pembelian]);
+
+        return $pdf->download('pembelian_'.$pembelian->id.'.pdf');
     }
 
     public function edit(Pembelian $pembelian)

@@ -23,6 +23,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Barcode</td>
                                     <td>Nama</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
@@ -31,11 +32,12 @@
                             @foreach ($pembelians as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{!! DNS1D::getBarcodeHTML($value->code, 'C128') !!}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>@currency($value->total)</td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
-                                        <a class="btn btn-info" href="{{ route('pembelian.show', $value->id) }}">Show</a>
+                                        <a class="btn btn-info" href="{{ route('pembelian.show', $value->id) }}">Print</a>
                                         <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

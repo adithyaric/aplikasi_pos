@@ -8,9 +8,13 @@ class StockController extends Controller
 {
     public function index()
     {
-        return view('stocks.index', [
-            'stocks' => Stock::get()->sortBy('product_id')->sortBy('expired_at'),
-        ]);
+        $stocks = Stock::get()->sortBy('product_id')->sortBy('expired_at');
+        $grouped_stocks = $stocks->groupBy('product_id');
+        $sorted_grouped_stocks = $grouped_stocks->sortBy(function ($stock_group, $product_id) {
+            return $stock_group->first()->product->name;
+        });
+
+        return view('stocks.index', ['grouped_stocks' => $sorted_grouped_stocks]);
     }
 
     public function show(Stock $stock)

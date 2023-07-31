@@ -16,28 +16,37 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-body table-responsive">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
+                        @foreach ($grouped_stocks as $product_id => $stock_group)
+                            <p>
+                                <b>{{ $stock_group->first()->product->name }}</b>
+                            </p>
+                            <table id="" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>No</td>
+                                        <td>Harga Beli</td>
+                                        <td>Qty</td>
+                                        <td>Created</td>
+                                        <td>Expired</td>
+                                    </tr>
+                                </thead>
+                                @foreach ($stock_group as $value)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>@currency($value->harga_beli)</td>
+                                        <td>{{ $value->qty }}</td>
+                                        <td>{{ $value->created_at->format('h:i a / d-M-Y') }}</td>
+                                        <td>{{ $value->expired_at->format('h:i a / d-M-Y') }}</td>
+                                    </tr>
+                                @endforeach
                                 <tr>
-                                    <td>No</td>
-                                    <td>Nama</td>
-                                    <td>Harga Beli</td>
-                                    <td>Qty</td>
-                                    <td>Created</td>
-                                    <td>Expired</td>
+                                    <th colspan="2">Total</th>
+                                    <th>{{ $stock_group->sum('qty') }}</th>
+                                    <th colspan="2"></th>
                                 </tr>
-                            </thead>
-                            @foreach ($stocks as $value)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->product->name }}</td>
-                                    <td>@currency($value->harga_beli)</td>
-                                    <td>{{ $value->qty }}</td>
-                                    <td>{{ $value->created_at->format('h:i a / d-M-Y') }}</td>
-                                    <td>{{ $value->expired_at->format('h:i a / d-M-Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </table>
+                            </table>
+                            <hr />
+                        @endforeach
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->
             </div><!-- /.col -->
