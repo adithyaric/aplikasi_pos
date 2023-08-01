@@ -21,17 +21,18 @@
                 <li class="{{ request()->is('supplier*') ? 'active' : '' }}"><a href="/supplier"><i class="fa fa-truck"></i><span>Suppliers</span></a></li>
             </ul>
         </li>
-        <li class="treeview {{ request()->is('category*') || request()->is('product*') || request()->is('stock*') ? 'active' : '' }}">
+        <li class="treeview {{ request()->is('category-product*') || request()->is('product*') || request()->is('stock*') ? 'active' : '' }}">
             <a href="#"><i class="fa fa-archive"></i><span>Products</span><i class="fa fa-angle-left pull-right"></i></a>
             <ul class="treeview-menu">
-                <li class="{{ request()->is('category*') ? 'active' : '' }}"><a href="/category"><i class="fa fa-tags"></i><span>Category</span></a></li>
+                <li class="{{ request()->is('category-product*') ? 'active' : '' }}"><a href="/category-product"><i class="fa fa-tags"></i><span>Category</span></a></li>
                 <li class="{{ request()->is('product*') ? 'active' : '' }}"><a href="/product"><i class="fa fa-archive"></i><span>Products</span></a></li>
                 <li class="{{ request()->is('stock*') ? 'active' : '' }}"><a href="/stock"><i class="fa fa-cubes"></i><span>Stocks</span></a></li>
             </ul>
         </li>
-        <li class="treeview {{ request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan') || request()->is('refund*') ? 'active' : '' }}">
+        <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan') || request()->is('refund*') ? 'active' : '' }}">
             <a href="#"><i class="fa fa-exchange"></i><span>Transactions</span><i class="fa fa-angle-left pull-right"></i></a>
             <ul class="treeview-menu">
+                <li class="{{ request()->is('category-pengeluaran*') ? 'active' : '' }}"><a href="/category-pengeluaran"><i class="fa fa-tags"></i><span>Category Pengeluaran</span></a></li>
                 <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}"><a href="/pengeluaran"><i class="fa fa-folder-open"></i><span>Pengeluaran</span></a></li>
                 <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>Pembelian</span></a></li>
                 <li class="{{ request()->is('penjualan') ? 'active' : '' }}"><a href="/penjualan"><i class="fa fa-shopping-cart"></i><span>Penjualan</span></a></li>

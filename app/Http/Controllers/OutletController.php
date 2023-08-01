@@ -46,7 +46,10 @@ class OutletController extends Controller
 
     public function show(Outlet $outlet)
     {
-        dd($outlet);
+        // dd($outlet);
+        return view('outlets.show', [
+            'outlet' => $outlet,
+        ]);
     }
 
     public function edit(Outlet $outlet)

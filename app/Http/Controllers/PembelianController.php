@@ -34,6 +34,10 @@ class PembelianController extends Controller
         $pembelian = Pembelian::create($data);
         $this->updateStock($request, $pembelian);
 
+        // $pdf = PDF::loadView('pembelians.pembelian_pdf', ['pembelian' => $pembelian]);
+
+        // return $pdf->download('pembelian_' . $pembelian->id . '.pdf')->with('toast_success', 'Berhasil Menyimpan Data!');
+
         return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
@@ -69,10 +73,7 @@ class PembelianController extends Controller
     {
         foreach ($request->product as $productData) {
             Stock::updateOrCreate(
-                [
-                    'pembelian_id' => $pembelian->id,
-                    'product_id' => $productData['product_id'],
-                ],
+                ['pembelian_id' => $pembelian->id, 'product_id' => $productData['product_id']],
                 [
                     'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
                     'qty' => (int) $productData['qty'],
@@ -80,6 +81,10 @@ class PembelianController extends Controller
                     'expired_at' => $productData['expired'],
                 ]
             );
+
+            // Retrieve the related Product instance and update its harga_beli attribute
+            $product = Product::find($productData['product_id']);
+            $product->update(['harga_beli' => (int) str_replace(',', '', $productData['harga_beli'])]);
         }
     }
 

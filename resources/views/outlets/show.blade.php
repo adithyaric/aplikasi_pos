@@ -1,0 +1,23 @@
+@extends('layouts.master')
+
+@section('title', 'Open POS')
+
+@section('body_class', 'sidebar-collapse')
+
+@section('container')
+    <section class="content-header">
+        <h1>
+            Open POS
+        </h1>
+    </section>
+
+    <section class="content">
+        <h1>{{ $outlet->name }}</h1>
+        <div id="cart"></div>
+    </section>
+@endsection
+@section('page-script')
+    <script>
+        window.outlet = {!! json_encode($outlet) !!};
+    </script>
+@endsection

@@ -86,16 +86,26 @@
                                     </div>
                                 @enderror
                             </div>
-                            {{-- <div class="form-group"> --}}
-                            {{-- <label for="">Harga Beli</label> --}}
-                            {{-- <input type="text" class="form-control" name="harga_beli" value="{{ old('harga_beli') }}" --}}
-                            {{-- placeholder="Masukkan Harga Beli"> --}}
-                            {{-- @error('harga_beli') --}}
-                            {{-- <div class="invalid-feedback text-danger"> --}}
-                            {{-- {{ $message }} --}}
-                            {{-- </div> --}}
-                            {{-- @enderror --}}
-                            {{-- </div> --}}
+                            <div class="form-group">
+                                <label for="">Harga Beli</label>
+                                <input type="text" class="form-control" name="harga_beli"
+                                    value="{{ old('harga_beli') }}" placeholder="Masukkan Harga Beli">
+                                @error('harga_beli')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="">Diskon</label>
+                                <input type="text" class="form-control" name="diskon"
+                                    value="{{ old('diskon') }}" placeholder="Masukkan Diskon">
+                                @error('diskon')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                             <div class="form-group">
                                 <label for="">Harga Jual</label>
                                 <input type="text" class="form-control" name="harga_jual"

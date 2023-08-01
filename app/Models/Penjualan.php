@@ -12,6 +12,7 @@ class Penjualan extends Model
     protected $fillable = [
         'code',
         'customer_id',
+        'outlet_id',
         'kasir_id',
         'discount',
         'total',
@@ -20,6 +21,11 @@ class Penjualan extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class, 'outlet_id');
     }
 
     public function kasir()

@@ -46,36 +46,36 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Email</label>
-                                <input type="email" class="form-control" name="email" value="{{ old('email') }}"
-                                    placeholder="Masukkan Email">
-                                @error('email')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Password</label>
-                                <input type="password" class="form-control" name="password" value="{{ old('password') }}"
-                                    placeholder="Masukkan Password">
-                                @error('password')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Confirm Password</label>
-                                <input type="password" class="form-control" name="confirm-password"
-                                    value="{{ old('confirm-password') }}" placeholder="Confirm Password">
-                                @error('confirm-password')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label for="">Email</label> --}}
+                            {{-- <input type="email" class="form-control" name="email" value="{{ old('email') }}" --}}
+                            {{-- placeholder="Masukkan Email"> --}}
+                            {{-- @error('email') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label for="">Password</label> --}}
+                            {{-- <input type="password" class="form-control" name="password" value="{{ old('password') }}" --}}
+                            {{-- placeholder="Masukkan Password"> --}}
+                            {{-- @error('password') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label for="">Confirm Password</label> --}}
+                            {{-- <input type="password" class="form-control" name="confirm-password" --}}
+                            {{-- value="{{ old('confirm-password') }}" placeholder="Confirm Password"> --}}
+                            {{-- @error('confirm-password') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
                         </div><!-- /.box-body -->
 
                         <div class="box-footer">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PenjualanRequest;
+use App\Models\Outlet;
 use App\Models\Penjualan;
 use App\Models\Stock;
 use Carbon\Carbon;
@@ -21,7 +22,9 @@ class PenjualanController extends Controller
 
     public function create()
     {
-        return view('penjualan.create', []);
+        return view('penjualan.create', [
+            'outlets' => Outlet::get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -42,6 +45,7 @@ class PenjualanController extends Controller
             $order = Penjualan::create([
                 'code' => $nextInvoiceCode,
                 'customer_id' => $request->customer_id,
+                'outlet_id' => $request->outlet_id,
                 'kasir_id' => auth()->id(),
                 'discount' => $request->discount,
                 'total' => $request->total,

@@ -24,6 +24,7 @@
                                 <thead>
                                     <tr>
                                         <td>No</td>
+                                        <td>ID</td>
                                         <td>Harga Beli</td>
                                         <td>Qty</td>
                                         <td>Created</td>
@@ -33,6 +34,7 @@
                                 @foreach ($stock_group as $value)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $value->id }}</td>
                                         <td>@currency($value->harga_beli)</td>
                                         <td>{{ $value->qty }}</td>
                                         <td>{{ $value->created_at->format('h:i a / d-M-Y') }}</td>
@@ -42,7 +44,7 @@
                                 <tr>
                                     <th colspan="2">Total</th>
                                     <th>{{ $stock_group->sum('qty') }}</th>
-                                    <th colspan="2"></th>
+                                    <th colspan="3"></th>
                                 </tr>
                             </table>
                             <hr />

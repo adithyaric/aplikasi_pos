@@ -18,8 +18,8 @@ class CustomerRequest extends FormRequest
             'username' => 'nullable',
             'alamat' => 'required',
             'no_telp' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|same:confirm-password',
+            // 'email' => 'required|email',
+            // 'password' => 'required|same:confirm-password',
         ];
     }
 }

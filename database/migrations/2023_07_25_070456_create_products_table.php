@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('ukuran')->nullable();
             $table->foreignIdFor(Outlet::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Supplier::class)->nullable()->constrained()->cascadeOnDelete();
-            // $table->integer('harga_beli')->nullable();
+            $table->integer('harga_beli')->nullable();
             $table->integer('harga_jual')->nullable();
             $table->integer('diskon')->nullable();
             $table->integer('berat')->nullable();

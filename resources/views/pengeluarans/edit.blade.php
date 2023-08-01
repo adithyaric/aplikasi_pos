@@ -19,7 +19,7 @@
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
-                                <label>Category</label>
+                                <label>Biaya</label>
                                 <select class="form-control select2" name="category_id" data-placeholder="Pilih Category"
                                     style="width: 100%;">
                                     <option value="" selected disabled>Pilih Category</option>
@@ -39,23 +39,24 @@
                             <div class="form-group">
                                 <label for="">Tanggal</label>
                                 <input type="date" class="form-control" name="tanggal"
-                                    value="{{ old('tanggal', $pengeluaran->tanggal->format('Y-m-d')) }}" placeholder="Masukkan Tanggal">
+                                    value="{{ old('tanggal', $pengeluaran->tanggal->format('Y-m-d')) }}"
+                                    placeholder="Masukkan Tanggal">
                                 @error('tanggal')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Biaya</label>
-                                <input type="number" class="form-control" name="biaya"
-                                    value="{{ old('biaya', $pengeluaran->biaya) }}" placeholder="Masukkan Biaya">
-                                @error('biaya')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label for="">Biaya</label> --}}
+                            {{-- <input type="number" class="form-control" name="biaya" --}}
+                            {{-- value="{{ old('biaya', $pengeluaran->biaya) }}" placeholder="Masukkan Biaya"> --}}
+                            {{-- @error('biaya') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Kas</label>
                                 <input type="number" class="form-control" name="kas"

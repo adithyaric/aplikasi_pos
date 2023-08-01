@@ -16,7 +16,7 @@ class PengeluaranRequest extends FormRequest
         return [
             'category_id' => 'required',
             'tanggal' => 'required',
-            'biaya' => 'required',
+            // 'biaya' => 'required',
             'desc' => 'required',
             'kas' => 'required',
             'jumlah' => 'required',

@@ -29,6 +29,7 @@
                                     <td>Nama</td>
                                     <td>Kategori</td>
                                     <td>Qty</td>
+                                    <td>Harga Beli</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -41,6 +42,8 @@
                                     <td>
                                         {{ $value->stocks()->where('created_at', '<=', $carbon::now())->where('expired_at', '>=', $carbon::now())->sum('qty') }}
                                     </td>
+                                    {{-- <td>@currency($value->stocks()->orderByRaw('ABS(DATEDIFF(expired_at, NOW()))')->first()->harga_beli)</td> --}}
+                                    <td>@currency($value->harga_beli)</td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('product.destroy', $value->id) }}" method="post"

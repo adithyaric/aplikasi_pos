@@ -18,6 +18,7 @@ const Cart = () => {
     const [search, setSearch] = useState("");
     const [discount, setDiscount] = useState(0);
     const [wishlist, setWishlist] = useState([]);
+    const outlet = window.outlet;
 
     useEffect(() => {
         loadCart();
@@ -267,6 +268,7 @@ const Cart = () => {
                 return axios
                     .post("/penjualan", {
                         customer_id: customerId,
+                        outlet_id: outlet.id,
                         total: amount,
                         discount: discount,
                         cart: cart,

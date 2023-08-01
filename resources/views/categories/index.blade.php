@@ -16,7 +16,9 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <a href="{{ route('category.create') }}" class="btn btn-md bg-green">Tambah</a>
+                        <a href="{{ $type == 'product' ? route('category.product.create') : route('category.pengeluaran.create') }}"
+                            class="btn btn-md bg-green">Tambah
+                        </a>
                     </div><!-- /.box-header -->
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
@@ -34,7 +36,7 @@
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->type }}</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('category.edit', $value->id) }}">Edit</a>
+                                        <a class="btn btn-warning" href="{{ $type == 'product' ? route('category.product.edit', $value->id) : route('category.pengeluaran.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('category.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

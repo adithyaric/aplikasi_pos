@@ -7,25 +7,51 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     return view('categories.index', [
+    //         'categories' => Category::get()->sortBy('type'),
+    //     ]);
+    // }
+
+    public function indexProduct()
     {
-        return view('categories.index', [
-            'categories' => Category::get()->sortBy('type'),
-        ]);
+        $categories = Category::where('type', 'product')->get();
+
+        return view('categories.index', ['categories' => $categories, 'type' => 'product']);
     }
 
-    public function create()
+    public function indexPengeluaran()
     {
-        return view('categories.create', []);
+        $categories = Category::where('type', 'pengeluaran')->get();
+
+        return view('categories.index', ['categories' => $categories, 'type' => 'pengeluaran']);
+    }
+
+    // public function create()
+    // {
+    //     return view('categories.create', []);
+    // }
+
+    public function createProduct()
+    {
+        return view('categories.create', ['type' => 'product']);
+    }
+
+    public function createPengeluaran()
+    {
+        return view('categories.create', ['type' => 'pengeluaran']);
     }
 
     public function store(CategoryRequest $request)
     {
         $data = $request->validated();
-
         Category::create($data);
-
-        return redirect(route('category.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        if ($data['type'] == 'product') {
+            return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        } else {
+            return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        }
     }
 
     public function show(Category $category)
@@ -33,11 +59,21 @@ class CategoryController extends Controller
         dd($category);
     }
 
-    public function edit(Category $category)
+    // public function edit(Category $category)
+    // {
+    //     return view('categories.edit', [
+    //         'category' => $category,
+    //     ]);
+    // }
+
+    public function editProduct(Category $category)
     {
-        return view('categories.edit', [
-            'category' => $category,
-        ]);
+        return view('categories.edit', ['category' => $category, 'type' => 'product']);
+    }
+
+    public function editPengeluaran(Category $category)
+    {
+        return view('categories.edit', ['category' => $category, 'type' => 'pengeluaran']);
     }
 
     public function update(CategoryRequest $request, Category $category)
@@ -46,13 +82,17 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        return redirect(route('category.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        if ($data['type'] == 'product') {
+            return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        } else {
+            return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        }
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
 
-        return redirect(route('category.index'))->with('toast_success', 'Berhasil Menghapus Data!');
+        return redirect()->back()->with('toast_success', 'Berhasil Menghapus Data!');
     }
 }

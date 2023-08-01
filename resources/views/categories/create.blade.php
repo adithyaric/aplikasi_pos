@@ -26,24 +26,25 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Tipe</label>
-                                <select class="form-control select2" name="type" data-placeholder="Pilih Tipe"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Tipe</option>
-                                    <option value="product">Product</option>
-                                    <option value="pengeluaran">Pengeluaran</option>
-                                </select>
-                                @error('type')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label>Tipe</label> --}}
+                            {{-- <select class="form-control select2" name="type" data-placeholder="Pilih Tipe" --}}
+                            {{-- style="width: 100%;"> --}}
+                            {{-- <option value="" selected disabled>Pilih Tipe</option> --}}
+                            {{-- <option value="product">Product</option> --}}
+                            {{-- <option value="pengeluaran">Pengeluaran</option> --}}
+                            {{-- </select> --}}
+                            {{-- @error('type') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
+                            <input type="hidden" name="type" value="{{ $type }}">
                         </div><!-- /.box-body -->
 
                         <div class="box-footer">
-                            <a href="{{ route('category.index') }}" class="btn btn-default">Kembali</a>
+                            <a href="{{ $type == 'product' ? route('category.product.index') : route('category.pengeluaran.index') }}" class="btn btn-default">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>

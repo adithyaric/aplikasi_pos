@@ -39,7 +39,7 @@ class CustomerController extends Controller
     public function store(CustomerRequest $request)
     {
         $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
+        $data['password'] = Hash::make($data['no_telp']);
 
         User::create($data);
 
@@ -65,7 +65,7 @@ class CustomerController extends Controller
             'username' => 'nullable',
             'alamat' => 'required',
             'no_telp' => 'required',
-            'email' => 'required|email|unique:users,email,'.$customer->id,
+            // 'email' => 'required|email|unique:users,email,'.$customer->id,
             'password' => 'same:confirm-password',
         ]);
 

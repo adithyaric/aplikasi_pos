@@ -12,8 +12,6 @@ class AdminController extends Controller
 {
     public function index()
     {
-        \abort_if(auth()->user()->role == 'customer', 403);
-
         return view('admins.index', [
             'users' => User::whereNot('role', 'customer')->get(),
         ]);
@@ -21,8 +19,6 @@ class AdminController extends Controller
 
     public function create()
     {
-        \abort_if(auth()->user()->role == 'customer', 403);
-
         return view('admins.create', [
             'roles' => [
                 'superadmin',
@@ -84,8 +80,6 @@ class AdminController extends Controller
 
     public function destroy(User $admin)
     {
-        \abort_if(auth()->user()->role == 'customer', 403);
-
         $admin->delete();
 
         return redirect(route('admin.index'))->with('toast_success', 'Berhasil Menghapus Data!');
