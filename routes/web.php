@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/wishlist', [CartController::class, 'addToWishlist']);
     Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
 
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/pembelian', [LaporanController::class, 'exportPembelian'])->name('laporan.pembelian');
     Route::get('/laporan/penjualan', [LaporanController::class, 'exportPenjualan'])->name('laporan.penjualan');
     Route::get('/laporan/penjualan-kasir', [LaporanController::class, 'exportPenjualanKasir'])->name('laporan.penjualan-kasir');

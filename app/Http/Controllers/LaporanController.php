@@ -8,23 +8,34 @@ use App\Exports\PengeluaranExport;
 use App\Exports\PenjualanExport;
 use App\Exports\PenjualanKasirExport;
 use App\Exports\StockExport;
+use App\Models\Outlet;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LaporanController extends Controller
 {
-    public function exportPembelian()
+    public function index()
     {
-        return Excel::download(new PembelianExport, 'laporan-pembelian.xlsx');
+        return view('laporan.index', [
+            'cashiers' => User::where('role', 'kasir')->get(),
+            'outlets' => Outlet::get(),
+        ]);
     }
 
-    public function exportPenjualan()
+    public function exportPembelian(Request $request)
     {
-        return Excel::download(new PenjualanExport, 'laporan-penjualan.xlsx');
+        return Excel::download(new PembelianExport($request), 'laporan-pembelian.xlsx');
     }
 
-    public function exportPenjualanKasir()
+    public function exportPenjualan(Request $request)
     {
-        return Excel::download(new PenjualanKasirExport, 'laporan-penjualan-kasir.xlsx');
+        return Excel::download(new PenjualanExport($request), 'laporan-penjualan.xlsx');
+    }
+
+    public function exportPenjualanKasir(Request $request)
+    {
+        return Excel::download(new PenjualanKasirExport($request), 'laporan-penjualan-kasir.xlsx');
     }
 
     public function exportStock()

@@ -49,23 +49,17 @@
                 <i class="fa fa-file-excel-o"></i><span>Laporan</span><i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-                <li class="{{ request()->is('laporan/pembelian*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.pembelian') }}"><i class="fa fa-file-text-o"></i><span>Laporan Pembelian</span></a>
-                </li>
-                <li class="{{ request()->is('laporan/penjualan*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.penjualan') }}"><i class="fa fa-file-text-o"></i><span>Laporan Penjualan</span></a>
-                </li>
-                <li class="{{ request()->is('laporan/penjualan-kasir*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.penjualan-kasir') }}"><i class="fa fa-file-text-o"></i><span>Laporan Penjualan Kasir</span></a>
+                <li class="{{ request()->is('laporan*') ? 'active' : '' }}">
+                    <a href="{{ route('laporan.index') }}"><i class="fa fa-file-excel-o"></i><span>Laporan</span></a>
                 </li>
                 <li class="{{ request()->is('laporan/stock*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.stock') }}"><i class="fa fa-file-text-o"></i><span>Laporan Stock</span></a>
+                    <a href="{{ route('laporan.stock') }}"><i class="fa fa-file-text-o"></i><span> - Stock</span></a>
                 </li>
                 <li class="{{ request()->is('laporan/pengeluaran*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.pengeluaran') }}"><i class="fa fa-file-text-o"></i><span>Laporan Pengeluaran</span></a>
+                    <a href="{{ route('laporan.pengeluaran') }}"><i class="fa fa-file-text-o"></i><span> - Pengeluaran</span></a>
                 </li>
                 <li class="{{ request()->is('laporan/labarugi*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.labarugi') }}"><i class="fa fa-file-text-o"></i><span>Laporan Laba Rugi</span></a>
+                    <a href="{{ route('laporan.labarugi') }}"><i class="fa fa-file-text-o"></i><span> - Laba Rugi</span></a>
                 </li>
             </ul>
         </li>
