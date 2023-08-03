@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KasController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PembelianController;
@@ -34,7 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('/admin', AdminController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
-    Route::resource('/bank', BankController::class);
+    // Route::resource('/bank', BankController::class);
+    Route::resource('/kas', KasController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);

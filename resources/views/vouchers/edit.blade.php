@@ -48,6 +48,20 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label>Tipe</label>
+                                <select class="form-control select2" name="type" data-placeholder="Pilih Tipe"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Tipe</option>
+                                    <option @if ($voucher->type == 'nominal') selected @endif value="nominal">Nominal</option>
+                                    <option @if ($voucher->type == 'percentage') selected @endif value="percentage">Percentage</option>
+                                </select>
+                                @error('type')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="">Value</label>
                                 <input type="text" class="form-control" name="value"
                                     value="{{ old('value', $voucher->value) }}" placeholder="Masukkan Value">
@@ -73,20 +87,6 @@
                                 <input type="text" class="form-control" name="desc"
                                     value="{{ old('desc', $voucher->desc) }}" placeholder="Masukkan Deskripsi">
                                 @error('desc')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Tipe</label>
-                                <select class="form-control select2" name="type" data-placeholder="Pilih Tipe"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Tipe</option>
-                                    <option @if ($voucher->type == 'nominal') selected @endif value="nominal">Nominal</option>
-                                    <option @if ($voucher->type == 'percentage') selected @endif value="percentage">Percentage</option>
-                                </select>
-                                @error('type')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>

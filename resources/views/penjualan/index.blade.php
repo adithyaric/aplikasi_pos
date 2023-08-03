@@ -22,8 +22,8 @@
                                     <td>No</td>
                                     <td>Kode Invoice</td>
                                     <td>Customer</td>
-                                    <td>Kasir</td>
                                     <td>Outlet</td>
+                                    <td>Kasir</td>
                                     <td>Detail</td>
                                     <td>Aksi</td>
                                 </tr>

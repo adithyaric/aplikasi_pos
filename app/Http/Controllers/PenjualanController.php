@@ -16,7 +16,7 @@ class PenjualanController extends Controller
     public function index()
     {
         return view('penjualan.index', [
-            'penjualan' => Penjualan::get(),
+            'penjualan' => Penjualan::orderBy('outlet_id', 'asc')->get(),
         ]);
     }
 
@@ -37,11 +37,12 @@ class PenjualanController extends Controller
         DB::beginTransaction();
 
         try {
-            $lastOrder = Penjualan::orderBy('created_at', 'desc')->first();
+            $lastOrder = Penjualan::where('outlet_id', $request->outlet_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
             $nextInvoiceNumber = $lastOrder ? ((int) substr($lastOrder->code, 3) + 1) : 1;
             $nextInvoiceNumber = str_pad($nextInvoiceNumber, 3, '0', STR_PAD_LEFT);
             $nextInvoiceCode = 'INV'.$nextInvoiceNumber;
-
             $order = Penjualan::create([
                 'code' => $nextInvoiceCode,
                 'customer_id' => $request->customer_id,

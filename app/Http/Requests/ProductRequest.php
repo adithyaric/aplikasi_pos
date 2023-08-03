@@ -27,7 +27,7 @@ class ProductRequest extends FormRequest
             'harga_beli' => 'required',
             'harga_jual' => 'required',
             'diskon' => 'nullable',
-            'berat' => 'required',
+            'berat' => 'nullable',
         ];
     }
 }

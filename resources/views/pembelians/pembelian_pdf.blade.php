@@ -38,10 +38,10 @@
             <td>Supplier</td>
             <td>{{ $pembelian->supplier->name }}</td>
         </tr>
-        <tr>
-            <td>Total</td>
-            <td>@currency($pembelian->total)</td>
-        </tr>
+        {{-- <tr> --}}
+        {{-- <td>Total</td> --}}
+        {{-- <td>@currency($pembelian->total)</td> --}}
+        {{-- </tr> --}}
     </table>
 
     <h2>Stocks</h2>
@@ -51,7 +51,7 @@
                 <th>No</th>
                 <th>Product</th>
                 <th>Qty</th>
-                <th>Subtotal</th>
+                {{-- <th>Subtotal</th> --}}
                 <th>Harga Jual</th>
                 <th>Expired At</th>
             </tr>
@@ -62,7 +62,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $stock->product->name }}</td>
                     <td>{{ $stock->qty }}</td>
-                    <td>@currency($stock->subtotal)</td>
+                    {{-- <td>@currency($stock->subtotal)</td> --}}
                     <td>@currency($stock->product->harga_jual)</td>
                     <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td>
                 </tr>

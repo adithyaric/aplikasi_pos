@@ -8,7 +8,7 @@ const Customers = ({ customers, customerId, setCustomerId }) => {
                     value={customerId}
                     onChange={(e) => setCustomerId(e.target.value)}
                 >
-                    <option value="">Walking Customer</option>
+                    <option value="">Pilih Customer</option>
                     {customers.map((cus) => (
                         <option key={cus.id} value={cus.id}>
                             {`${cus.name}, ${cus.alamat}`}
