@@ -19,4 +19,9 @@ class Kas extends Model
     {
         return $this->belongsTo(Outlet::class);
     }
+
+    public function penjualan()
+    {
+        return $this->hasMany(Penjualan::class);
+    }
 }
