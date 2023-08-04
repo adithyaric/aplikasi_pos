@@ -101,6 +101,20 @@
                                 </div>
                                 <p class="help-block">Rentang waktu</p>
                             </div>
+                            <div class="form-group">
+                                <label>Digunakan Untuk</label>
+                                <select class="form-control select2" name="jenis" data-placeholder="Pilih Jenis"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Jenis</option>
+                                    <option value="satuan">Satuan</option>
+                                    <option value="keseluruhan">Keseluruhan</option>
+                                </select>
+                                @error('type')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                         </div><!-- /.box-body -->
 
                         <div class="box-footer">

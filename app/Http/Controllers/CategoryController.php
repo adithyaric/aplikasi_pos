@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
+use App\Models\Outlet;
 
 class CategoryController extends Controller
 {
@@ -35,12 +36,12 @@ class CategoryController extends Controller
 
     public function createProduct()
     {
-        return view('categories.create', ['type' => 'product']);
+        return view('categories.create', ['type' => 'product', 'outlets' => Outlet::get()]);
     }
 
     public function createPengeluaran()
     {
-        return view('categories.create', ['type' => 'pengeluaran']);
+        return view('categories.create', ['type' => 'pengeluaran', 'outlets' => Outlet::get()]);
     }
 
     public function store(CategoryRequest $request)
@@ -68,12 +69,12 @@ class CategoryController extends Controller
 
     public function editProduct(Category $category)
     {
-        return view('categories.edit', ['category' => $category, 'type' => 'product']);
+        return view('categories.edit', ['category' => $category, 'type' => 'product', 'outlets' => Outlet::get()]);
     }
 
     public function editPengeluaran(Category $category)
     {
-        return view('categories.edit', ['category' => $category, 'type' => 'pengeluaran']);
+        return view('categories.edit', ['category' => $category, 'type' => 'pengeluaran', 'outlets' => Outlet::get()]);
     }
 
     public function update(CategoryRequest $request, Category $category)

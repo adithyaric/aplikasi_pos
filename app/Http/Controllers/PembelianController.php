@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PembelianRequest;
+use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\Product;
@@ -22,6 +23,7 @@ class PembelianController extends Controller
     public function create()
     {
         return view('pembelians.create', [
+            'kas' => Kas::get(),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'products' => Product::get(),
@@ -33,6 +35,9 @@ class PembelianController extends Controller
         $data = $request->validated();
         $pembelian = Pembelian::create($data);
         $this->updateStock($request, $pembelian);
+        $kas = Kas::find($request->kas_id);
+        $kas->nominal -= $request->total;
+        $kas->save();
 
         // $pdf = PDF::loadView('pembelians.pembelian_pdf', ['pembelian' => $pembelian]);
 
@@ -54,6 +59,7 @@ class PembelianController extends Controller
     {
         return view('pembelians.edit', [
             'pembelian' => $pembelian,
+            'kas' => Kas::get(),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'products' => Product::get(),

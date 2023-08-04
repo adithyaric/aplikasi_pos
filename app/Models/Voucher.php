@@ -13,6 +13,7 @@ class Voucher extends Model
         'name',
         'code',
         'type',
+        'jenis',
         'limit',
         'value',
         'min_purchase',

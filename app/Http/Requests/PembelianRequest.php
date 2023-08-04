@@ -17,7 +17,7 @@ class PembelianRequest extends FormRequest
             'code' => 'required',
             'outlet_id' => 'required',
             'supplier_id' => 'required',
-            // 'product_id' => 'required',
+            'kas_id' => 'required',
             // 'qty' => 'required',
             // 'expired' => 'required',
             // 'harga_beli' => 'required',

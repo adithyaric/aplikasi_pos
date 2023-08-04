@@ -22,6 +22,7 @@
                                     <td>No</td>
                                     <td>Kode Invoice</td>
                                     <td>Customer</td>
+                                    <td>Kas/Metode Pembayaran</td>
                                     <td>Outlet</td>
                                     <td>Kasir</td>
                                     <td>Detail</td>
@@ -33,6 +34,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>{{ $value->customer->name }}</td>
+                                    <td>{{ $value->kas->name }}</td>
                                     <td>{{ $value->outlet->name }}</td>
                                     <td>{{ $value->kasir->name }}</td>
                                     <td>

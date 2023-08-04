@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\KasRequest;
 use App\Models\Kas;
 use App\Models\Outlet;
+use Illuminate\Http\Request;
 
 class KasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->wantsJson()) {
+            return response(Kas::orderBy('outlet_id', 'asc')->get());
+        }
+
         return view('kas.index', [
             'kas' => Kas::orderBy('outlet_id', 'asc')->get(),
         ]);

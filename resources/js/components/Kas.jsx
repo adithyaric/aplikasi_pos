@@ -1,0 +1,22 @@
+import React from "react";
+const Kas = ({ kas, kasId, setKasId }) => {
+    return (
+        <div className="form-group row">
+            <div className="col-sm-12">
+                <select
+                    className="form-control"
+                    value={kasId}
+                    onChange={(e) => setKasId(e.target.value)}
+                >
+                    <option value="">Pilih Metode Pembayaran</option>
+                    {kas.map((kas) => (
+                        <option key={kas.id} value={kas.id}>
+                            {`${kas.name}`}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </div>
+    );
+};
+export default Kas;

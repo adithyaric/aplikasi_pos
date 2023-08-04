@@ -5,6 +5,7 @@ import { sum } from "lodash";
 import Swal from "sweetalert2";
 import Barcodes from "./Barcodes.jsx";
 import Customers from "./Customers";
+import Kas from "./Kas";
 import CartTable from "./CartTable";
 import Gallery from "./Gallery";
 import Wishlist from "./Wishlist";
@@ -13,8 +14,10 @@ const Cart = () => {
     const [cart, setCart] = useState([]);
     const [products, setProducts] = useState([]);
     const [customers, setCustomers] = useState([]);
-    const [barcode, setBarcode] = useState("");
     const [customerId, setCustomerId] = useState("");
+    const [kas, setKas] = useState([]);
+    const [kasId, setKasId] = useState("");
+    const [barcode, setBarcode] = useState("");
     const [search, setSearch] = useState("");
     const [discount, setDiscount] = useState(0);
     const [wishlist, setWishlist] = useState([]);
@@ -24,6 +27,7 @@ const Cart = () => {
         loadCart();
         loadProducts();
         loadCustomers();
+        loadKas();
         loadWishlist();
     }, []);
 
@@ -176,6 +180,14 @@ const Cart = () => {
         });
     };
 
+    //Data Kas
+    const loadKas = () => {
+        axios.get("/kas").then((res) => {
+            const kas = res.data;
+            setKas(kas);
+        });
+    };
+
     const handleOnChangeBarcode = (event) => {
         setBarcode(event.target.value);
     };
@@ -269,6 +281,7 @@ const Cart = () => {
                     .post("/penjualan", {
                         customer_id: customerId,
                         outlet_id: outlet.id,
+                        kas_id: kasId,
                         total: amount,
                         discount: discount,
                         cart: cart,
@@ -327,6 +340,8 @@ const Cart = () => {
                     handleClickWishlist={handleClickWishlist}
                     handleClickSubmit={handleClickSubmit}
                 />
+                <hr />
+                <Kas kas={kas} kasId={kasId} setKasId={setKasId} />
             </div>
             <hr />
             <div className="col-md-6 col-lg-8">

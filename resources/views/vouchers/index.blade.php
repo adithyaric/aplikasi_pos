@@ -24,6 +24,7 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
+                                    <td>Nominal</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -31,6 +32,13 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->name }}</td>
+                                    <td>
+                                        @if ($value->type == 'percentage')
+                                            {{ $value->value }}%
+                                        @else
+                                            @currency($value->value)
+                                        @endif
+                                    </td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('voucher.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('voucher.destroy', $value->id) }}" method="post"

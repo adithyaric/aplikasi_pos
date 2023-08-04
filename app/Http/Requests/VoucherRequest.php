@@ -17,6 +17,7 @@ class VoucherRequest extends FormRequest
             'name' => 'required',
             'code' => 'required',
             'type' => 'required',
+            'jenis' => 'required',
             'limit' => 'required',
             'value' => 'required',
             'min_purchase' => 'required',

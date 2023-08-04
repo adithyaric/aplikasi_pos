@@ -13,6 +13,7 @@ class Pembelian extends Model
         'code',
         'outlet_id',
         'supplier_id',
+        'kas_id',
         'total',
     ];
 
@@ -29,6 +30,11 @@ class Pembelian extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class);
     }
 
     public function stocks()

@@ -39,9 +39,9 @@
                 <li class="{{ request()->is('refund*') ? 'active' : '' }}"><a href="/refund"><i class="fa fa-refresh"></i><span>Refund/Return Order</span></a></li>
             </ul>
         </li>
-        <li class="{{ request()->is('penjualan/create') ? 'active' : '' }}"><a href="/penjualan/create"><i class="fa fa-calculator"></i><span>POS</span></a></li>
+        <li class="{{ request()->is('penjualan/create') || Route::currentRouteName() == 'outlet.show'  ? 'active' : '' }}"><a href="/penjualan/create"><i class="fa fa-calculator"></i><span>POS</span></a></li>
         <li class="{{ request()->is('kas*') ? 'active' : '' }}"><a href="/kas"><i class="fa fa-bank"></i><span>Kas</span></a></li>
-        <li class="{{ request()->is('outlet*') ? 'active' : '' }}"><a href="/outlet"><i class="fa fa-home"></i><span>Outlets</span></a></li>
+        <li class="{{ in_array(Route::currentRouteName(), ['outlet.index', 'outlet.create', 'outlet.edit']) ? 'active' : '' }}"><a href="/outlet"><i class="fa fa-home"></i><span>Outlets</span></a></li>
         <li class="{{ request()->is('voucher*') ? 'active' : '' }}"><a href="/voucher"><i class="fa fa-newspaper-o"></i><span>Vouchers</span></a></li>
         <li class="{{ request()->is('slider*') ? 'active' : '' }}"><a href="/slider"><i class="fa fa-image"></i><span>Sliders</span></a></li>
         <li class="treeview {{ request()->is('laporan*') ? 'active' : '' }}">

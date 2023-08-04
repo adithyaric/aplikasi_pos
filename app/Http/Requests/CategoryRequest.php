@@ -16,6 +16,7 @@ class CategoryRequest extends FormRequest
         return [
             'name' => 'required',
             'type' => 'nullable',
+            'outlet_id' => 'nullable',
         ];
     }
 }

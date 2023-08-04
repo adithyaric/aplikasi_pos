@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PenjualanRequest;
+use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Penjualan;
 use App\Models\Stock;
@@ -47,10 +48,15 @@ class PenjualanController extends Controller
                 'code' => $nextInvoiceCode,
                 'customer_id' => $request->customer_id,
                 'outlet_id' => $request->outlet_id,
+                'kas_id' => $request->kas_id,
                 'kasir_id' => auth()->id(),
                 'discount' => $request->discount,
                 'total' => $request->total,
             ]);
+
+            $kas = Kas::find($request->kas_id);
+            $kas->nominal += $request->total;
+            $kas->save();
 
             $cart = $request->user()->cart()->get();
             foreach ($cart as $item) {
