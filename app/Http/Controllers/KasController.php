@@ -11,13 +11,12 @@ class KasController extends Controller
 {
     public function index(Request $request)
     {
+        $outletId = $request->input('outlet_id');
         if ($request->wantsJson()) {
-            return response(Kas::orderBy('outlet_id', 'asc')->get());
+            return response(Kas::where('outlet_id', $outletId)->orderBy('outlet_id', 'asc')->get());
         }
 
-        return view('kas.index', [
-            'kas' => Kas::orderBy('outlet_id', 'asc')->get(),
-        ]);
+        return view('kas.index', ['kas' => Kas::where('outlet_id', $outletId)->orderBy('outlet_id', 'asc')->get()]);
     }
 
     public function create()

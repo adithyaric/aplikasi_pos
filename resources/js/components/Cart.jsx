@@ -182,7 +182,7 @@ const Cart = () => {
 
     //Data Kas
     const loadKas = () => {
-        axios.get("/kas").then((res) => {
+        axios.get(`/kas?outlet_id=${outlet.id}`).then((res) => {
             const kas = res.data;
             setKas(kas);
         });

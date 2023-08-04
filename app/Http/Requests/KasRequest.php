@@ -16,7 +16,7 @@ class KasRequest extends FormRequest
         return [
             'name' => 'required',
             'outlet_id' => 'required',
-            'nominal' => 'nullable',
+            'nominal' => 'nullable|numeric',
         ];
     }
 }
