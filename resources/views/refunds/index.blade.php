@@ -35,6 +35,7 @@
                                     <td>@currency($value->total)</td>
                                     <td>
                                         <a class="btn btn-info" href="{{ route('refund.show', $value->id) }}">Show</a>
+                                        <a class="btn btn-warning" href="{{ route('refund.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('refund.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

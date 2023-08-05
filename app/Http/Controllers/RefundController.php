@@ -29,6 +29,17 @@ class RefundController extends Controller
         ]);
     }
 
+    public function edit(Refund $refund)
+    {
+        return view('refunds.edit', [
+            'refund' => $refund,
+            'outlets' => Outlet::get(),
+            'customers' => User::where('role', 'customer')->get(),
+            'penjualans' => Penjualan::get(),
+            'products' => Product::get(),
+        ]);
+    }
+
     public function show(Refund $refund)
     {
         dd($refund->load(['customer', 'outlet', 'penjualan', 'refundItems', 'refundItems.product'])->toArray());
@@ -50,7 +61,24 @@ class RefundController extends Controller
             ]);
         }
 
-        // Redirect to the refund index page with a success message
+        return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+    }
+
+    public function update(RefundRequest $request, Refund $refund)
+    {
+        $data = $request->validated();
+        $data['total'] = (int) str_replace(',', '', $data['total']);
+        $refund->update($data);
+        RefundItem::where('refund_id', $refund->id)->delete();
+        foreach ($request->product as $product) {
+            RefundItem::create([
+                'refund_id' => $refund->id,
+                'product_id' => $product['product_id'],
+                'qty' => $product['qty'],
+                'alasan' => $product['alasan'],
+            ]);
+        }
+
         return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
