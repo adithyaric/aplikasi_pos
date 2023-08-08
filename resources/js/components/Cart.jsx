@@ -177,6 +177,7 @@ const Cart = () => {
         axios.get("/customer").then((res) => {
             const customers = res.data;
             setCustomers(customers);
+            setCustomerId(customers[0].id);
         });
     };
 

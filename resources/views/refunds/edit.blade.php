@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Edit Refund')
+@section('title', 'Edit Refund Penjualan')
 
 @section('container')
     <section class="content">

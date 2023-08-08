@@ -36,7 +36,8 @@
                 <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}"><a href="/pengeluaran"><i class="fa fa-folder-open"></i><span>Pengeluaran</span></a></li>
                 <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>Pembelian</span></a></li>
                 <li class="{{ request()->is('penjualan') ? 'active' : '' }}"><a href="/penjualan"><i class="fa fa-shopping-cart"></i><span>Penjualan</span></a></li>
-                <li class="{{ request()->is('refund*') ? 'active' : '' }}"><a href="/refund"><i class="fa fa-refresh"></i><span>Refund/Return Order</span></a></li>
+                <li class="{{ in_array(Route::currentRouteName(), ['refund.index', 'refund.show', 'refund.create', 'refund.edit']) ? 'active' : '' }}"><a href="/refund"><i class="fa fa-refresh"></i><span>Refund/Return Order</span></a></li>
+                <li class="{{ request()->is('refundPembelian*') ? 'active' : '' }}"><a href="/refundPembelian"><i class="fa fa-refresh"></i><span>Refund/Return Pembelian</span></a></li>
             </ul>
         </li>
         <li class="{{ request()->is('penjualan/create') || Route::currentRouteName() == 'outlet.show'  ? 'active' : '' }}"><a href="/penjualan/create"><i class="fa fa-calculator"></i><span>POS</span></a></li>

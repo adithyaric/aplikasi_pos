@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\RefundPembelianController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
@@ -55,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
     Route::resource('/refund', RefundController::class);
+    Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);
 
     Route::resource('/cart', CartController::class);
@@ -87,3 +90,5 @@ Route::get('/storage-link', function () {
 
     return redirect('/login')->with(['success' => 'Optimization Berhasil']);
 });
+
+Route::resource('/market', MarketplaceController::class);

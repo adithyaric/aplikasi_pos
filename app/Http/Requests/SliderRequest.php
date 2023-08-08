@@ -17,7 +17,7 @@ class SliderRequest extends FormRequest
             'status' => 'required',
             'type' => 'required',
             'desc' => 'required',
-            'pic' => 'required',
+            'pic' => 'nullable',
         ];
     }
 }

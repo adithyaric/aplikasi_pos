@@ -16,7 +16,7 @@ class KasController extends Controller
             return response(Kas::where('outlet_id', $outletId)->orderBy('outlet_id', 'asc')->get());
         }
 
-        return view('kas.index', ['kas' => Kas::where('outlet_id', $outletId)->orderBy('outlet_id', 'asc')->get()]);
+        return view('kas.index', ['kas' => Kas::get()]);
     }
 
     public function create()
