@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PengeluaranRequest;
 use App\Models\Category;
+use App\Models\Kas;
 use App\Models\Pengeluaran;
 
 class PengeluaranController extends Controller
@@ -18,6 +19,7 @@ class PengeluaranController extends Controller
     public function create()
     {
         return view('pengeluarans.create', [
+            'kas' => Kas::get(),
             'categories' => Category::where('type', 'pengeluaran')->get(),
         ]);
     }
@@ -40,6 +42,7 @@ class PengeluaranController extends Controller
     {
         return view('pengeluarans.edit', [
             'pengeluaran' => $pengeluaran,
+            'kas' => Kas::get(),
             'categories' => Category::where('type', 'pengeluaran')->get(),
         ]);
     }

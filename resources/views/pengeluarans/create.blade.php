@@ -55,10 +55,18 @@
                             {{-- @enderror --}}
                             {{-- </div> --}}
                             <div class="form-group">
-                                <label for="">Kas</label>
-                                <input type="number" class="form-control" name="kas" value="{{ old('kas') }}"
-                                    placeholder="Masukkan Kas">
-                                @error('kas')
+                                <label>Kas</label>
+                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Kas</option>
+                                    @foreach ($kas as $k)
+                                        <option value="{{ $k->id }}"
+                                            {{ old('kas_id') == $k->id ? 'selected' : '' }}>
+                                            {{ $k->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('kas_id')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>

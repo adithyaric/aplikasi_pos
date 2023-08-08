@@ -14,13 +14,18 @@ class Pengeluaran extends Model
         'tanggal',
         'biaya',
         'desc',
-        'kas',
+        'kas_id',
         'jumlah',
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class);
     }
 
     protected $casts = [

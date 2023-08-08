@@ -18,7 +18,7 @@ class PengeluaranRequest extends FormRequest
             'tanggal' => 'required',
             // 'biaya' => 'required',
             'desc' => 'required',
-            'kas' => 'required',
+            'kas_id' => 'required',
             'jumlah' => 'required',
         ];
     }
