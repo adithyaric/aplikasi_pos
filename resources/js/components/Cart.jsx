@@ -5,7 +5,7 @@ import { sum } from "lodash";
 import Swal from "sweetalert2";
 import Barcodes from "./Barcodes.jsx";
 import Customers from "./Customers";
-import Kas from "./Kas";
+// import Kas from "./Kas";
 import CartTable from "./CartTable";
 import Gallery from "./Gallery";
 import Wishlist from "./Wishlist";
@@ -20,8 +20,14 @@ const Cart = () => {
     const [barcode, setBarcode] = useState("");
     const [search, setSearch] = useState("");
     const [discount, setDiscount] = useState(0);
+    const [total, setTotal] = useState(0);
     const [wishlist, setWishlist] = useState([]);
+    const [errorMessage, setErrorMessage] = useState("");
     const outlet = window.outlet;
+
+    useEffect(() => {
+        setTotal(getTotal(cart) - discount);
+    }, [cart, discount]);
 
     useEffect(() => {
         loadCart();
@@ -172,6 +178,10 @@ const Cart = () => {
         return sum(total);
     };
 
+    const handleChangeTotal = (event) => {
+        setTotal(event.target.value);
+    };
+
     //Data Customers
     const loadCustomers = () => {
         axios.get("/customer").then((res) => {
@@ -269,45 +279,85 @@ const Cart = () => {
     };
 
     //Submit
-    const handleClickSubmit = (event) => {
-        Swal.fire({
-            title: "Received Amount",
-            input: "text",
-            inputValue: getTotal(cart) - discount,
-            showCancelButton: true,
-            confirmButtonText: "Send",
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                return axios
-                    .post("/penjualan", {
-                        customer_id: customerId,
-                        outlet_id: outlet.id,
-                        kas_id: kasId,
-                        total: amount,
-                        discount: discount,
-                        cart: cart,
-                    })
-                    .then((res) => {
-                        loadCart();
-                        loadWishlist();
-                        loadProducts();
-                        setBarcode("");
-                        setCustomerId("");
-                        setSearch("");
-                        setDiscount(0);
-                        Swal.fire(
-                            "Success!",
-                            "Pesanan berhasil dibuat",
-                            "success"
-                        );
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
-        });
+    // const handleClickSubmit = (event) => {
+    //     Swal.fire({
+    //         title: "Received Amount",
+    //         input: "text",
+    //         inputValue: getTotal(cart) - discount,
+    //         showCancelButton: true,
+    //         confirmButtonText: "Send",
+    //         showLoaderOnConfirm: true,
+    //         preConfirm: (amount) => {
+    //             return axios
+    //                 .post("/penjualan", {
+    //                     customer_id: customerId,
+    //                     outlet_id: outlet.id,
+    //                     kas_id: kasId,
+    //                     total: amount,
+    //                     discount: discount,
+    //                     cart: cart,
+    //                 })
+    //                 .then((res) => {
+    //                     loadCart();
+    //                     loadWishlist();
+    //                     loadProducts();
+    //                     setBarcode("");
+    //                     setCustomerId("");
+    //                     setSearch("");
+    //                     setDiscount(0);
+    //                     Swal.fire(
+    //                         "Success!",
+    //                         "Pesanan berhasil dibuat",
+    //                         "success"
+    //                     );
+    //                 })
+    //                 .catch((err) => {
+    //                     Swal.showValidationMessage(err.response.data.message);
+    //                 });
+    //         },
+    //         allowOutsideClick: () => !Swal.isLoading(),
+    //     });
+    // };
+
+    // Handle form submission
+    const handleSubmit = (event) => {
+        // Get the total amount from the input field
+        const totalAmount = $(".total").val();
+
+        // Send the POST request with the data
+        axios
+            .post("/penjualan", {
+                customer_id: customerId,
+                outlet_id: outlet.id,
+                kas_id: kasId,
+                total: totalAmount,
+                discount: discount,
+                cart: cart,
+            })
+            .then((res) => {
+                loadCart();
+                loadWishlist();
+                loadProducts();
+                setBarcode("");
+                setCustomerId("");
+                setKasId("");
+                setSearch("");
+                setErrorMessage("");
+                setDiscount(0);
+                Swal.fire("Success!", "Pesanan berhasil dibuat", "success");
+            })
+            .catch((err) => {
+                // console.log(err.response.data.message);
+                Swal.showValidationMessage(err.response.data.message);
+                setErrorMessage(err.response.data.message);
+            });
+
+        // Hide the modal
+        $("#tombolSubmit").modal("hide");
     };
+
+    // Add an onClick event handler to the "OK" button in the modal footer
+    $(".modal-footer .btn-primary").on("click", handleSubmit);
 
     return (
         <div className="row">
@@ -339,10 +389,16 @@ const Cart = () => {
                     getTotal={getTotal}
                     handleEmptyCart={handleEmptyCart}
                     handleClickWishlist={handleClickWishlist}
-                    handleClickSubmit={handleClickSubmit}
+                    // handleClickSubmit={handleClickSubmit}
+                    handleChangeTotal={handleChangeTotal}
+                    total={total}
+                    errorMessage={errorMessage}
+                    kas={kas}
+                    kasId={kasId}
+                    setKasId={setKasId}
                 />
                 <hr />
-                <Kas kas={kas} kasId={kasId} setKasId={setKasId} />
+                {/* <Kas kas={kas} kasId={kasId} setKasId={setKasId} /> */}
             </div>
             <hr />
             <div className="col-md-6 col-lg-8">

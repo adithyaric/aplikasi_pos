@@ -24,6 +24,7 @@ class VoucherRequest extends FormRequest
             'start_at' => 'nullable',
             'end_at' => 'nullable',
             'desc' => 'required',
+            'product_id' => 'nullable',
         ];
     }
 }

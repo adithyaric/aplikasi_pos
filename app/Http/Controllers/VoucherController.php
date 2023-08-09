@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VoucherRequest;
+use App\Models\Product;
 use App\Models\Voucher;
 
 class VoucherController extends Controller
@@ -16,7 +17,9 @@ class VoucherController extends Controller
 
     public function create()
     {
-        return view('vouchers.create', []);
+        return view('vouchers.create', [
+            'products' => Product::get(),
+        ]);
     }
 
     public function store(VoucherRequest $request)
@@ -41,6 +44,7 @@ class VoucherController extends Controller
     {
         return view('vouchers.edit', [
             'voucher' => $voucher,
+            'products' => Product::get(),
             'defaultDateRange' => $voucher->start_at.' - '.$voucher->end_at,
         ]);
     }

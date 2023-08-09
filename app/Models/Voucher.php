@@ -20,5 +20,11 @@ class Voucher extends Model
         'start_at',
         'end_at',
         'desc',
+        'product_id',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

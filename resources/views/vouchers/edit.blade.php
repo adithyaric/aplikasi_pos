@@ -52,8 +52,10 @@
                                 <select class="form-control select2" name="type" data-placeholder="Pilih Tipe"
                                     style="width: 100%;">
                                     <option value="" selected disabled>Pilih Tipe</option>
-                                    <option @if ($voucher->type == 'nominal') selected @endif value="nominal">Nominal</option>
-                                    <option @if ($voucher->type == 'percentage') selected @endif value="percentage">Percentage</option>
+                                    <option @if ($voucher->type == 'nominal') selected @endif value="nominal">Nominal
+                                    </option>
+                                    <option @if ($voucher->type == 'percentage') selected @endif value="percentage">Percentage
+                                    </option>
                                 </select>
                                 @error('type')
                                     <div class="invalid-feedback text-danger">
@@ -105,13 +107,32 @@
                             </div>
                             <div class="form-group">
                                 <label>Digunakan Untuk</label>
-                                <select class="form-control select2" name="jenis" data-placeholder="Pilih Jenis"
-                                    style="width: 100%;">
+                                <select class="form-control select2" id="jenis" name="jenis"
+                                    data-placeholder="Pilih Jenis" style="width: 100%;">
                                     <option value="" selected disabled>Pilih Jenis</option>
                                     <option @if ($voucher->jenis == 'satuan') selected @endif value="satuan">Satuan</option>
-                                    <option @if ($voucher->jenis == 'keseluruhan') selected @endif value="keseluruhan">Keseluruhan</option>
+                                    <option @if ($voucher->jenis == 'keseluruhan') selected @endif value="keseluruhan">
+                                        Keseluruhan</option>
                                 </select>
                                 @error('type')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label>Product</label>
+                                <select class="form-control select2" id="product" name="product_id"
+                                    data-placeholder="Pilih Product" style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Product</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}"
+                                            {{ old('product_id', $voucher->product_id) == $product->id ? 'selected' : '' }}>
+                                            {{ $product->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('product_id')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>
@@ -132,6 +153,24 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
+            // Check the value of #jenis on page load
+            if ($('#jenis').val() === 'satuan') {
+                $('#product').prop('disabled', false);
+            } else {
+                $('#product').prop('disabled', true);
+            }
+
+            // Listen for changes on the "Jenis" select form
+            $('#jenis').on('change', function() {
+                // Check if the selected value is "Satuan"
+                if ($(this).val() === 'satuan') {
+                    // Enable the product select form
+                    $('#product').prop('disabled', false);
+                } else {
+                    // Disable the product select form
+                    $('#product').prop('disabled', true);
+                }
+            });
             var startDate = new Date();
             var endDate = new Date();
 
