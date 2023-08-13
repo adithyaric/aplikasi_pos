@@ -28,7 +28,10 @@ class MarketplaceController extends Controller
 
     public function show($id)
     {
-        //
+        return view('market.show', [
+            'product' => Product::find($id),
+        ]);
+
     }
 
     public function edit($id)

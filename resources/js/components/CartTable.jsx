@@ -106,6 +106,7 @@ const CartTable = ({
                         className="btn btn-success btn-block"
                         data-toggle="modal"
                         data-target="#tombolSubmit"
+                        disabled={!cart.length}
                     >
                         Submit
                     </button>

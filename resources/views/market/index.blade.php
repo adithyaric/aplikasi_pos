@@ -29,10 +29,8 @@
                                     @foreach ($sliders as $slider)
                                         <div class="item">
                                             <div class="image-container">
-                                                <a class="item-img-wrapper-link" href="single-product.html">
-                                                    <img class="img-fluid"
-                                                        src="{{ asset($slider->pic) }}"
-                                                        alt="Product">
+                                                <a class="item-img-wrapper-link" href="{{ route('market.show', $slider->id) }}">
+                                                    <img class="img-fluid" src="{{ asset($slider->pic) }}" alt="Product">
                                                 </a>
                                             </div>
                                         </div>
@@ -74,7 +72,7 @@
                     @foreach ($products as $product)
                         <div class="item">
                             <div class="image-container">
-                                <a class="item-img-wrapper-link" href="single-product.html">
+                                <a class="item-img-wrapper-link" href="{{ route('market.show', $product->id) }}">
                                     <img class="img-fluid" src="{{ asset($product->pic) }}">
                                 </a>
                                 <div class="item-action-behaviors">
@@ -82,18 +80,25 @@
                                         Look</a>
                                     <a class="item-mail" href="javascript:void(0)">Mail</a>
                                     <a class="item-addwishlist" href="javascript:void(0)">Add to Wishlist</a>
-                                    <a class="item-addCart" href="javascript:void(0)">Add to Cart</a>
                                 </div>
                             </div>
                             <div class="item-content">
+                                <form action="{{ route('marketcart.store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" value="{{ $product->id }}" name="id">
+                                    <input type="hidden" value="{{ $product->name }}" name="name">
+                                    <input type="hidden" value="{{ $product->harga_jual }}" name="price">
+                                    <input type="hidden" value="1" name="quantity">
+                                    <button class="mb-1 button button-outline-secondary" type="submit">Add To Cart</button>
+                                </form>
                                 <div class="what-product-is">
                                     <ul class="bread-crumb">
                                         <li class="">
-                                            <a href="shop-v1-root-category.html">{{ $product->category->name }}</a>
+                                            <a href="#">{{ $product->category->name }}</a>
                                         </li>
                                     </ul>
                                     <h6 class="item-title">
-                                        <a href="single-product.html">{{ $product->name }}</a>
+                                        <a href="{{ route('market.show', $slider->id) }}">{{ $product->name }}</a>
                                     </h6>
                                 </div>
                                 <div class="price-template">
@@ -116,9 +121,10 @@
     <!-- Men-Clothing /- -->
     <!-- Continue-Link -->
     <div class="continue-link-wrapper u-s-p-b-80">
-        <a class="continue-link" href="store-directory.html" title="View all products on site">
+        <a class="continue-link" href="#" title="View all products on site">
             <i class="ion ion-ios-more"></i>
         </a>
     </div>
     <!-- Continue-Link /- -->
+    @include('layouts.market.slider')
 @endsection

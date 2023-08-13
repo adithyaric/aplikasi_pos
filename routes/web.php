@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\BankController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartUserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -28,16 +28,14 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('/admin', AdminController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
-    // Route::resource('/bank', BankController::class);
     Route::resource('/kas', KasController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
@@ -76,6 +74,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan/labarugi', [LaporanController::class, 'exportLabaRugi'])->name('laporan.labarugi');
 });
 
+Route::middleware(['role:superadmin'])->group(function () {
+    Route::resource('/admin', AdminController::class);
+});
+
+Route::middleware(['role:customer'])->group(function () {
+    Route::resource('/market', MarketplaceController::class);
+    Route::controller(CartUserController::class)->group(function () {
+        Route::get('marketcart', 'index')->name('marketcart.index');
+        Route::post('marketcart', 'addToCart')->name('marketcart.store');
+        Route::post('market-update-cart', 'updateCart')->name('marketcart.update');
+        Route::post('market-remove', 'removeCart')->name('marketcart.remove');
+        Route::post('market-clear', 'clearAllCart')->name('marketcart.clear');
+    });
+}
+);
+
 require __DIR__.'/auth.php';
 
 //* Artisan Commands
@@ -90,5 +104,3 @@ Route::get('/storage-link', function () {
 
     return redirect('/login')->with(['success' => 'Optimization Berhasil']);
 });
-
-Route::resource('/market', MarketplaceController::class);

@@ -12,13 +12,13 @@
                         <h6>CUSTOMER SERVICE</h6>
                         <ul>
                             <li>
-                                <a href="faq.html">FAQs</a>
+                                <a href="#">FAQs</a>
                             </li>
                             <li>
-                                <a href="track-order.html">Track Order</a>
+                                <a href="tr#">Track Order</a>
                             </li>
                             <li>
-                                <a href="terms-and-conditions.html">Terms & Conditions</a>
+                                <a href="#">Terms & Conditions</a>
                             </li>
                         </ul>
                     </div>
@@ -28,13 +28,13 @@
                         <h6>COMPANY</h6>
                         <ul>
                             <li>
-                                <a href="home.html">Home</a>
+                                <a href="{{ route('market.index') }}">Home</a>
                             </li>
                             <li>
-                                <a href="about.html">About</a>
+                                <a href="#">About</a>
                             </li>
                             <li>
-                                <a href="contact.html">Contact</a>
+                                <a href="#">Contact</a>
                             </li>
                         </ul>
                     </div>
@@ -44,13 +44,13 @@
                         <h6>INFORMATION</h6>
                         <ul>
                             <li>
-                                <a href="store-directory.html">Categories Directory</a>
+                                <a href="#">Categories Directory</a>
                             </li>
                             <li>
-                                <a href="wishlist.html">My Wishlist</a>
+                                <a href="#">My Wishlist</a>
                             </li>
                             <li>
-                                <a href="cart.html">My Cart</a>
+                                <a href="{{ route('marketcart.index') }}">My Cart</a>
                             </li>
                         </ul>
                     </div>
@@ -72,8 +72,7 @@
                             <li>
                                 <a href="mailto:contact@domain.com">
                                     <i class="fas fa-envelope u-s-m-r-9"></i>
-                                    <span>
-                                        contact@domain.com</span>
+                                    <span>contact@domain.com</span>
                                 </a>
                             </li>
                         </ul>
@@ -124,7 +123,7 @@
                 </ul>
             </div>
             <p class="copyright-text">Copyright &copy; 2018
-                <a href="home.html">Groover</a> All Right Reserved
+                <a href="{{ route('market.index') }}">Groover</a> All Right Reserved
             </p>
         </div>
     </div>

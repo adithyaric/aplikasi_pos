@@ -37,7 +37,6 @@
     <div id="app">
         @include('layouts.market.header')
         @yield('container')
-        @include('layouts.market.slider')
         @include('layouts.market.footer')
         <!-- Dummy Selectbox -->
         <div class="select-dummy-wrapper">
