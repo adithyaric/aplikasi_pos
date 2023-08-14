@@ -26,8 +26,8 @@
                         </a>
                         <ul class="g-dropdown" style="width:200px">
                             <li><a href="{{ route('marketcart.index') }}"><i class="fas fa-cog u-s-m-r-9"></i>My Cart</a></li>
-                            <li><a href="#"><i class="far fa-heart u-s-m-r-9"></i>My Wishlist</a></li>
-                            <li><a href="#"><i class="far fa-check-circle u-s-m-r-9"></i>Checkout</a></li>
+                            <li><a href="{{ route('wishlist.index') }}"><i class="far fa-heart u-s-m-r-9"></i>My Wishlist</a></li>
+                            <li><a href="{{ route('market.checkout') }}"><i class="far fa-check-circle u-s-m-r-9"></i>Checkout</a></li>
                             @auth
                             <li><a href="{{ url('profile') }}"><i class="fas fa-user u-s-m-r-9"></i>Profile</a></li>
                             <form action="{{ route('logout') }}" method="POST">
@@ -90,7 +90,8 @@
                                 </a>
                             </li>
                             <li class="u-d-none-lg">
-                                <a href="#">
+                                <a href="{{ route('wishlist.index') }}">
+                                    <span class="item-counter">{{ app('wishlist')->getContent()->count() }}</span>
                                     <i class="far fa-heart"></i>
                                 </a>
                             </li>

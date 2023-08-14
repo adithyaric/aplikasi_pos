@@ -76,10 +76,14 @@
                                     <img class="img-fluid" src="{{ asset($product->pic) }}">
                                 </a>
                                 <div class="item-action-behaviors">
-                                    <a class="item-quick-look" data-toggle="modal" href="#quick-view">Quick
-                                        Look</a>
-                                    <a class="item-mail" href="javascript:void(0)">Mail</a>
-                                    <a class="item-addwishlist" href="javascript:void(0)">Add to Wishlist</a>
+                                    <form action="{{ route('wishlist.store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="hidden" value="{{ $product->id }}" name="id">
+                                        <input type="hidden" value="{{ $product->name }}" name="name">
+                                        <input type="hidden" value="{{ $product->harga_jual }}" name="price">
+                                        <input type="hidden" value="1" name="quantity">
+                                        <button class="mt-5 mb-1 btn btn-sm" type="submit">Add to Wishlist</button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="item-content">

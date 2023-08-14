@@ -40,8 +40,9 @@
                                     <td>
                                         <div class="cart-anchor-image">
                                             <a href="#">
-                                                <img class="img-thumbnail" src="{{ asset($item->model->pic) }}" alt="Product"
-                                                    width="100px">
+                                                @if ($item->model)
+                                                    <img class="img-thumbnail" src="{{ asset($item->model->pic) }}" alt="Product" width="100px">
+                                                @endif
                                                 <h6>{{ $item->name }}</h6>
                                             </a>
                                         </div>
@@ -79,22 +80,12 @@
                         </tbody>
                     </table>
                 </div><!-- /.box-body -->
-                <!-- Coupon -->
                 <div class="coupon-continue-checkout u-s-m-b-60">
-                    <div class="coupon-area">
-                        <h6>Enter your coupon code if you have one.</h6>
-                        <div class="coupon-field">
-                            <label class="sr-only" for="coupon-code">Apply Coupon</label>
-                            <input id="coupon-code" type="text" class="text-field" placeholder="Coupon Code">
-                            <button type="submit" class="button">Apply Coupon</button>
-                        </div>
-                    </div>
                     <div class="button-area">
                         <a href="{{ route('market.index') }}" class="continue">Continue Shopping</a>
                         <a href="{{ route('market.checkout') }}" class="checkout">Proceed to Checkout</a>
                     </div>
                 </div>
-                <!-- Coupon /- -->
             </div><!-- /.box -->
         </div><!-- /.row -->
     </section><!-- /.content -->

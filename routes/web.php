@@ -21,6 +21,7 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -80,6 +81,9 @@ Route::middleware(['role:superadmin'])->group(function () {
 
 Route::middleware(['role:customer'])->group(function () {
     Route::resource('/market', MarketplaceController::class);
+    Route::resource('/wishlist', WishlistController::class);
+    Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+    Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
     Route::controller(CartUserController::class)->group(function () {
         Route::get('marketcart', 'index')->name('marketcart.index');
