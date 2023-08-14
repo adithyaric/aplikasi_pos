@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Slider;
+use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Http\Request;
 
 class MarketplaceController extends Controller
@@ -16,36 +17,22 @@ class MarketplaceController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        //
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
     public function show($id)
     {
         return view('market.show', [
             'product' => Product::find($id),
         ]);
-
     }
 
-    public function edit($id)
+    public function checkout()
     {
-        //
+        return view('market.checkout', [
+            'cartItems' => Cart::session(auth()->id())->getContent(),
+        ]);
     }
 
-    public function update(Request $request, $id)
+    public function store(Request $request)
     {
-        //
-    }
-
-    public function destroy($id)
-    {
-        //
+        dd($request->all());
     }
 }

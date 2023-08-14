@@ -74,11 +74,27 @@
                                 @endforeach
                                 <tr>
                                     <th colspan="3">Total</th>
-                                    <th>Total: Rp. {{ number_format(Cart::getTotal(), 0, ',', '.') }}</th>
+                                    <th>Total: Rp. {{ number_format(Cart::session(auth()->id())->getTotal(), 0, ',', '.') }}</th>
                                 </tr>
                         </tbody>
                     </table>
                 </div><!-- /.box-body -->
+                <!-- Coupon -->
+                <div class="coupon-continue-checkout u-s-m-b-60">
+                    <div class="coupon-area">
+                        <h6>Enter your coupon code if you have one.</h6>
+                        <div class="coupon-field">
+                            <label class="sr-only" for="coupon-code">Apply Coupon</label>
+                            <input id="coupon-code" type="text" class="text-field" placeholder="Coupon Code">
+                            <button type="submit" class="button">Apply Coupon</button>
+                        </div>
+                    </div>
+                    <div class="button-area">
+                        <a href="{{ route('market.index') }}" class="continue">Continue Shopping</a>
+                        <a href="{{ route('market.checkout') }}" class="checkout">Proceed to Checkout</a>
+                    </div>
+                </div>
+                <!-- Coupon /- -->
             </div><!-- /.box -->
         </div><!-- /.row -->
     </section><!-- /.content -->

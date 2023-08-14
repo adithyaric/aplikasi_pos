@@ -80,6 +80,7 @@ Route::middleware(['role:superadmin'])->group(function () {
 
 Route::middleware(['role:customer'])->group(function () {
     Route::resource('/market', MarketplaceController::class);
+    Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
     Route::controller(CartUserController::class)->group(function () {
         Route::get('marketcart', 'index')->name('marketcart.index');
         Route::post('marketcart', 'addToCart')->name('marketcart.store');
