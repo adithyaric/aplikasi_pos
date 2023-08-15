@@ -115,9 +115,9 @@
             <button type="button" class="button fas fa-search" id="responsive-search"></button>
         </div>
         <div class="fixed-responsive-wrapper">
-            <a href="#">
+            <a href="{{ route('wishlist.index') }}">
                 <i class="far fa-heart"></i>
-                <span class="fixed-item-counter">4</span>
+                <span class="fixed-item-counter">{{ app('wishlist')->getContent()->count() }}</span>
             </a>
         </div>
     </div>

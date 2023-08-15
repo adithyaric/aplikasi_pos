@@ -45,6 +45,11 @@ class Product extends Model
         return $this->hasMany(Stock::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function wishlist()
     {
         return $this->belongsToMany(User::class, 'user_wishlist')->withPivot('qty', 'name', 'customer_id');

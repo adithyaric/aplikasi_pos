@@ -41,4 +41,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Product::class, 'user_wishlist')->withPivot('qty', 'name', 'customer_id');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

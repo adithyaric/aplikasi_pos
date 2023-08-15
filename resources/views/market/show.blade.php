@@ -102,7 +102,7 @@
                                 <a class="nav-link active" data-toggle="tab" href="#specification">Specifications</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#review">Reviews (15)</a>
+                                <a class="nav-link" data-toggle="tab" href="#review">Reviews ({{ $product->reviews->count() }})</a>
                             </li>
                         </ul>
                     </div>
@@ -137,10 +137,8 @@
                                     <div class="col-lg-6 col-md-6">
                                         <div class="total-score-wrapper">
                                             <h6 class="review-h6">Average Rating</h6>
-                                            <div class="circle-wrapper">
-                                                <h1>4.5</h1>
-                                            </div>
-                                            <h6 class="review-h6">Based on 23 Reviews</h6>
+                                            <h1>{{ $product->reviews->avg('rating') }}</h1>
+                                            <h6 class="review-h6">Based on {{ $product->reviews->count() }} Reviews</h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6">
@@ -148,74 +146,115 @@
                                             <div class="star-wrapper">
                                                 <span>5 Stars</span>
                                                 <div class="star">
-                                                    <span style='width:0'></span>
+                                                    @php
+                                                        if ($product->reviews->count() > 0) {
+                                                            $percentage = ($fiveStarReviews / $product->reviews->count()) * 100;
+                                                            $width = ($percentage / 100) * 75;
+                                                        } else {
+                                                            $width = 0;
+                                                        }
+                                                    @endphp
+                                                    <span style='width:{{ $width }}px'></span>
                                                 </div>
-                                                <span>(0)</span>
+                                                <span>({{ $fiveStarReviews }})</span>
                                             </div>
                                             <div class="star-wrapper">
                                                 <span>4 Stars</span>
                                                 <div class="star">
-                                                    <span style='width:67px'></span>
+                                                    @php
+                                                        if ($product->reviews->count() > 0) {
+                                                            $percentage = ($fourStarReviews /$product->reviews->count()) * 100;
+                                                            $width = ($percentage / 100) * 75;
+                                                        } else {
+                                                        $width = 0;
+                                                        }
+                                                    @endphp
+                                                    <span style='width:{{$width}}px'></span>
                                                 </div>
-                                                <span>(23)</span>
+                                                <span>({{$fourStarReviews}})</span>
                                             </div>
                                             <div class="star-wrapper">
                                                 <span>3 Stars</span>
                                                 <div class="star">
-                                                    <span style='width:0'></span>
+                                                    @php
+                                                        if ($product->reviews->count() > 0) {
+                                                        $percentage = ($threeStarReviews /$product->reviews->count()) * 100;
+                                                        $width = ($percentage /100) *75;
+                                                        } else {
+                                                        $width =0;
+                                                        }
+                                                    @endphp
+                                                    <span style='width:{{$width}}px'></span>
                                                 </div>
-                                                <span>(0)</span>
+                                                <span>({{$threeStarReviews}})</span>
                                             </div>
                                             <div class="star-wrapper">
                                                 <span>2 Stars</span>
                                                 <div class="star">
-                                                    <span style='width:0'></span>
+                                                    @php
+                                                        if ($product->reviews->count() >0) {
+                                                        $percentage =($twoStarReviews /$product->reviews->count()) *100;
+                                                        $width =($percentage /100) *75;
+                                                        } else {
+                                                        $width =0;
+                                                        }
+                                                    @endphp
+                                                    <span style='width:{{$width}}px'></span>
                                                 </div>
-                                                <span>(0)</span>
+                                                <span>({{$twoStarReviews}})</span>
                                             </div>
                                             <div class="star-wrapper">
                                                 <span>1 Star</span>
                                                 <div class="star">
-                                                    <span style='width:0'></span>
+                                                    @php
+                                                        if ($product->reviews->count() >0) {
+                                                        $percentage =($oneStarReviews /$product->reviews->count()) *100;
+                                                        $width =($percentage /100) *75;
+                                                        } else {
+                                                        $width =0;
+                                                        }
+                                                    @endphp
+                                                    <span style='width:{{$width}}px'></span>
                                                 </div>
-                                                <span>(0)</span>
+                                                <span>({{$oneStarReviews}})</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row r-2 u-s-m-b-26 u-s-p-b-22">
+                                    @if (auth()->user()->reviews()->where('product_id', $product->id))
                                     <div class="col-lg-12">
-                                        <div class="your-rating-wrapper">
-                                            <h6 class="review-h6">Your Review is matter.</h6>
-                                            <h6 class="review-h6">Have you used this product before?</h6>
-                                            <div class="star-wrapper u-s-m-b-8">
-                                                <div class="star">
-                                                    <span id="your-stars" style='width:0'></span>
+                                        <ol>
+                                            @foreach (auth()->user()->reviews()->where('product_id', $product->id)->get() as $review)
+                                                <li>{{ $review->comment }}</li>
+                                            @endforeach
+                                        </ol>
+                                    </div>
+                                    @endif
+                                    <hr />
+                                    <div class="col-lg-12">
+                                        <form action="{{ route('review.store') }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="your-rating-wrapper">
+                                                <h6 class="review-h6">Your Review is matter.</h6>
+                                                <h6 class="review-h6">Have you used this product before?</h6>
+                                                <div class="star-wrapper u-s-m-b-8">
+                                                    <div class="star">
+                                                        <span id="your-stars" style='width:0'></span>
+                                                    </div>
+                                                    <label for="your-rating-value"></label>
+                                                    <input id="your-rating-value" name="rating" type="text" class="text-field" placeholder="0.0">
+                                                    <span id="star-comment"></span>
                                                 </div>
-                                                <label for="your-rating-value"></label>
-                                                <input id="your-rating-value" type="text" class="text-field" placeholder="0.0">
-                                                <span id="star-comment"></span>
-                                            </div>
-                                            <form>
-                                                <label for="your-name">Name
-                                                    <span class="astk"> *</span>
-                                                </label>
-                                                <input id="your-name" type="text" class="text-field" placeholder="Your Name">
-                                                <label for="your-email">Email
-                                                    <span class="astk"> *</span>
-                                                </label>
-                                                <input id="your-email" type="text" class="text-field" placeholder="Your Email">
-                                                <label for="review-title">Review Title
-                                                    <span class="astk"> *</span>
-                                                </label>
-                                                <input id="review-title" type="text" class="text-field" placeholder="Review Title">
                                                 <label for="review-text-area">Review
                                                     <span class="astk"> *</span>
                                                 </label>
-                                                <textarea class="text-area u-s-m-b-8" id="review-text-area" placeholder="Review"></textarea>
-                                                <button class="button button-outline-secondary">Submit Review</button>
-                                            </form>
-                                        </div>
+                                                <textarea class="text-area u-s-m-b-8" name="comment" id="review-text-area" placeholder="Review"></textarea>
+                                                <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <button type="submit" class="button button-outline-secondary">Submit Review</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

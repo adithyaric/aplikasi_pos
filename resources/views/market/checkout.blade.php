@@ -25,9 +25,32 @@
     <div class="page-checkout u-s-p-t-80">
         <div class="container">
             <div class="row">
-                <form action="{{ route('market.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="col-lg-12 col-md-12">
+                <div class="col-lg-12 col-md-12">
+                    <!-- Second Accordion -->
+                    @if (count(Cart::session(auth()->id())->getConditions()) == 0 && $cartItems->count() > 0)
+                        <form action="{{ route('market.coupon') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="message-open u-s-m-b-24">
+                                Have a coupon?
+                                <strong>
+                                    <a class="u-c-brand" data-toggle="collapse" href="#showcoupon">Click here to enter your code</a>
+                                </strong>
+                            </div>
+                            <div class="collapse u-s-m-b-24" id="showcoupon">
+                                <h6 class="collapse-h6">
+                                    Enter your coupon code if you have one.
+                                </h6>
+                                <div class="coupon-field">
+                                    <label class="sr-only" for="coupon-code">Apply Coupon</label>
+                                    <input id="coupon-code" name="code" type="text" class="text-field" placeholder="Coupon Code">
+                                    <button type="submit" class="button">Apply Coupon</button>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
+                    <!-- Second Accordion /- -->
+                    <form action="{{ route('market.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="row">
                             <!-- Billing-&-Shipping-Details -->
                             <div class="col-lg-6">
@@ -67,10 +90,6 @@
                                     <label for="order-notes">Order Notes</label>
                                     <textarea class="text-area" name="order-notes" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
                                 </div>
-                                <div class="u-s-m-b-13">
-                                    <label for="address">Coupon Codes</label>
-                                    <input name="coupon-code" type="text" class="text-field" placeholder="Coupon Code">
-                                </div>
                             </div>
                             <!-- Billing-&-Shipping-Details /- -->
                             <!-- Checkout -->
@@ -85,53 +104,65 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($cartItems->sortBy('name') as $item)
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="order-h6">{{ $item->name }}</h6>
-                                                        <span class="order-span-quantity">x {{ $item->quantity }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="order-h6">@currency($item->price * $item->quantity)</h6>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                            <tr>
-                                                <td>
-                                                    <h3 class="order-h3">Subtotal</h3>
-                                                </td>
-                                                <td>
-                                                    <h3 class="order-h3">Rp.
-                                                        {{ number_format(Cart::session(auth()->id())->getTotal(), 0, ',', '.') }}
-                                                    </h3>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h3 class="order-h3">Shipping</h3>
-                                                </td>
-                                                <td>
-                                                    <h3 class="order-h3">$0.00</h3>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h3 class="order-h3">Tax</h3>
-                                                </td>
-                                                <td>
-                                                    <h3 class="order-h3">$0.00</h3>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h3 class="order-h3">Total</h3>
-                                                </td>
-                                                <td>
-                                                    <h3 class="order-h3">Rp.
-                                                        {{ number_format(Cart::session(auth()->id())->getTotal(), 0, ',', '.') }}
-                                                    </h3>
-                                                </td>
-                                            </tr>
+                                        @foreach($cartItems->sortBy('name') as $item)
+                                        <tr>
+                                            <td>
+                                                <h6 class="order-h6">{{$item->name}}</h6>
+                                                <span class="order-span-quantity">x{{$item->quantity}}</span>
+                                                @foreach($item->conditions as $condition)
+                                                <span class="order-span-voucher">{{$condition->getName()}}: {{$condition->getValue()}}</span>
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @if ($item->getPriceSumWithConditions() != $item->price)
+                                                    <h6 class="order-h6"><s>@currency($item->price)</s></h6>
+                                                @endif
+                                                <h6 class="order-h6">@currency($item->getPriceSumWithConditions())</h6>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Subtotal</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">Rp.{{number_format(Cart::session(auth()->id())->getSubTotal(),0,',','.')}}</h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Shipping</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">$0.00</h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Tax</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">$0.00</h3>
+                                            </td>
+                                        </tr>
+                                        @foreach(Cart::session(auth()->id())->getConditions() as $condition)
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">{{$condition->getName()}}</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">{{$condition->getValue()}}</h3>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Total</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">Rp.{{number_format(Cart::session(auth()->id())->getTotal(),0,',','.')}}</h3>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                     <div class="u-s-m-b-13">
@@ -157,8 +188,8 @@
                             </div>
                             <!-- Checkout /- -->
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

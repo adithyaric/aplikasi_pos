@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundPembelianController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
@@ -81,10 +82,11 @@ Route::middleware(['role:superadmin'])->group(function () {
 
 Route::middleware(['role:customer'])->group(function () {
     Route::resource('/market', MarketplaceController::class);
+    Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
+    Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
     Route::resource('/wishlist', WishlistController::class);
     Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
     Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
-    Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
     Route::controller(CartUserController::class)->group(function () {
         Route::get('marketcart', 'index')->name('marketcart.index');
         Route::post('marketcart', 'addToCart')->name('marketcart.store');
@@ -92,6 +94,7 @@ Route::middleware(['role:customer'])->group(function () {
         Route::post('market-remove', 'removeCart')->name('marketcart.remove');
         Route::post('market-clear', 'clearAllCart')->name('marketcart.clear');
     });
+    Route::resource('/review', ReviewController::class);
 }
 );
 
