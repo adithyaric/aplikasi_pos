@@ -34,9 +34,9 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>{{ $value->customer->name }}</td>
-                                    <td>{{ $value->kas->name }}</td>
-                                    <td>{{ $value->outlet->name }}</td>
-                                    <td>{{ $value->kasir->name }}</td>
+                                    <td>{{ $value->kas->name ?? '___customer' }}</td>
+                                    <td>{{ $value->outlet->name ?? '___customer' }}</td>
+                                    <td>{{ $value->kasir->name ?? '___customer' }}</td>
                                     <td>
                                         <table class="table table-sm table-bordered">
                                             <tr>

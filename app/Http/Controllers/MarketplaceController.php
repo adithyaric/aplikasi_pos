@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Penjualan;
+use App\Models\PenjualanItem;
 use App\Models\Product;
 use App\Models\Slider;
 use App\Models\Voucher;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MarketplaceController extends Controller
 {
@@ -47,7 +51,70 @@ class MarketplaceController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+        DB::beginTransaction();
+        try {
+            // Get the data from the request
+            $name = $request->name;
+            $address = $request->address;
+            $email = $request->email;
+            $phone = $request->phone;
+            $orderNotes = $request->order_notes;
+            $paymentMethod = $request->payment_method;
+
+            // Get the cart data
+            $cartItems = Cart::session(auth()->id())->getContent();
+            $cartSubtotal = Cart::session(auth()->id())->getSubTotal();
+            $cartTotal = Cart::session(auth()->id())->getTotal();
+
+            // Calculate the discount
+            $discount = $cartSubtotal - $cartTotal;
+
+            // Generate the next invoice code
+            $lastOrder = Penjualan::orderBy('created_at', 'desc')->first();
+            $nextInvoiceNumber = $lastOrder ? ((int) substr($lastOrder->code, 3) + 1) : 1;
+            $nextInvoiceNumber = str_pad($nextInvoiceNumber, 3, '0', STR_PAD_LEFT);
+            $nextInvoiceCode = 'INV'.$nextInvoiceNumber;
+
+            // Create a new Penjualan instance
+            $penjualan = new Penjualan([
+                'code' => $nextInvoiceCode,
+                'customer_id' => auth()->user()->id,
+                'outlet_id' => null,
+                'kasir_id' => null,
+                'kas_id' => null,
+                'discount' => $discount,
+                'total' => $cartTotal,
+            ]);
+
+            // Save the Penjualan instance
+            $penjualan->save();
+
+            // Create a new PenjualanItem instance for each item in the cart
+            foreach ($cartItems as $item) {
+                $penjualanItem = new PenjualanItem([
+                    'penjualan_id' => $penjualan->id,
+                    'product_id' => $item->id,
+                    'qty' => $item->quantity,
+                    'price' => $item->price,
+                    'subtotal' => $item->getPriceSum(),
+                ]);
+
+                // Save the PenjualanItem instance
+                $penjualanItem->save();
+            }
+
+            // Clear the cart
+            Cart::session(auth()->id())->clear();
+            Cart::session(auth()->id())->clearCartConditions();
+            Cart::session(auth()->id())->removeConditionsByType('subtotal');
+            // Cart::session(auth()->id())->getConditions()
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return $e->getMessage();
+        }
     }
 
     public function coupon(Request $request)

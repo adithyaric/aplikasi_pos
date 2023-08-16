@@ -63,8 +63,8 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::resource('/cart', CartController::class);
     Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
     Route::delete('/cart-empty', [CartController::class, 'empty']);
-    Route::get('/wishlist', [CartController::class, 'getWishlist']);
-    Route::post('/wishlist', [CartController::class, 'addToWishlist']);
+    Route::get('/wishlist-pos', [CartController::class, 'getWishlist']);
+    Route::post('/wishlist-pos', [CartController::class, 'addToWishlist']);
     Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');

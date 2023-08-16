@@ -27,7 +27,7 @@
             <div class="row">
                 <div class="col-lg-12 col-md-12">
                     <!-- Second Accordion -->
-                    @if (count(Cart::session(auth()->id())->getConditions()) == 0 && $cartItems->count() > 0)
+                    @if ((count(Cart::session(auth()->id())->getConditions()) == 0) && $cartItems->count() > 0)
                         <form action="{{ route('market.coupon') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="message-open u-s-m-b-24">
@@ -87,8 +87,8 @@
                                 </div>
                                 <!-- Form-Fields /- -->
                                 <div class="u-s-m-b-13">
-                                    <label for="order-notes">Order Notes</label>
-                                    <textarea class="text-area" name="order-notes" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
+                                    <label for="order_notes">Order Notes</label>
+                                    <textarea class="text-area" name="order_notes" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
                                 </div>
                             </div>
                             <!-- Billing-&-Shipping-Details /- -->
@@ -114,8 +114,8 @@
                                                 @endforeach
                                             </td>
                                             <td>
-                                                @if ($item->getPriceSumWithConditions() != $item->price)
-                                                    <h6 class="order-h6"><s>@currency($item->price)</s></h6>
+                                                @if ($item->getPriceSumWithConditions() != $item->price * $item->quantity)
+                                                    <h6 class="order-h6"><s>@currency($item->price * $item->quantity)</s></h6>
                                                 @endif
                                                 <h6 class="order-h6">@currency($item->getPriceSumWithConditions())</h6>
                                             </td>
@@ -151,7 +151,7 @@
                                                 <h3 class="order-h3">{{$condition->getName()}}</h3>
                                             </td>
                                             <td>
-                                                <h3 class="order-h3">{{$condition->getValue()}}</h3>
+                                                <h3 class="order-h3">{{(strpos($value = $condition->getValue(), '%') !== false) ? $value : "Rp. " . number_format($value, 0, ',', '.')}}</h3>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -166,15 +166,15 @@
                                         </tbody>
                                     </table>
                                     <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment-method" id="cash-on-delivery" value="cash" checked>
+                                        <input type="radio" class="radio-box" name="payment_method" id="cash-on-delivery" value="cash" checked>
                                         <label class="label-text" for="cash-on-delivery">Cash</label>
                                     </div>
                                     <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment-method" id="credit-card-stripe" value="credit">
+                                        <input type="radio" class="radio-box" name="payment_method" id="credit-card-stripe" value="credit">
                                         <label class="label-text" for="credit-card-stripe">Credit Card</label>
                                     </div>
                                     <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment-method" id="paypal" value="paypal">
+                                        <input type="radio" class="radio-box" name="payment_method" id="paypal" value="paypal">
                                         <label class="label-text" for="paypal">Paypal</label>
                                     </div>
                                     <div class="u-s-m-b-13">

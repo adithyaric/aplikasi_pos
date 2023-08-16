@@ -217,7 +217,7 @@ const Cart = () => {
 
     //Hold
     const loadWishlist = () => {
-        axios.get("/wishlist").then((res) => {
+        axios.get("/wishlist-pos").then((res) => {
             setWishlist(res.data);
         });
     };
@@ -231,7 +231,7 @@ const Cart = () => {
             showLoaderOnConfirm: true,
             preConfirm: (name) => {
                 return axios
-                    .post("/wishlist", {
+                    .post("/wishlist-pos", {
                         cart,
                         customer_id: customerId,
                         name: name,
