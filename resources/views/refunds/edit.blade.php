@@ -39,7 +39,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
+                                <select id="outlet" class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
                                     style="width: 100%;">
                                     <option value="" selected disabled>Pilih Outlet</option>
                                     @foreach ($outlets as $outlet)
@@ -196,14 +196,39 @@
             }
         }
 
-        $('#penjualan').on('change', function() {
-            // Get the selected penjualan_id
-            let penjualan_id = $(this).val();
-            // Fetch the related customer data from the server
-            $.get('/get-customer/' + penjualan_id, function(data) {
-                // Set the value of the customer select element using the Select2 API
-                $('#customer').val(data.id).trigger('change.select2');
+        $('#penjualan').prop('disabled', true);
+        $('#customer').prop('disabled', true);
+
+        $('#outlet').on('change', function() {
+            let outlet_id = $(this).val();
+            $.get('/get-penjualan/' + outlet_id, function(data) {
+                $('#penjualan').find('option').remove();
+                let defaultOption = $('<option>').val('').text('Pilih Penjualan').prop('disabled', true).prop('selected', true);
+                $('#penjualan').append(defaultOption);
+                data.forEach(function(penjualan) {
+                    let option = $('<option>').val(penjualan.id).text(penjualan.code);
+                    $('#penjualan').append(option);
+                });
+                $('#penjualan').trigger('change.select2');
             });
+            $('#penjualan').prop('disabled', false);
+            $('#customer').prop('disabled', true);
+            $('#customer').find('option').remove();
+            let defaultOption = $('<option>').val('').text('Pilih Customer').prop('disabled', true).prop('selected', true);
+            $('#customer').append(defaultOption);
+        });
+
+        $('#penjualan').on('change', function() {
+            let penjualan_id = $(this).val();
+            $.get('/get-customer/' + penjualan_id, function(data) {
+                $('#customer').find('option').remove();
+                let defaultOption = $('<option>').val('').text('Pilih Customer').prop('disabled', true).prop('selected', true);
+                $('#customer').append(defaultOption);
+                let option = $('<option>').val(data.id).text(data.name);
+                $('#customer').append(option);
+                $('#customer').trigger('change.select2');
+            });
+            $('#customer').prop('disabled', false);
         });
     </script>
 @endsection

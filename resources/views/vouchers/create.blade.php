@@ -61,9 +61,9 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Value</label>
+                                <label for="">Nominal/Percentage</label>
                                 <input type="text" class="form-control" name="value" value="{{ old('value') }}"
-                                    placeholder="Masukkan Value">
+                                    placeholder="Masukkan Nominal">
                                 @error('value')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}

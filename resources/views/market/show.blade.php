@@ -221,42 +221,44 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row r-2 u-s-m-b-26 u-s-p-b-22">
-                                    @if (auth()->user()->reviews()->where('product_id', $product->id))
-                                    <div class="col-lg-12">
-                                        <ol>
-                                            @foreach (auth()->user()->reviews()->where('product_id', $product->id)->get() as $review)
-                                                <li>{{ $review->comment }}</li>
-                                            @endforeach
-                                        </ol>
-                                    </div>
-                                    @endif
-                                    <hr />
-                                    <div class="col-lg-12">
-                                        <form action="{{ route('review.store') }}" method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="your-rating-wrapper">
-                                                <h6 class="review-h6">Your Review is matter.</h6>
-                                                <h6 class="review-h6">Have you used this product before?</h6>
-                                                <div class="star-wrapper u-s-m-b-8">
-                                                    <div class="star">
-                                                        <span id="your-stars" style='width:0'></span>
+                                @auth
+                                    <div class="row r-2 u-s-m-b-26 u-s-p-b-22">
+                                        @if (auth()->user()->reviews()->where('product_id', $product->id))
+                                        <div class="col-lg-12">
+                                            <ol>
+                                                @foreach (auth()->user()->reviews()->where('product_id', $product->id)->get() as $review)
+                                                    <li>{{ $review->comment }}</li>
+                                                @endforeach
+                                            </ol>
+                                        </div>
+                                        @endif
+                                        <hr />
+                                        <div class="col-lg-12">
+                                            <form action="{{ route('review.store') }}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="your-rating-wrapper">
+                                                    <h6 class="review-h6">Your Review is matter.</h6>
+                                                    <h6 class="review-h6">Have you used this product before?</h6>
+                                                    <div class="star-wrapper u-s-m-b-8">
+                                                        <div class="star">
+                                                            <span id="your-stars" style='width:0'></span>
+                                                        </div>
+                                                        <label for="your-rating-value"></label>
+                                                        <input id="your-rating-value" name="rating" type="text" class="text-field" placeholder="0.0">
+                                                        <span id="star-comment"></span>
                                                     </div>
-                                                    <label for="your-rating-value"></label>
-                                                    <input id="your-rating-value" name="rating" type="text" class="text-field" placeholder="0.0">
-                                                    <span id="star-comment"></span>
+                                                    <label for="review-text-area">Review
+                                                        <span class="astk"> *</span>
+                                                    </label>
+                                                    <textarea class="text-area u-s-m-b-8" name="comment" id="review-text-area" placeholder="Review"></textarea>
+                                                    <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+                                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                    <button type="submit" class="button button-outline-secondary">Submit Review</button>
                                                 </div>
-                                                <label for="review-text-area">Review
-                                                    <span class="astk"> *</span>
-                                                </label>
-                                                <textarea class="text-area u-s-m-b-8" name="comment" id="review-text-area" placeholder="Review"></textarea>
-                                                <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
-                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                <button type="submit" class="button button-outline-secondary">Submit Review</button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
+                                @endauth
                             </div>
                         </div>
                         <!-- Reviews-Tab /- -->

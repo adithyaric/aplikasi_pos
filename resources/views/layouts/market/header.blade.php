@@ -98,8 +98,10 @@
                             <li>
                                 <a href="{{ route('marketcart.index') }}">
                                     <i class="ion ion-md-basket"></i>
-                                    <span class="item-counter">{{ Cart::session(auth()->id())->getContent()->count() }}</span>
-                                    <span class="item-price">Rp. {{ number_format(Cart::session(auth()->id())->getTotal(), 0, ',', '.') }}</span>
+                                    @auth
+                                        <span class="item-counter">{{ Cart::session(auth()->id())->getContent()->count() }}</span>
+                                        <span class="item-price">Rp. {{ number_format(Cart::session(auth()->id())->getTotal(), 0, ',', '.') }}</span>
+                                    @endauth
                                 </a>
                             </li>
                         </ul>
@@ -136,110 +138,14 @@
                         <nav>
                             <div class="v-wrapper">
                                 <ul class="v-list animated fadeIn">
-                                    <li class="js-backdrop">
-                                        <a href="#">
-                                            <i class="ion ion-md-shirt"></i>
-                                            Men's Clothing
-                                            <i class="ion ion-ios-arrow-forward"></i>
-                                        </a>
-                                        <button class="v-button ion ion-md-add"></button>
-                                        <div class="v-drop-right" style="width: 700px;">
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="shop-v2-sub-#">Tops</a>
-                                                            <ul>
-                                                                <li><a href="#">T-Shirts</a></li>
-                                                                <li><a href="#">Hoodies</a></li>
-                                                                <li><a href="#">Suits</a></li>
-                                                                <li><a href="#">Black Bean T-Shirt</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="shop-v2-sub-#">Outwear</a>
-                                                            <ul>
-                                                                <li><a href="#">Jackets</a></li>
-                                                                <li><a href="#">Trench</a></li>
-                                                                <li><a href="#">Parkas</a></li>
-                                                                <li><a href="#">Sweaters</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="#">Accessories</a>
-                                                            <ul>
-                                                                <li><a href="#">Watches</a></li>
-                                                                <li><a href="#">Ties</a></li>
-                                                                <li><a href="#">Scarves</a></li>
-                                                                <li><a href="#">Belts</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="shop-v2-sub-#">Bottoms</a>
-                                                            <ul>
-                                                                <li><a href="#">Casual Pants</a></li>
-                                                                <li><a href="#">Shoes</a></li>
-                                                                <li><a href="#">Jeans</a></li>
-                                                                <li><a href="#">Shorts</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="shop-v2-sub-#">Underwear</a>
-                                                            <ul>
-                                                                <li><a href="#">Boxers</a></li>
-                                                                <li><a href="#">Briefs</a></li>
-                                                                <li><a href="#">Robes</a></li>
-                                                                <li><a href="#">Socks</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <ul class="v-level-2">
-                                                        <li>
-                                                            <a href="shop-v2-sub-#">Sunglasses</a>
-                                                            <ul>
-                                                                <li><a href="#">Pilot</a></li>
-                                                                <li><a href="#">Wayfarer</a></li>
-                                                                <li><a href="#">Square</a></li>
-                                                                <li><a href="#">Round</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="ion ion-md-phone-portrait"></i>
-                                            Mobiles & Tablets
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="v-more">
-                                            <i class="ion ion-md-add"></i>
-                                            <span>View More</span>
-                                        </a>
-                                    </li>
+                                    @foreach ($categories as $category)
+                                        <li>
+                                            <a href="#">
+                                                <i class="ion ion-md-phone-portrait"></i>
+                                                {{ $category->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                         </nav>

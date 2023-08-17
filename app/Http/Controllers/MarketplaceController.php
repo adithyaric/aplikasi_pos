@@ -70,7 +70,7 @@ class MarketplaceController extends Controller
             $discount = $cartSubtotal - $cartTotal;
 
             // Generate the next invoice code
-            $lastOrder = Penjualan::orderBy('created_at', 'desc')->first();
+            $lastOrder = Penjualan::whereNull('outlet_id')->orderBy('created_at', 'desc')->first();
             $nextInvoiceNumber = $lastOrder ? ((int) substr($lastOrder->code, 3) + 1) : 1;
             $nextInvoiceNumber = str_pad($nextInvoiceNumber, 3, '0', STR_PAD_LEFT);
             $nextInvoiceCode = 'INV'.$nextInvoiceNumber;
@@ -110,6 +110,8 @@ class MarketplaceController extends Controller
             // Cart::session(auth()->id())->getConditions()
 
             DB::commit();
+
+            return redirect()->route('marketcart.index')->with('success', 'Voucher applied successfully!');
         } catch (Exception $e) {
             DB::rollBack();
 

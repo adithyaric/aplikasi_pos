@@ -39,7 +39,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
+                                <select id="outlet" class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
                                     style="width: 100%;">
                                     <option value="" selected disabled>Pilih Outlet</option>
                                     @foreach ($outlets as $outlet)
@@ -196,14 +196,22 @@
             }
         }
 
-        $('#pembelian').on('change', function() {
-            // Get the selected pembelian_id
-            let pembelian_id = $(this).val();
-            // Fetch the related customer data from the server
-            $.get('/get-customer/' + pembelian_id, function(data) {
-                // Set the value of the customer select element using the Select2 API
-                $('#customer').val(data.id).trigger('change.select2');
+        $('#pembelian').prop('disabled', true);
+
+        $('#outlet').on('change', function() {
+            let outlet_id = $(this).val();
+            $.get('/get-pembelian/' + outlet_id, function(data) {
+                $('#pembelian').find('option').remove();
+                let defaultOption = $('<option>').val('').text('Pilih Penjualan').prop('disabled', true).prop('selected', true);
+                $('#pembelian').append(defaultOption);
+                data.forEach(function(pembelian) {
+                    let option = $('<option>').val(pembelian.id).text(pembelian.code);
+                    $('#pembelian').append(option);
+                });
+                $('#pembelian').trigger('change.select2');
             });
+            $('#pembelian').prop('disabled', false);
         });
+
     </script>
 @endsection

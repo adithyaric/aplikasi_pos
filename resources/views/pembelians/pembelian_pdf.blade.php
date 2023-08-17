@@ -26,10 +26,10 @@
 <body>
     <h1>Pembelian #{{ $pembelian->code }}</h1>
     <table>
-        <tr>
-            <td>Barcode</td>
-            <td>{!! DNS1D::getBarcodeHTML($pembelian->code, 'C128') !!}</td>
-        </tr>
+        {{-- <tr> --}}
+        {{-- <td>Barcode</td> --}}
+        {{-- <td>{!! DNS1D::getBarcodeHTML($pembelian->code, 'C128') !!}</td> --}}
+        {{-- </tr> --}}
         <tr>
             <td>Outlet</td>
             <td>{{ $pembelian->outlet->name }}</td>

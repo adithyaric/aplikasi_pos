@@ -13,6 +13,13 @@ use PDF;
 
 class PembelianController extends Controller
 {
+    public function getPembelian($outlet_id)
+    {
+        $pembelians = Pembelian::where('outlet_id', $outlet_id)->get();
+
+        return response()->json($pembelians);
+    }
+
     public function index()
     {
         return view('pembelians.index', [

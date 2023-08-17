@@ -35,9 +35,11 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
+    Route::get('/get-penjualan/{outlet_id}', [PenjualanController::class, 'getPenjualan']);
+    Route::get('/get-pembelian/{outlet_id}', [PembelianController::class, 'getPembelian']);
 
     Route::resource('/customer', CustomerController::class);
-    Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
     Route::resource('/kas', KasController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
@@ -80,8 +82,8 @@ Route::middleware(['role:superadmin'])->group(function () {
     Route::resource('/admin', AdminController::class);
 });
 
+Route::resource('/market', MarketplaceController::class);
 Route::middleware(['role:customer'])->group(function () {
-    Route::resource('/market', MarketplaceController::class);
     Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
     Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
     Route::resource('/wishlist', WishlistController::class);

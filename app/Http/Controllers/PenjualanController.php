@@ -14,10 +14,17 @@ use Illuminate\Support\Facades\DB;
 
 class PenjualanController extends Controller
 {
+    public function getPenjualan($outlet_id)
+    {
+        $penjualans = Penjualan::where('outlet_id', $outlet_id)->get();
+
+        return response()->json($penjualans);
+    }
+
     public function index()
     {
         return view('penjualan.index', [
-            'penjualan' => Penjualan::orderBy('outlet_id', 'asc')->get(),
+            'penjualan' => Penjualan::orderBy('created_at', 'desc')->get(),
         ]);
     }
 
