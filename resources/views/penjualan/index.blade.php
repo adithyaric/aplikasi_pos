@@ -34,7 +34,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>{{ $value->customer->name }}</td>
-                                    <td>{{ $value->kas->name ?? '___customer' }}</td>
+                                    <td>{{ $value->kas->name ?? $value->transaction->payment_method }}</td>
                                     <td>{{ $value->outlet->name ?? '___customer' }}</td>
                                     <td>{{ $value->kasir->name ?? '___customer' }}</td>
                                     <td>

@@ -39,6 +39,11 @@ class Penjualan extends Model
         return $this->belongsTo(Kas::class);
     }
 
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class);
+    }
+
     public function items()
     {
         return $this->hasMany(PenjualanItem::class);

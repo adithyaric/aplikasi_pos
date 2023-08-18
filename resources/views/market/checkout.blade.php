@@ -165,24 +165,14 @@
                                         </tr>
                                         </tbody>
                                     </table>
-                                    <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment_method" id="cash-on-delivery" value="cash" checked>
-                                        <label class="label-text" for="cash-on-delivery">Cash</label>
-                                    </div>
-                                    <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment_method" id="credit-card-stripe" value="credit">
-                                        <label class="label-text" for="credit-card-stripe">Credit Card</label>
-                                    </div>
-                                    <div class="u-s-m-b-13">
-                                        <input type="radio" class="radio-box" name="payment_method" id="paypal" value="paypal">
-                                        <label class="label-text" for="paypal">Paypal</label>
-                                    </div>
-                                    <div class="u-s-m-b-13">
-                                        <input type="checkbox" class="check-box" id="accept">
-                                        <label class="label-text no-color" for="accept">I’ve read and accept the
-                                            <a href="terms-and-conditions.html" class="u-c-brand">terms & conditions</a>
-                                        </label>
-                                    </div>
+                                    @foreach ($payments as $item)
+                                        <div class="u-s-m-b-13">
+                                            <input type="radio" class="radio-box" name="payment_method" id="{{ $item->id }}" value="{{ $item->name }}" @checked($loop->first)>
+                                            <label class="label-text" for="{{ $item->id }}">{{ $item->name }}</label>
+                                            <label class="label-text" for="{{ $item->id }}">{{ $item->bank_number }}</label>
+                                            <label class="label-text" for="{{ $item->id }}">{{ $item->desc }}</label>
+                                        </div>
+                                    @endforeach
                                     <button type="submit" class="button button-outline-secondary">Place Order</button>
                                 </div>
                             </div>

@@ -10,6 +10,7 @@ use App\Http\Controllers\KasController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\OutletController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\PenjualanController;
@@ -41,6 +42,7 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
 
     Route::resource('/customer', CustomerController::class);
     Route::resource('/kas', KasController::class);
+    Route::resource('/payment', PaymentMethodController::class);
     Route::resource('/outlet', OutletController::class);
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);

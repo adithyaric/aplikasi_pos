@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentMethod;
 use App\Models\Penjualan;
 use App\Models\PenjualanItem;
 use App\Models\Product;
 use App\Models\Slider;
+use App\Models\Transaction;
 use App\Models\Voucher;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
@@ -59,6 +61,7 @@ class MarketplaceController extends Controller
     public function checkout()
     {
         return view('market.checkout', [
+            'payments' => PaymentMethod::get(),
             'cartItems' => Cart::session(auth()->id())->getContent(),
         ]);
     }
@@ -116,6 +119,12 @@ class MarketplaceController extends Controller
                 // Save the PenjualanItem instance
                 $penjualanItem->save();
             }
+
+            Transaction::create([
+                'penjualan_id' => $penjualan->id,
+                'payment_method' => $request->payment_method,
+                'tanggal' => now(),
+            ]);
 
             // Clear the cart
             Cart::session(auth()->id())->clear();

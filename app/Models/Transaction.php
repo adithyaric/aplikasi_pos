@@ -10,6 +10,8 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'penjualan_id',
+        'payment_method',
         'tanggal',
         'status',
         'pic',
@@ -18,4 +20,9 @@ class Transaction extends Model
     protected $casts = [
         'tanggal' => 'datetime',
     ];
+
+    public function penjualan()
+    {
+        return $this->belongsTo(Penjualan::class);
+    }
 }

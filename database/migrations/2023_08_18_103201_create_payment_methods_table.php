@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Penjualan;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,9 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->foreignIdFor(Penjualan::class)->constrained()->cascadeOnDelete();
-            $table->string('payment_method')->nullable();
+        Schema::create('payment_methods', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('bank_number')->nullable();
+            $table->text('desc')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -27,8 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('payment_methods');
     }
 };
