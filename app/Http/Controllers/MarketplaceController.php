@@ -15,10 +15,24 @@ use Illuminate\Support\Facades\DB;
 
 class MarketplaceController extends Controller
 {
-    public function index()
+    public function index($category = null)
     {
+        $bestSellingProducts = Product::with('penjualanItems')->take(10)->get()->sortByDesc(function ($product) {
+            return $product->penjualanItems->sum('qty');
+        });
+        $topRatedProducts = Product::withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', 'desc')->take(10)->get();
+
+        $products = Product::query();
+        if ($category) {
+            $products->whereHas('category', function ($query) use ($category) {
+                $query->whereRaw("REPLACE(name, ' ', '_') = ?", [$category]);
+            });
+        }
+
         return view('market.index', [
-            'products' => Product::get(),
+            'products' => $products->get(),
+            'bestSellingProducts' => $bestSellingProducts,
+            'topRatedProducts' => $topRatedProducts,
             'sliders' => Slider::where('status', 'active')->get(),
         ]);
     }

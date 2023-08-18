@@ -22,11 +22,6 @@ class Pembelian extends Model
         return $this->belongsTo(Outlet::class);
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
@@ -40,5 +35,10 @@ class Pembelian extends Model
     public function stocks()
     {
         return $this->hasMany(Stock::class);
+    }
+
+    public function pembelianProducts()
+    {
+        return $this->hasMany(PembelianProduct::class);
     }
 }

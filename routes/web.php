@@ -58,6 +58,7 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
 
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
+    Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
     Route::resource('/refund', RefundController::class);
     Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);
@@ -82,7 +83,10 @@ Route::middleware(['role:superadmin'])->group(function () {
     Route::resource('/admin', AdminController::class);
 });
 
-Route::resource('/market', MarketplaceController::class);
+Route::get('/market/{category?}', [MarketplaceController::class, 'index'])->name('market.index');
+Route::get('/marketdetail/{id}', [MarketplaceController::class, 'show'])->name('market.show');
+Route::post('/marketstore', [MarketplaceController::class, 'store'])->name('market.store');
+
 Route::middleware(['role:customer'])->group(function () {
     Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
     Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');

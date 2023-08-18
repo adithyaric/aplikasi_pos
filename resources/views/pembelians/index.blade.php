@@ -26,6 +26,7 @@
                                     <td>Nama</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
+                                    <td>Posting</td>
                                 </tr>
                             </thead>
                             @foreach ($pembelians as $value)
@@ -34,14 +35,22 @@
                                     <td>{{ $value->code }}</td>
                                     <td>@currency($value->total)</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
-                                        <a class="btn btn-info" href="{{ route('pembelian.show', $value->id) }}">Print</a>
-                                        <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
-                                            style="display: inline;">
-                                            @method('delete')
+                                        <a class=" btn-sm btn btn-info" href="{{ route('pembelian.show', $value->id) }}">Print</a>
+                                        @if (!$value->is_published)
+                                            <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
+                                            <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
+                                                style="display: inline;">
+                                                @method('delete')
+                                                @csrf
+                                                <button class="border-0 btn-sm btn btn-danger"
+                                                    onclick="return confirm('Are you sure?')">Hapus</button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('pembelian.publish', $value) }}" method="POST">
                                             @csrf
-                                            <button class="border-0 btn btn-danger"
-                                                onclick="return confirm('Are you sure?')">Hapus</button>
+                                            <button class="btn btn-sm btn-primary" type="submit" @disabled($value->is_published)>Publish</button>
                                         </form>
                                     </td>
                                 </tr>

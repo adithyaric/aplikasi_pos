@@ -39,24 +39,34 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="men-best-selling-products">
-                            <!-- Product Not Found -->
-                            <div class="product-not-found">
-                                <div class="not-found">
-                                    <h2>SORRY!</h2>
-                                    <h6>There is not any product in specific catalogue.</h6>
+                            <div class="slider-fouc">
+                                <div class="products-slider owl-carousel" data-item="2">
+                                    @foreach ($bestSellingProducts as $best)
+                                        <div class="item">
+                                            <div class="image-container">
+                                                <a class="item-img-wrapper-link" href="{{ route('market.show', $best->id) }}">
+                                                    <img class="img-fluid" src="{{ asset($best->pic) }}" alt="Product">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
-                            <!-- Product Not Found /- -->
                         </div>
                         <div class="tab-pane fade" id="men-top-rating-products">
-                            <!-- Product Not Found -->
-                            <div class="product-not-found">
-                                <div class="not-found">
-                                    <h2>SORRY!</h2>
-                                    <h6>There is not any product in specific catalogue.</h6>
+                            <div class="slider-fouc">
+                                <div class="products-slider owl-carousel" data-item="2">
+                                    @foreach ($topRatedProducts as $top)
+                                        <div class="item">
+                                            <div class="image-container">
+                                                <a class="item-img-wrapper-link" href="{{ route('market.show', $top->id) }}">
+                                                    <img class="img-fluid" src="{{ asset($top->pic) }}" alt="Product">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
-                            <!-- Product Not Found /- -->
                         </div>
                     </div>
                 </div>

@@ -54,4 +54,9 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'user_wishlist')->withPivot('qty', 'name', 'customer_id');
     }
+
+    public function penjualanItems()
+    {
+        return $this->hasMany(PenjualanItem::class);
+    }
 }

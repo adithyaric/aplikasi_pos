@@ -138,11 +138,10 @@
                         <nav>
                             <div class="v-wrapper">
                                 <ul class="v-list animated fadeIn">
-                                    @foreach ($categories as $category)
+                                    @foreach($categories as $category)
                                         <li>
-                                            <a href="#">
-                                                <i class="ion ion-md-phone-portrait"></i>
-                                                {{ $category->name }}
+                                            <a href="{{ route('market.index', ['category' => Str::slug($category->name, '_')]) }}">
+                                                <i class="ion ion-md-phone-portrait"></i>{{$category->name}}
                                             </a>
                                         </li>
                                     @endforeach

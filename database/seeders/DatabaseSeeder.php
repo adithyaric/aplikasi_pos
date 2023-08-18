@@ -119,16 +119,16 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        for ($i = 1; $i <= 3; $i++) {
-            Pengeluaran::create([
-                'category_id' => Category::where('type', 'pengeluaran')->inRandomOrder()->first()->id,
-                'tanggal' => now()->addDays($i),
-                'biaya' => round(rand(10000, 100000), -4),
-                'desc' => 'Description '.$i,
-                'kas' => round(rand(10000, 100000), -4),
-                'jumlah' => round(rand(1, 10)),
-            ]);
-        }
+        // for ($i = 1; $i <= 3; $i++) {
+        //     Pengeluaran::create([
+        //         'category_id' => Category::where('type', 'pengeluaran')->inRandomOrder()->first()->id,
+        //         'tanggal' => now()->addDays($i),
+        //         'biaya' => round(rand(10000, 100000), -4),
+        //         'desc' => 'Description '.$i,
+        //         'kas' => round(rand(10000, 100000), -4),
+        //         'jumlah' => round(rand(1, 10)),
+        //     ]);
+        // }
 
         for ($i = 1; $i <= 3; $i++) {
             $pembelian = Pembelian::create([
