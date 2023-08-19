@@ -91,7 +91,8 @@ Route::post('/marketstore', [MarketplaceController::class, 'store'])->name('mark
 
 Route::middleware(['role:customer'])->group(function () {
     Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
-    Route::get('/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
+    Route::match(['get', 'post'], '/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
+    Route::get('/cities', [MarketplaceController::class, 'cities']);
     Route::resource('/wishlist', WishlistController::class);
     Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
     Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');

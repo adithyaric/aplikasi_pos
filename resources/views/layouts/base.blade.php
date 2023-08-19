@@ -119,6 +119,7 @@
     <script type="text/javascript" src="{{ asset('assets/marketplace/js/owl.carousel.min.js') }}"></script>
     <!-- Main -->
     <script type="text/javascript" src="{{ asset('assets/marketplace/js/app.js') }}"></script>
+    @yield('page-script')
 </body>
 
 </html>

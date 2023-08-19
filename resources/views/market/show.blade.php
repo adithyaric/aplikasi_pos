@@ -63,6 +63,10 @@
                                 <span>Only:</span>
                                 <span>{{ $product->stocks()->where('created_at', '<=', now())->where('expired_at', '>=', now())->sum('qty'); }}</span>
                             </div>
+                            <div class="left">
+                                <span>Weight:</span>
+                                <span>{{ $product->berat; }} gram</span>
+                            </div>
                         @else
                             <div class="availability">
                                 <span>Availability:</span>

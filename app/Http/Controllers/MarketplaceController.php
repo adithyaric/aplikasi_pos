@@ -14,6 +14,7 @@ use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class MarketplaceController extends Controller
 {
@@ -58,16 +59,95 @@ class MarketplaceController extends Controller
         ]);
     }
 
-    public function checkout()
+    public function cities(Request $request)
     {
+        $apiKey = env('APP_KEY_RAJAONGKIR');
+        $provinceId = $request->query('province_id');
+
+        $response = Http::withoutVerifying()->withHeaders([
+            'key' => $apiKey
+        ])->get("https://api.rajaongkir.com/starter/city?province=$provinceId");
+
+        return response()->json(json_decode($response->body(), true)['rajaongkir']['results']);
+    }
+
+    public function checkout(Request $request)
+    {
+        $apiKey = env('APP_KEY_RAJAONGKIR');
+        $cartItems = Cart::session(auth()->id())->getContent();
+
+        if ($request->isMethod('POST')) {
+            if ($cartItems->isEmpty()) {
+                return redirect()->back()->withErrors(['cart' => 'Your cart is empty.']);
+            }
+            $origin = 501; // Set the origin city ID here
+            $courier = $request->courier;
+            $destination = $request->city;
+            $weight = 0;
+            foreach ($cartItems as $item) {
+                $product = $item->associatedModel;
+                $weight += $product->berat * $item->quantity;
+            }
+
+            $response = Http::withoutVerifying()->withHeaders([
+                'key' => $apiKey
+            ])->get("https://api.rajaongkir.com/starter/city?id=$destination");
+            $destinationName = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
+
+            $response = Http::withoutVerifying()->asForm()->withHeaders([
+                'key' => $apiKey
+            ])->post('https://api.rajaongkir.com/starter/cost', [
+                'origin' => $origin,
+                'destination' => $destination,
+                'weight' => $weight,
+                'courier' => $courier
+            ]);
+
+            $costs = json_decode($response->body(), true)['rajaongkir']['results'][0]['costs'];
+            $shipping_cost = $costs[0]['cost'][0]['value'];
+
+            $condition = new CartCondition([
+                'name' => 'Shipping',
+                'type' => 'shipping',
+                'target' => 'total',
+                'value' => "+$shipping_cost",
+                'order' => 1
+            ]);
+
+            Cart::session(auth()->id())->condition($condition);
+
+            return redirect()->back()->with([
+                'shipping_cost' => $shipping_cost,
+                'destination' => $destinationName,
+                'courier' => $courier,
+                'weight' => $weight
+            ]);
+        }
+
+        $response = Http::withoutVerifying()->withHeaders([
+            'key' => $apiKey
+        ])->get('https://api.rajaongkir.com/starter/province');
+        $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
+
         return view('market.checkout', [
             'payments' => PaymentMethod::get(),
             'cartItems' => Cart::session(auth()->id())->getContent(),
+            'provinces' => $provinces,
         ]);
     }
 
     public function store(Request $request)
     {
+        $cartItems = Cart::session(auth()->id())->getContent();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->back()->withErrors(['cart' => 'Your cart is empty.']);
+        }
+
+        if (! session()->has('shipping_cost')) {
+            return redirect()->back()->withErrors(['shipping' => 'Please select a shipping method.']);
+        }
+
         DB::beginTransaction();
         try {
             // Get the data from the request
