@@ -74,8 +74,10 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/pembelian', [LaporanController::class, 'exportPembelian'])->name('laporan.pembelian');
+    Route::get('/laporan/pembelian-supplier', [LaporanController::class, 'exportPembelianSupplier'])->name('laporan.pembelian-supplier');
     Route::get('/laporan/penjualan', [LaporanController::class, 'exportPenjualan'])->name('laporan.penjualan');
     Route::get('/laporan/penjualan-kasir', [LaporanController::class, 'exportPenjualanKasir'])->name('laporan.penjualan-kasir');
+    Route::get('/laporan/penjualan-supplier', [LaporanController::class, 'exportPenjualanSupplier'])->name('laporan.penjualan-supplier');
     Route::get('/laporan/stock', [LaporanController::class, 'exportStock'])->name('laporan.stock');
     Route::get('/laporan/pengeluaran', [LaporanController::class, 'exportPengeluaran'])->name('laporan.pengeluaran');
     Route::get('/laporan/labarugi', [LaporanController::class, 'exportLabaRugi'])->name('laporan.labarugi');

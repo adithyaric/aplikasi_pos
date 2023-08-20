@@ -13,7 +13,7 @@
             <tr>
                 <td>{{ $penjualan->code }}</td>
                 <td>{{ $penjualan->customer->name }}</td>
-                <td>{{ $penjualan->kasir->name }}</td>
+                <td>{{ $penjualan->kasir->name ?? ''}}</td>
                 <td>@currency($penjualan->discount)</td>
                 <td>@currency($penjualan->total)</td>
             </tr>

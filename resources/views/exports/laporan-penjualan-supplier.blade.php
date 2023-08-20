@@ -4,9 +4,9 @@
             <th>Code</th>
             <th>Customer</th>
             <th>Kasir</th>
-            <th>Outlet</th>
             <th>Discount</th>
             <th>Total</th>
+            <th>Detail</th>
         </tr>
     </thead>
     <tbody>
@@ -15,9 +15,13 @@
                 <td>{{ $penjualan->code }}</td>
                 <td>{{ $penjualan->customer->name }}</td>
                 <td>{{ $penjualan->kasir->name ?? '' }}</td>
-                <td>{{ $penjualan->outlet->name ?? '' }}</td>
-                <td>{{ $penjualan->discount }}</td>
+                <td>@currency($penjualan->discount)</td>
                 <td>@currency($penjualan->total)</td>
+                <td>
+                    @foreach ($penjualan->items as $item)
+                        {{ $item->product->name }} ({{ $item->product->supplier->name }})@if (!$loop->last), @endif
+                    @endforeach
+                </td>
             </tr>
         @endforeach
     </tbody>

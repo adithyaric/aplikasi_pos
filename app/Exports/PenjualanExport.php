@@ -21,6 +21,7 @@ class PenjualanExport implements FromView
         $tanggal = isset($request->tanggal) ? explode(' - ', $request->tanggal) : null;
         $this->startDate = $tanggal[0] ?? null;
         $this->endDate = $tanggal[1] ?? null;
+        $this->outlet_id = $request->outlet_id;
         $this->hari = $request->hari;
     }
 
