@@ -15,6 +15,7 @@ class Pembelian extends Model
         'supplier_id',
         'kas_id',
         'total',
+        'is_published',
     ];
 
     public function outlet()

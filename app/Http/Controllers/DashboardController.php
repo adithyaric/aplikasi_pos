@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\PenjualanItem;
 use App\Models\Product;
@@ -79,6 +80,7 @@ class DashboardController extends Controller
             'products' => Product::count(),
             'stocks' => Stock::sum('qty'),
             'penjualans' => Penjualan::count(),
+            'pembelianTerkirim' => Pembelian::where('is_published', true)->count(),
             'totalRevenue' => $monthlyRevenue->sum('total'),
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);

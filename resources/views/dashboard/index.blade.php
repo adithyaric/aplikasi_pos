@@ -11,7 +11,7 @@
 
     <section class="content">
         <div class="row">
-            <div class="col-lg-3 col-xs-3">
+            <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">
                     <div class="inner">
                         <p style="font-size:20px;">{{ $products }}</p>
@@ -22,7 +22,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-xs-3">
+            <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">
                     <div class="inner">
                         <p style="font-size:20px;">{{ $stocks }}</p>
@@ -34,6 +34,17 @@
                 </div>
             </div>
             <div class="col-lg-3 col-xs-3">
+                <div class="small-box bg-yellow-gradient">
+                    <div class="inner">
+                        <p style="font-size:20px;">{{ $pembelianTerkirim }}</p>
+                        <p>Jumlah Total Pembelian Terkirim</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-rocket"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">
                     <div class="inner">
                         <p style="font-size:20px;">{{ $penjualans }}</p>
@@ -55,12 +66,20 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-xs-6">
-                <div id="bestBuyProducts"></div>
-            </div>
             {{-- <div class="col-lg-6 col-xs-6"> --}}
             {{-- <div id="bestOutlets"></div> --}}
             {{-- </div> --}}
+            {{-- <div class="col-lg-12 col-xs-12"> --}}
+            {{-- <h1 for="check-sliders">Sliders</h1> --}}
+            {{-- @foreach ($sliders as $slider) --}}
+            {{-- <img class="img-thumbnail" src="{{ asset($slider->pic) }}" alt=""> --}}
+            {{-- @endforeach --}}
+            {{-- </div> --}}
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-xs-6">
+                <div id="bestBuyProducts"></div>
+            </div>
             <div class="col-lg-6 col-xs-6">
                 <div id="bestBuySuppliers"></div>
                 <hr />
@@ -77,12 +96,6 @@
                 <div id="productGraph"></div>
                 <hr />
             </div>
-            {{-- <div class="col-lg-12 col-xs-12"> --}}
-            {{-- <h1 for="check-sliders">Sliders</h1> --}}
-            {{-- @foreach ($sliders as $slider) --}}
-            {{-- <img class="img-thumbnail" src="{{ asset($slider->pic) }}" alt=""> --}}
-            {{-- @endforeach --}}
-            {{-- </div> --}}
         </div>
     </section>
 @endsection

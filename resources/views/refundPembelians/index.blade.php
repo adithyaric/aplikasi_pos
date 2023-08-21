@@ -24,6 +24,7 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
+                                    <td>Nama Operator</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
                                 </tr>
@@ -32,6 +33,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
+                                    <td>{{ $value->user->name }}</td>
                                     <td>@currency($value->total)</td>
                                     <td>
                                         <a class="btn btn-info" href="{{ route('refundPembelian.show', $value->id) }}">Show</a>

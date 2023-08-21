@@ -50,6 +50,7 @@ class RefundPembelianController extends Controller
         $data = $request->validated();
 
         $data['total'] = (int) str_replace(',', '', $data['total']);
+        $data['user_id'] = auth()->user()->id;
         $refundPembelian = RefundPembelian::create($data);
 
         foreach ($request->product as $product) {
@@ -68,6 +69,7 @@ class RefundPembelianController extends Controller
     {
         $data = $request->validated();
         $data['total'] = (int) str_replace(',', '', $data['total']);
+        $data['user_id'] = auth()->user()->id;
         $refundPembelian->update($data);
         RefundPembelianItem::where('refund_pembelian_id', $refundPembelian->id)->delete();
         foreach ($request->product as $product) {

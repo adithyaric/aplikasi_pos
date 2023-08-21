@@ -50,6 +50,7 @@ class RefundController extends Controller
         $data = $request->validated();
 
         $data['total'] = (int) str_replace(',', '', $data['total']);
+        $data['user_id'] = auth()->user()->id;
         $refund = Refund::create($data);
 
         foreach ($request->product as $product) {
@@ -68,6 +69,7 @@ class RefundController extends Controller
     {
         $data = $request->validated();
         $data['total'] = (int) str_replace(',', '', $data['total']);
+        $data['user_id'] = auth()->user()->id;
         $refund->update($data);
         RefundItem::where('refund_id', $refund->id)->delete();
         foreach ($request->product as $product) {

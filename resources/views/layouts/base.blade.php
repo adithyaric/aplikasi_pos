@@ -35,6 +35,7 @@
 
     <!-- app -->
     <div id="app">
+        @include('sweetalert::alert')
         @include('layouts.market.header')
         @yield('container')
         @include('layouts.market.footer')

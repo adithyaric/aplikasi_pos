@@ -14,6 +14,7 @@ class RefundPembelian extends Model
         'customer_id',
         'pembelian_id',
         'outlet_id',
+        'user_id',
         'tanggal',
         'total',
     ];
@@ -21,6 +22,11 @@ class RefundPembelian extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function outlet()
