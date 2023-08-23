@@ -51,11 +51,31 @@
         <div class="container">
             <div class="clearfix row align-items-center">
                 <div class="col-lg-3 col-md-9 col-sm-6">
-                    <div class="brand-logo text-lg-center">
-                        <a href="{{ route('market.index') }}">
-                            <img src="{{ asset('assets/marketplace/images/main-logo/groover-branding-1.png') }}"
-                                alt="Groover Brand Logo" class="app-brand-logo">
-                        </a>
+                    {{-- <div class="brand-logo text-lg-center"> --}}
+                        {{-- <a href="{{ route('market.index') }}"> --}}
+                            {{-- <img src="{{ asset('assets/marketplace/images/main-logo/groover-branding-1.png') }}" --}}
+                                {{-- alt="Groover Brand Logo" class="app-brand-logo"> --}}
+                        {{-- </a> --}}
+                    {{-- </div> --}}
+                    <div class="v-menu v-close">
+                        <span class="v-title">
+                            <i class="ion ion-md-menu"></i>
+                            All Categories
+                            <i class="fas fa-angle-down"></i>
+                        </span>
+                        <nav>
+                            <div class="v-wrapper">
+                                <ul class="v-list animated fadeIn">
+                                    @foreach($categories as $category)
+                                        <li>
+                                            <a href="{{ route('market.index', ['category' => Str::slug($category->name, '_')]) }}">
+                                                <i class="ion ion-md-phone-portrait"></i>{{$category->name}}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </nav>
                     </div>
                 </div>
                 <div class="col-lg-6 u-d-none-lg">
@@ -109,56 +129,42 @@
     </div>
     <!-- Responsive-Buttons /- -->
     <!-- Bottom-Header -->
-    <div class="full-layer-bottom-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-3">
-                    <div class="v-menu v-close">
-                        <span class="v-title">
-                            <i class="ion ion-md-menu"></i>
-                            All Categories
-                            <i class="fas fa-angle-down"></i>
-                        </span>
-                        <nav>
-                            <div class="v-wrapper">
-                                <ul class="v-list animated fadeIn">
-                                    @foreach($categories as $category)
-                                        <li>
-                                            <a href="{{ route('market.index', ['category' => Str::slug($category->name, '_')]) }}">
-                                                <i class="ion ion-md-phone-portrait"></i>{{$category->name}}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-                <div class="col-lg-9">
-                    <ul class="bottom-nav g-nav u-d-none-lg">
-                        <li>
-                            <a href="#">New Arrivals
-                                <span class="superscript-label-new">NEW</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">Exclusive Deals
-                                <span class="superscript-label-hot">HOT</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">Flash Deals</a>
-                        </li>
-                        <li>
-                            <a href="#">Super Sale
-                                <span class="superscript-label-discount">-15%</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- <div class="full-layer-bottom-header"> --}}
+        {{-- <div class="container"> --}}
+            {{-- <div class="row align-items-center"> --}}
+                {{-- <div class="col-lg-3"> --}}
+                    {{-- <div class="v-menu v-close"> --}}
+                        {{-- <span class="v-title"> --}}
+                            {{-- <i class="ion ion-md-menu"></i> --}}
+                            {{-- All Categories --}}
+                            {{-- <i class="fas fa-angle-down"></i> --}}
+                        {{-- </span> --}}
+                        {{-- <nav> --}}
+                            {{-- <div class="v-wrapper"> --}}
+                                {{-- <ul class="v-list animated fadeIn"> --}}
+                                    {{-- @foreach($categories as $category) --}}
+                                        {{-- <li> --}}
+                                            {{-- <a href="{{ route('market.index', ['category' => Str::slug($category->name, '_')]) }}"> --}}
+                                                {{-- <i class="ion ion-md-phone-portrait"></i>{{$category->name}} --}}
+                                            {{-- </a> --}}
+                                        {{-- </li> --}}
+                                    {{-- @endforeach --}}
+                                {{-- </ul> --}}
+                            {{-- </div> --}}
+                        {{-- </nav> --}}
+                    {{-- </div> --}}
+                {{-- </div> --}}
+                {{-- <div class="col-lg-9"> --}}
+                    {{-- <ul class="bottom-nav g-nav u-d-none-lg"> --}}
+                        {{-- <li><a href="#">New Arrivals<span class="superscript-label-new">NEW</span></a></li> --}}
+                        {{-- <li><a href="#">Exclusive Deals<span class="superscript-label-hot">HOT</span></a></li> --}}
+                        {{-- <li><a href="#">Flash Deals</a></li> --}}
+                        {{-- <li><a href="#">Super Sale<span class="superscript-label-discount">-15%</span></a></li> --}}
+                    {{-- </ul> --}}
+                {{-- </div> --}}
+            {{-- </div> --}}
+        {{-- </div> --}}
+    {{-- </div> --}}
     <!-- Bottom-Header /- -->
 </header>
 <!-- Header /- -->

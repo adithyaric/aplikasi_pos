@@ -8,6 +8,7 @@ use App\Models\Pembelian;
 use App\Models\Product;
 use App\Models\RefundPembelian;
 use App\Models\RefundPembelianItem;
+use App\Models\Supplier;
 use App\Models\User;
 
 class RefundPembelianController extends Controller
@@ -25,6 +26,7 @@ class RefundPembelianController extends Controller
             'outlets' => Outlet::get(),
             'customers' => User::where('role', 'customer')->get(),
             'pembelians' => Pembelian::get(),
+            'suppliers' => Supplier::get(),
             'products' => Product::get(),
         ]);
     }
@@ -36,13 +38,17 @@ class RefundPembelianController extends Controller
             'outlets' => Outlet::get(),
             'customers' => User::where('role', 'customer')->get(),
             'pembelians' => Pembelian::get(),
+            'suppliers' => Supplier::get(),
             'products' => Product::get(),
         ]);
     }
 
     public function show(RefundPembelian $refundPembelian)
     {
-        dd($refundPembelian->load(['customer', 'outlet', 'pembelian', 'refundPembelianItems', 'refundPembelianItems.product'])->toArray());
+        // dd($refundPembelian->load(['customer', 'outlet', 'pembelian', 'refundPembelianItems', 'refundPembelianItems.product'])->toArray());
+        return view('refundPembelians.show', [
+            'refundPembelian' => $refundPembelian,
+        ]);
     }
 
     public function store(RefundPembelianRequest $request)

@@ -42,7 +42,10 @@ class RefundController extends Controller
 
     public function show(Refund $refund)
     {
-        dd($refund->load(['customer', 'outlet', 'penjualan', 'refundItems', 'refundItems.product'])->toArray());
+        // dd($refund->load(['customer', 'outlet', 'penjualan', 'refundItems', 'refundItems.product'])->toArray());
+        return view('refunds.show', [
+            'refund' => $refund,
+        ]);
     }
 
     public function store(RefundRequest $request)

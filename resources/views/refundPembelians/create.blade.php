@@ -66,17 +66,17 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label>Customer</label>
-                                <select id="customer" class="form-control select2" name="customer_id"
-                                    data-placeholder="Pilih Customer" style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Customer</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">
-                                            {{ $customer->name }}
+                                <label>Supplier</label>
+                                <select id="supplier" class="form-control select2" name="supplier_id"
+                                    data-placeholder="Pilih supplier" style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Supplier</option>
+                                    @foreach ($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}">
+                                            {{ $supplier->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('customer_id')
+                                @error('supplier_id')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>
