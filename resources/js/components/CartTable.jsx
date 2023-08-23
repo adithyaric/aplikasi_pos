@@ -123,11 +123,6 @@ const CartTable = ({
                                     >
                                         &times;
                                     </button>
-                                    {errorMessage && (
-                                        <p className="text-danger">
-                                            {errorMessage}
-                                        </p>
-                                    )}
                                 </div>
                                 <div className="modal-body">
                                     <Kas

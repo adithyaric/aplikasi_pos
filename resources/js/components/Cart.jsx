@@ -168,8 +168,19 @@ const Cart = () => {
 
     //Delete All item
     const handleEmptyCart = () => {
-        axios.post("/cart-empty", { _method: "DELETE" }).then((res) => {
-            setCart([]);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to clear your cart?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, clear it!",
+            cancelButtonText: "No, keep it",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post("/cart-empty", { _method: "DELETE" }).then((res) => {
+                    setCart([]);
+                });
+            }
         });
     };
 
@@ -336,24 +347,19 @@ const Cart = () => {
             })
             .then((res) => {
                 loadCart();
-                loadWishlist();
                 loadProducts();
-                setBarcode("");
-                setCustomerId("");
-                setKasId("");
-                setSearch("");
-                setErrorMessage("");
-                setDiscount(0);
-                Swal.fire("Success!", "Pesanan berhasil dibuat", "success");
+                loadCustomers();
+                loadKas();
+                loadWishlist();
+                Swal.fire("Success!", "Pesanan berhasil dibuat", "success").then(() => {
+                    window.location.reload(false); // <-- added this line to refresh the page
+                });
             })
             .catch((err) => {
                 // console.log(err.response.data.message);
                 Swal.showValidationMessage(err.response.data.message);
                 setErrorMessage(err.response.data.message);
             });
-
-        // Hide the modal
-        $("#tombolSubmit").modal("hide");
     };
 
     // Add an onClick event handler to the "OK" button in the modal footer
@@ -374,6 +380,7 @@ const Cart = () => {
                     handleOnChangeBarcode={handleOnChangeBarcode}
                 />
                 <Customers
+                    key={customerId}
                     customers={customers}
                     customerId={customerId}
                     setCustomerId={setCustomerId}

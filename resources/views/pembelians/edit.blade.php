@@ -95,7 +95,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="product-repeater">
-                                    @foreach ($pembelian->stocks as $key => $stock)
+                                    @foreach ($pembelian->pembelianProducts as $key => $stock)
                                         <tr>
                                             <td>
                                                 <select class="form-control select2" data-placeholder="Pilih Product"

@@ -59,27 +59,9 @@
                     </div>
                 </div>
                 <div class="col-lg-6 u-d-none-lg">
-                    <form class="form-searchbox">
+                    <form action="{{ route('market.index') }}" method="GET" class="form-searchbox">
                         <label class="sr-only" for="search-landscape">Search</label>
-                        <input id="search-landscape" type="text" class="text-field" placeholder="Search everything">
-                        <div class="select-box-position">
-                            <div class="select-box-wrapper select-hide">
-                                <label class="sr-only" for="select-category">Choose category for search</label>
-                                <select class="select-box" id="select-category">
-                                    <option selected="selected" value="">
-                                        All
-                                    </option>
-                                    <option value="">Men's Clothing</option>
-                                    <option value="">Women's Clothing</option>
-                                    <option value="">Toys Hobbies & Robots</option>
-                                    <option value="">Mobiles & Tablets</option>
-                                    <option value="">Consumer Electronics</option>
-                                    <option value="">Books & Audible</option>
-                                    <option value="">Beauty & Health</option>
-                                    <option value="">Furniture Home & Office</option>
-                                </select>
-                            </div>
-                        </div>
+                        <input id="search-landscape" name="search" type="text" class="text-field" placeholder="Search everything">
                         <button id="btn-search" type="submit" class="button button-primary fas fa-search"></button>
                     </form>
                 </div>

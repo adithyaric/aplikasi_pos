@@ -18,6 +18,7 @@ class ProductController extends Controller
         $products = new Product();
         if ($request->search) {
             $products = $products->where('name', 'LIKE', "%{$request->search}%")
+                ->orWhere('code', 'LIKE', "%{$request->search}%")
                 ->orWhere('harga_jual', 'LIKE', "%{$request->search}%");
         }
         if (request()->wantsJson()) {

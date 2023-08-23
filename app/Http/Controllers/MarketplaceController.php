@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MarketplaceController extends Controller
 {
-    public function index($category = null)
+    public function index(Request $request, $category = null)
     {
         $bestSellingProducts = Product::with('penjualanItems')->take(10)->get()->sortByDesc(function ($product) {
             return $product->penjualanItems->sum('qty');
@@ -29,6 +29,11 @@ class MarketplaceController extends Controller
         $topRatedProducts = Product::withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', 'desc')->take(10)->get();
 
         $products = Product::query();
+        if ($request->search) {
+            $products = $products->where('name', 'LIKE', "%{$request->search}%")
+                ->orWhere('code', 'LIKE', "%{$request->search}%")
+                ->orWhere('harga_jual', 'LIKE', "%{$request->search}%");
+        }
         if ($category) {
             $products->whereHas('category', function ($query) use ($category) {
                 $query->whereRaw("REPLACE(name, ' ', '_') = ?", [$category]);

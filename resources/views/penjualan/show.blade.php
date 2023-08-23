@@ -226,25 +226,6 @@
         </button>
     </div>
 
-    <div id="bkpos_wrp" style="margin-top: 8px;">
-        <span class="left">
-            <a href="#"
-                style="width:100%; display:block; font-size:12px; text-decoration: none; text-align:center; color:#000; background-color:#4FA950; border:2px solid #4FA950; padding: 10px 0px; font-weight:bold;"
-                id="email">
-                Email
-            </a>
-        </span>
-    </div>
-
-    <div id="bkpos_wrp">
-        <span class="left">
-            <a href="#"
-                style="width:100%; display:block; font-size:12px; text-decoration: none; text-align:center; color:#000; background-color:#4FA950; border:2px solid #4FA950; padding: 10px 0px; font-weight:bold; margin-top: 6px;">
-                Print
-            </a>
-        </span>
-    </div>
-
     </div>
 </body>
 
