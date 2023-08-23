@@ -38,9 +38,9 @@
                             @foreach ($items as $item)
                                 <tr>
                                     <td>
-                                        <div class="cart-name">
+                                        <a href="{{ route('market.show', $item->id) }}" class="cart-name">
                                             {{ $item->name }}
-                                        </div>
+                                        </a>
                                     </td>
                                     <td>
                                         <div class="cart-price">

@@ -24,10 +24,10 @@ class RoleMiddleware
         if (! in_array($user->role, $roles)) {
             switch ($user->role) {
                 case 'customer':
-                    return redirect()->route('market.index')->with('toast_error', 'Maaf Anda tidak punya akses');
+                    return redirect()->route('market.index');
                 case 'kasir':
                 case 'superadmin':
-                    return redirect()->route('dashboard')->with('toast_error', 'Maaf Anda tidak punya akses');
+                    return redirect()->route('dashboard');
                 default:
                     return redirect('/')->with('toast_error', 'Maaf Anda tidak punya akses');
             }

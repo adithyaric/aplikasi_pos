@@ -41,6 +41,7 @@
                                     </td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('voucher.edit', $value->id) }}">Edit</a>
+                                        <a class="btn btn-info" href="{{ route('voucher.show', $value->id) }}">Lihat</a>
                                         <form action="{{ route('voucher.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

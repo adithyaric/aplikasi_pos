@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class PenjualanController extends Controller
 {
@@ -119,7 +120,13 @@ class PenjualanController extends Controller
 
     public function show(Penjualan $penjualan)
     {
-        dd($penjualan->load(['kasir', 'customer', 'items.product'])->toArray());
+        // dd($penjualan->load(['kasir', 'customer', 'items.product'])->toArray());
+        // $pdf = PDF::loadView('penjualan.penjualan_pdf', ['penjualan' => $penjualan]);
+
+        // return $pdf->download('penjualan_'.$penjualan->id.'.pdf');
+        return view('penjualan.show', [
+            'penjualan' => $penjualan,
+        ]);
     }
 
     // public function edit(Penjualan $penjualan)

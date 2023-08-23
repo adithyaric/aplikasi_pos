@@ -43,9 +43,6 @@ class PembelianController extends Controller
         $data = $request->validated();
         $pembelian = Pembelian::create($data);
         $this->updateStock($request, $pembelian);
-        $kas = Kas::find($request->kas_id);
-        $kas->nominal -= $request->total;
-        $kas->save();
 
         // $pdf = PDF::loadView('pembelians.pembelian_pdf', ['pembelian' => $pembelian]);
 
@@ -57,7 +54,13 @@ class PembelianController extends Controller
     public function show(Pembelian $pembelian)
     {
         // dd($pembelian->load(['stocks', 'stocks.product'])->toArray());
-        // Generate and download the PDF file
+        return view('pembelian.show', [
+            'pembelian' => $pembelian,
+        ]);
+    }
+
+    public function print(Pembelian $pembelian)
+    {
         $pdf = PDF::loadView('pembelians.pembelian_pdf', ['pembelian' => $pembelian]);
 
         return $pdf->download('pembelian_'.$pembelian->id.'.pdf');
@@ -88,6 +91,9 @@ class PembelianController extends Controller
         $pembelian->is_published = $pembelian->is_published ? false : true;
         $this->updateStock($pembelian->pembelianProducts, $pembelian);
         $pembelian->save();
+        $kas = Kas::find($pembelian->kas_id);
+        $kas->nominal -= $pembelian->total;
+        $kas->save();
 
         return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Memperbarui Data!');
     }

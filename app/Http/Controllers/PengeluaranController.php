@@ -27,8 +27,10 @@ class PengeluaranController extends Controller
     public function store(PengeluaranRequest $request)
     {
         $data = $request->validated();
-
         Pengeluaran::create($data);
+        $kas = Kas::find($data['kas_id']);
+        $kas->nominal -= $data['jumlah'];
+        $kas->save();
 
         return redirect(route('pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }

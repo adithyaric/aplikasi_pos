@@ -196,8 +196,8 @@
             }
         }
 
-        $('#penjualan').prop('disabled', true);
-        $('#customer').prop('disabled', true);
+        // $('#penjualan').prop('disabled', true);
+        // $('#customer').prop('disabled', true);
 
         $('#outlet').on('change', function() {
             let outlet_id = $(this).val();

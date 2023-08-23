@@ -39,7 +39,7 @@
                                 <tr>
                                     <td>
                                         <div class="cart-anchor-image">
-                                            <a href="#">
+                                            <a href="{{ route('market.show', $item->model->id) }}">
                                                 @if ($item->model)
                                                     <img class="img-thumbnail" src="{{ asset($item->model->pic) }}" alt="Product" width="100px">
                                                 @endif

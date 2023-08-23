@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect('/market');
 });
 
 Route::middleware(['role:kasir|superadmin'])->group(function () {
@@ -36,6 +36,8 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/setting', [DashboardController::class, 'setting'])->name('setting');
+    Route::post('/setting-store', [DashboardController::class, 'store'])->name('setting.store');
     Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
     Route::get('/get-penjualan/{outlet_id}', [PenjualanController::class, 'getPenjualan']);
     Route::get('/get-pembelian/{outlet_id}', [PembelianController::class, 'getPembelian']);
@@ -61,6 +63,7 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
     Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
+    Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
     Route::resource('/refund', RefundController::class);
     Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);
@@ -91,10 +94,10 @@ Route::get('/market/{category?}', [MarketplaceController::class, 'index'])->name
 Route::get('/marketdetail/{id}', [MarketplaceController::class, 'show'])->name('market.show');
 Route::post('/marketstore', [MarketplaceController::class, 'store'])->name('market.store');
 
+Route::get('/cities', [MarketplaceController::class, 'cities']);
 Route::middleware(['role:customer'])->group(function () {
     Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
     Route::match(['get', 'post'], '/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
-    Route::get('/cities', [MarketplaceController::class, 'cities']);
     Route::resource('/wishlist', WishlistController::class);
     Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
     Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');

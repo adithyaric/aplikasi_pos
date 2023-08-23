@@ -20,6 +20,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Nama Outlet</td>
                                     <td>Nama Product</td>
                                     <td>Harga Beli</td>
                                     <td>Qty</td>
@@ -31,6 +32,7 @@
                                 @foreach ($stocks as $stock)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $stock->product->outlet->name }}</td>
                                         <td>{{ $stock->product->name }}</td>
                                         <td>@currency($stock->harga_beli)</td>
                                         <td>{{ $stock->qty }}</td>

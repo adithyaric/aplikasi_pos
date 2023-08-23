@@ -35,7 +35,6 @@
                                     <td>{{ $value->code }}</td>
                                     <td>@currency($value->total)</td>
                                     <td>
-                                        <a class=" btn-sm btn btn-info" href="{{ route('pembelian.show', $value->id) }}">Print</a>
                                         @if (!$value->is_published)
                                             <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
                                             <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
@@ -45,6 +44,9 @@
                                                 <button class="border-0 btn-sm btn btn-danger"
                                                     onclick="return confirm('Are you sure?')">Hapus</button>
                                             </form>
+                                        @else
+                                        <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.show', $value->id) }}">Print Barcode</a>
+                                        <a class=" btn-sm btn btn-info" href="{{ route('pembelian.print', $value->id) }}">Print</a>
                                         @endif
                                     </td>
                                     <td>

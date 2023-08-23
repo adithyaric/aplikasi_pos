@@ -25,4 +25,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Penjualan::class);
     }
+
+    public function payment()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method');
+    }
 }

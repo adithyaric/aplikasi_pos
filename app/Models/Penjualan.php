@@ -19,6 +19,10 @@ class Penjualan extends Model
         'total',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');

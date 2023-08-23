@@ -19,6 +19,7 @@
                 </ul>
             </nav>
             <nav>
+                @auth
                 <ul class="secondary-nav g-nav">
                     <li>
                         <a>My Account
@@ -28,18 +29,19 @@
                             <li><a href="{{ route('marketcart.index') }}"><i class="fas fa-cog u-s-m-r-9"></i>My Cart</a></li>
                             <li><a href="{{ route('wishlist.index') }}"><i class="far fa-heart u-s-m-r-9"></i>My Wishlist</a></li>
                             <li><a href="{{ route('market.checkout') }}"><i class="far fa-check-circle u-s-m-r-9"></i>Checkout</a></li>
-                            @auth
                             <li><a href="{{ url('profile') }}"><i class="fas fa-user u-s-m-r-9"></i>Profile</a></li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button class="btn btn-default btn-flat">Logout</button>
                             </form>
-                            @else
-                            <li><a href="{{ route('login') }}"><i class="fas fa-sign-in-alt u-s-m-r-9"></i>Login / Signup</a></li>
-                            @endauth
                         </ul>
                     </li>
                 </ul>
+                @else
+                <ul class="secondary-nav g-nav">
+                    <li><a href="{{ route('login') }}"><i class="fas fa-sign-in-alt u-s-m-r-9"></i>Login / Signup</a></li>
+                </ul>
+                @endauth
             </nav>
         </div>
     </div>

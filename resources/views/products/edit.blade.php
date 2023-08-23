@@ -39,7 +39,7 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Code</label>
+                                <label for="">Kode Produk</label>
                                 <input type="text" class="form-control" name="code"
                                     value="{{ old('code', $product->code) }}" placeholder="Masukkan Code">
                                 @error('code')
@@ -79,7 +79,7 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Berat</label>
+                                <label for="">Berat (gram)</label>
                                 <input type="text" class="form-control" name="berat"
                                     value="{{ old('berat', $product->berat) }}" placeholder="Masukkan Berat">
                                 @error('berat')

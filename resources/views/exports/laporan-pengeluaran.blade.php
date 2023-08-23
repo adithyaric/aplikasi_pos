@@ -16,7 +16,7 @@
                 <td>{{ $pengeluaran->tanggal }}</td>
                 <td>@currency($pengeluaran->biaya)</td>
                 <td>{{ $pengeluaran->desc }}</td>
-                <td>@currency($pengeluaran->kas)</td>
+                <td>@currency($pengeluaran->kas->nominal)</td>
                 <td>{{ $pengeluaran->jumlah }}</td>
             </tr>
         @endforeach

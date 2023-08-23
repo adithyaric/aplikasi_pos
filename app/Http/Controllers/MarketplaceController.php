@@ -17,6 +17,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class MarketplaceController extends Controller
 {
@@ -82,7 +83,8 @@ class MarketplaceController extends Controller
             if ($cartItems->isEmpty()) {
                 return redirect()->back()->withErrors(['cart' => 'Your cart is empty.']);
             }
-            $origin = 501; // Set the origin city ID here
+            // Set the origin city ID here
+            $origin = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
             $courier = $request->courier;
             $destination = $request->city;
             $weight = 0;
@@ -160,13 +162,6 @@ class MarketplaceController extends Controller
             $nextInvoiceNumber = str_pad($nextInvoiceNumber, 3, '0', STR_PAD_LEFT);
             $nextInvoiceCode = 'INV'.$nextInvoiceNumber;
 
-            // // Get the data from the request
-            // $name = $request->name;
-            // $address = $request->address;
-            // $email = $request->email;
-            // $phone = $request->phone;
-            // $orderNotes = $request->order_notes;
-
             $penjualan = new Penjualan([
                 'code' => $nextInvoiceCode,
                 'customer_id' => auth()->user()->id,
@@ -183,6 +178,7 @@ class MarketplaceController extends Controller
                     ->where('created_at', '<=', $now)
                     ->where('expired_at', '>=', $now)
                     ->orderBy('expired_at', 'asc')
+                    ->lockForUpdate()
                     ->get();
                 if ($stocks->isEmpty()) {
                     throw new Exception('Stock not found or expired for product: '.$item->name);
@@ -230,18 +226,24 @@ class MarketplaceController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            return $e->getMessage();
+            // return $e->getMessage();
+            return redirect()->route('marketcart.index')->with('errors', $e->getMessage());
         }
     }
 
     public function coupon(Request $request)
     {
         $voucher = Voucher::where('code', $request->code)->first();
+        $voucherConditions = Cart::session(auth()->id())->getConditionsByType('Voucher');
+
+        foreach ($voucherConditions as $condition) {
+            Cart::session(auth()->id())->removeCartCondition($condition->getName());
+        }
 
         if ($voucher) {
             $condition = new CartCondition([
                 'name' => $voucher->name,
-                'type' => $voucher->type,
+                'type' => 'Voucher',
                 'target' => $voucher->jenis == 'keseluruhan' ? 'total' : 'subtotal',
                 'value' => $voucher->type == 'percentage' ? -$voucher->value.'%' : -$voucher->value,
             ]);

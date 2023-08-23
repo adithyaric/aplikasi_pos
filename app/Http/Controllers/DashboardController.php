@@ -12,6 +12,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -85,4 +87,25 @@ class DashboardController extends Controller
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
     }
+
+    public function setting()
+    {
+        $apiKey = env('APP_KEY_RAJAONGKIR');
+        $headers = ['key' => $apiKey];
+        $response = Http::withoutVerifying()->withHeaders($headers)->get('https://api.rajaongkir.com/starter/province');
+        $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
+        $originCity = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
+        $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$originCity");
+        $origin = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
+
+        return view('dashboard.setting', ['provinces' => $provinces, 'origin' => $origin]);
+    }
+
+    public function store(Request $request)
+    {
+        Storage::disk('public')->put('settings.json', json_encode(['origin' => $request->city]));
+
+        return redirect(route('setting'))->with('toast_success', 'Berhasil Menyimpan Data!');
+    }
+
 }

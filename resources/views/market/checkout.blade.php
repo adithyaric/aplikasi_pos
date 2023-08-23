@@ -3,6 +3,8 @@
 @section('title', 'Marketplace')
 
 @section('container')
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ asset('assets/adminlte/plugins/select2/select2.min.css') }}">
     <!-- Page Introduction Wrapper -->
     <div class="page-style-a">
         <div class="container">
@@ -134,14 +136,6 @@
                                                     </h3>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td>
-                                                    <h3 class="order-h3">Tax</h3>
-                                                </td>
-                                                <td>
-                                                    <h3 class="order-h3">$0.00</h3>
-                                                </td>
-                                            </tr>
                                             @foreach (Cart::session(auth()->id())->getConditions() as $condition)
                                                 <tr>
                                                     <td>
@@ -174,7 +168,7 @@
                                     @foreach ($payments as $item)
                                         <div class="u-s-m-b-13">
                                             <input type="radio" class="radio-box" name="payment_method"
-                                                id="{{ $item->id }}" value="{{ $item->name }}"
+                                                id="{{ $item->id }}" value="{{ $item->id }}"
                                                 @checked($loop->first)>
                                             <label class="label-text"
                                                 for="{{ $item->id }}">{{ $item->name }}</label>
@@ -197,8 +191,11 @@
     <!-- Checkout-Page /- -->
 @endsection
 @section('page-script')
+    <!-- Select2 -->
+    <script src="{{ asset('assets/adminlte/plugins/select2/select2.full.min.js') }}"></script>
     <script>
         $(document).ready(function() {
+            $(".select2").select2();
             $('#city').prop('disabled', true);
             $('#province').on('change', function() {
                 const provinceId = $(this).val();

@@ -112,7 +112,7 @@
                                         </li>
                                     </ul>
                                     <h6 class="item-title">
-                                        <a href="{{ route('market.show', $slider->id) }}">{{ $product->name }}</a>
+                                        <a href="{{ route('market.show', $product->id) }}">{{ $product->name }}</a>
                                     </h6>
                                 </div>
                                 <div class="price-template">
