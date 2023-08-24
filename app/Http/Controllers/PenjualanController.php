@@ -129,6 +129,13 @@ class PenjualanController extends Controller
         ]);
     }
 
+    public function print(Penjualan $penjualan)
+    {
+        return view('penjualan.print', [
+            'penjualan' => $penjualan,
+        ]);
+    }
+
     // public function edit(Penjualan $penjualan)
     // {
     //     return view('penjualan.edit', [

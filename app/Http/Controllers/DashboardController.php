@@ -94,16 +94,35 @@ class DashboardController extends Controller
         $headers = ['key' => $apiKey];
         $response = Http::withoutVerifying()->withHeaders($headers)->get('https://api.rajaongkir.com/starter/province');
         $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
-        $originCity = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
-        $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$originCity");
-        $origin = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
+        $origin = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
+        $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$origin");
+        $CityName = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
 
-        return view('dashboard.setting', ['provinces' => $provinces, 'origin' => $origin]);
+        return view('dashboard.setting', [
+            'provinces' => $provinces,
+            'origin' => $origin,
+            'CityName' => $CityName,
+            'email' => json_decode(Storage::disk('public')->get('settings.json'), true)['email'],
+            'telp' => json_decode(Storage::disk('public')->get('settings.json'), true)['telp'],
+            'address' => json_decode(Storage::disk('public')->get('settings.json'), true)['address'],
+        ]);
     }
 
     public function store(Request $request)
     {
-        Storage::disk('public')->put('settings.json', json_encode(['origin' => $request->city]));
+        $this->validate($request, [
+            'city' => 'required',
+            'email' => 'required',
+            'telp' => 'required',
+            'address' => 'required',
+        ]);
+
+        Storage::disk('public')->put('settings.json', json_encode([
+            'origin' => $request->city,
+            'email' => $request->email,
+            'telp' => $request->telp,
+            'address' => $request->address,
+        ]));
 
         return redirect(route('setting'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }

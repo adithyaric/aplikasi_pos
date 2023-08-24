@@ -17,15 +17,18 @@
         </tr>
     </thead>
     <tbody>
+        <tr>
+            <td colspan="3">Pengeluaran</td>
+        </tr>
         @foreach ($pengeluaran as $item)
             <tr>
-                <td>{{ $item->category->name }}</td>
-                <td>@currency($item->kas)</td>
+                <td>{{ $item->category->name }} - {{ $item->kas->name }}</td>
+                <td>@currency($item->jumlah)</td>
                 <td></td>
             </tr>
         @endforeach
         <tr>
-            <td>Pembelian</td>
+            <td>Total Pembelian</td>
             <td>@currency($total_pembelian)</td>
             <td></td>
         </tr>

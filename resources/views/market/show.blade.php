@@ -231,7 +231,7 @@
                                         <div class="col-lg-12">
                                             <ol>
                                                 @foreach (auth()->user()->reviews()->where('product_id', $product->id)->get() as $review)
-                                                    <li>{{ $review->comment }}</li>
+                                                    <li>{{ $review->comment }} By {{ $review->user->name }}</li>
                                                 @endforeach
                                             </ol>
                                         </div>

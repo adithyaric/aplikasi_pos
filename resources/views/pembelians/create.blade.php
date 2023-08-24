@@ -95,8 +95,8 @@
                                 <tbody id="product-repeater">
                                     <tr>
                                         <td>
-                                            <select class="form-control select2" data-placeholder="Pilih Product"
-                                                name="product[0][product_id]" required style="width:100%">
+                                            <select class="form-control select2 product" data-placeholder="Pilih Product" name="product[0][product_id]" required style="width:100%">
+                                                <option value="" disabled selected>Pilih Produk</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
@@ -109,12 +109,10 @@
                                             <input class="form-control" name="product[0][expired]" required type="date">
                                         </td>
                                         <td>
-                                            <input class="form-control harga_beli numeral-mask"
-                                                name="product[0][harga_beli]" required value="0">
+                                            <input class="form-control harga_beli numeral-mask" name="product[0][harga_beli]" required value="0">
                                         </td>
                                         <td>
-                                            <input class="form-control subtotal" name="product[0][subtotal]" required
-                                                readonly>
+                                            <input class="form-control subtotal" name="product[0][subtotal]" required readonly>
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)"
@@ -152,7 +150,8 @@
             let productTemplate = `
         <tr>
             <td>
-                <select required class="form-control select2" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                    <option value="" disabled selected>Pilih Produk</option>
                     @foreach ($products as $product)
                         <option value="{{ $product->id }}">{{ $product->name }}</option>
                     @endforeach
@@ -200,5 +199,13 @@
                 updateSubtotalAndTotal();
             }
         }
+
+        $(document).on('change', '.product', function() {
+            let harga_beli = $(this).closest('tr').find('.harga_beli');
+            let product_id = $(this).val();
+            $.get('/product/' + product_id, function(data) {
+                harga_beli.val(data.harga_beli);
+            });
+        });
     </script>
 @endsection

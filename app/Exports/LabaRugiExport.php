@@ -17,8 +17,7 @@ class LabaRugiExport implements FromView
         $total_penjualan = Penjualan::sum('total');
         $total_refund = Refund::sum('total');
         $total_pembelian = Pembelian::sum('total');
-        // $total_pengeluaran = Pengeluaran::sum('kas');
-        $total_pengeluaran = 0;
+        $total_pengeluaran = Pengeluaran::sum('jumlah');
         $laba_rugi = $total_penjualan - ($total_refund + $total_pembelian + $total_pengeluaran);
 
         return view('exports.laporan-laba-rugi', [

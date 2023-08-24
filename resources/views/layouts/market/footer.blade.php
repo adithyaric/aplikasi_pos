@@ -61,18 +61,18 @@
                         <ul>
                             <li>
                                 <i class="fas fa-location-arrow u-s-m-r-9"></i>
-                                <span>819 Sugar Camp Road, West Concord, MN 55985</span>
+                                <span>{{ json_decode(Storage::disk('public')->get('settings.json'), true)['address'] }}</span>
                             </li>
                             <li>
-                                <a href="tel:+923086561801">
+                                <a href="tel:{{ json_decode(Storage::disk('public')->get('settings.json'), true)['telp'] }}">
                                     <i class="fas fa-phone u-s-m-r-9"></i>
-                                    <span>+111-444-989</span>
+                                    <span>{{ json_decode(Storage::disk('public')->get('settings.json'), true)['telp'] }}</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="mailto:contact@domain.com">
+                                <a href="mailto:{{ json_decode(Storage::disk('public')->get('settings.json'), true)['email'] }}">
                                     <i class="fas fa-envelope u-s-m-r-9"></i>
-                                    <span>contact@domain.com</span>
+                                    <span>{{ json_decode(Storage::disk('public')->get('settings.json'), true)['email'] }}</span>
                                 </a>
                             </li>
                         </ul>

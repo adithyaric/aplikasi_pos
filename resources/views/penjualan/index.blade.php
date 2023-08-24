@@ -45,6 +45,7 @@
                                                 <th>Harga Jual</th>
                                                 <th>Sub total</th>
                                             </tr>
+                                            @php $totalCost = 0; @endphp
                                             @foreach ($value->items as $item)
                                                 <tr>
                                                     <td>{{ $item->product->name }}</td>
@@ -52,18 +53,20 @@
                                                     <td>@currency($item->price)</td>
                                                     <td>@currency($item->qty * $item->price)</td>
                                                 </tr>
+                                            @php $totalCost += $item->qty * $item->price; @endphp
                                             @endforeach
                                             <tr>
                                                 <th>Diskon : @currency($value->discount)</th>
-                                                <th colspan="3" class="text-right">Total : @currency($value->total + $value->discount)</th>
+                                                <th colspan="3" class="text-right">Total : @currency($totalCost)</th>
                                             </tr>
                                             <tr>
-                                                <th colspan="4" class="text-right">Grand Total : @currency($value->total)</th>
+                                                <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $value->discount)</th>
                                             </tr>
                                         </table>
                                     </td>
                                     <td>
                                         <a class="btn btn-info" href="{{ route('penjualan.show', $value->id) }}">Show</a>
+                                        <a class="btn btn-warning" href="{{ route('penjualan.print', $value->id) }}">Print</a>
                                         <form action="{{ route('penjualan.destroy', $value->id) }}" method="post"
                                             style="display: inline;">
                                             @method('delete')

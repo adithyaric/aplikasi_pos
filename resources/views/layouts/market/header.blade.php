@@ -6,14 +6,15 @@
             <nav>
                 <ul class="primary-nav g-nav">
                     <li>
-                        <a href="tel:+111444989">
+                        <a href="tel:{{ json_decode(Storage::disk('public')->get('settings.json'), true)['telp'] }}">
                             <i class="fas fa-phone u-c-brand u-s-m-r-9"></i>
-                            Telephone:+111-444-989</a>
+                            Telephone: {{ json_decode(Storage::disk('public')->get('settings.json'), true)['telp'] }}
+                        </a>
                     </li>
                     <li>
-                        <a href="mailto:contact@domain.com">
+                        <a href="mailto:{{ json_decode(Storage::disk('public')->get('settings.json'), true)['email'] }}">
                             <i class="fas fa-envelope u-c-brand u-s-m-r-9"></i>
-                            E-mail: contact@domain.com
+                            E-mail: {{ json_decode(Storage::disk('public')->get('settings.json'), true)['email'] }}
                         </a>
                     </li>
                 </ul>

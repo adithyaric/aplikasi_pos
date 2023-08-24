@@ -98,36 +98,26 @@
                                     @foreach ($pembelian->pembelianProducts as $key => $stock)
                                         <tr>
                                             <td>
-                                                <select class="form-control select2" data-placeholder="Pilih Product"
-                                                    name="product[{{ $key }}][product_id]" required
-                                                    style="width:100%">
+                                                <select class="form-control select2 product" data-placeholder="Pilih Product" name="product[{{ $key }}][product_id]" required style="width:100%">
                                                     @foreach ($products as $product)
-                                                        <option {{ $stock->product_id == $product->id ? 'selected' : '' }}
-                                                            value="{{ $product->id }}">{{ $product->name }}</option>
+                                                        <option {{ $stock->product_id == $product->id ? 'selected' : '' }} value="{{ $product->id }}">{{ $product->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
                                             <td>
-                                                <input class="form-control qty" name="product[{{ $key }}][qty]"
-                                                    required value="{{ $stock->qty }}">
+                                                <input class="form-control qty" name="product[{{ $key }}][qty]" required value="{{ $stock->qty }}">
                                             </td>
                                             <td>
-                                                <input class="form-control" name="product[{{ $key }}][expired]"
-                                                    required value="{{ $stock->expired_at->format('Y-m-d') }}"
-                                                    type="date">
+                                                <input class="form-control" name="product[{{ $key }}][expired]" required value="{{ $stock->expired_at->format('Y-m-d') }}" type="date">
                                             </td>
                                             <td>
-                                                <input class="form-control harga_beli numeral-mask"
-                                                    name="product[{{ $key }}][harga_beli]" required
-                                                    value="{{ $stock->harga_beli }}">
+                                                <input class="form-control harga_beli numeral-mask" name="product[{{ $key }}][harga_beli]" required value="{{ $stock->harga_beli }}">
                                             </td>
                                             <td>
-                                                <input class="form-control subtotal"
-                                                    name="product[{{ $key }}][subtotal]" required readonly>
+                                                <input class="form-control subtotal" name="product[{{ $key }}][subtotal]" required readonly>
                                             </td>
                                             <td>
-                                                <a class="btn btn-danger btn-group-sm"
-                                                    href="{{ route('stock.show', $stock->id) }}">
+                                                <a class="btn btn-danger btn-group-sm" href="{{ route('pembelian.stock.destroy', $stock->id) }}">
                                                     <li class="fa fa-trash"></li>
                                                 </a>
                                             </td>
@@ -164,7 +154,7 @@
             let productTemplate = `
         <tr>
             <td>
-                <select required class="form-control select2" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
                     @foreach ($products as $product)
                         <option value="{{ $product->id }}">{{ $product->name }}</option>
                     @endforeach
@@ -211,5 +201,13 @@
                 updateSubtotalAndTotal();
             }
         }
+
+        $(document).on('change', '.product', function() {
+            let harga_beli = $(this).closest('tr').find('.harga_beli');
+            let product_id = $(this).val();
+            $.get('/product/' + product_id, function(data) {
+                harga_beli.val(data.harga_beli);
+            });
+        });
     </script>
 @endsection

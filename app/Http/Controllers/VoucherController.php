@@ -37,7 +37,9 @@ class VoucherController extends Controller
 
     public function show(Voucher $voucher)
     {
-        dd($voucher);
+        return view('vouchers.show', [
+            'voucher' => $voucher,
+        ]);
     }
 
     public function edit(Voucher $voucher)

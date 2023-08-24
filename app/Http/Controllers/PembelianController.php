@@ -138,4 +138,17 @@ class PembelianController extends Controller
 
         return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Menghapus Data!');
     }
+
+    public function stockDestroy($id)
+    {
+        $pembelianProduct = PembelianProduct::find($id);
+        $pembelian = $pembelianProduct->pembelian;
+        $pembelianProduct->delete();
+
+        $pembelian->update(
+            ['total' => $pembelian->pembelianProducts->sum('subtotal')]
+        );
+
+        return redirect()->back()->with('toast_success', 'Berhasil Menghapus Data!');
+    }
 }

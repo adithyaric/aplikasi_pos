@@ -64,9 +64,11 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::resource('/pembelian', PembelianController::class);
     Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
     Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
+    Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
     Route::resource('/refund', RefundController::class);
     Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);
+    Route::get('/penjualan/{penjualan}/print', [PenjualanController::class, 'print'])->name('penjualan.print');
 
     Route::resource('/cart', CartController::class);
     Route::post('/cart-change-qty', [CartController::class, 'changeQty']);

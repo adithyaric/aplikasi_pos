@@ -15,8 +15,8 @@
             <div class="col-md-6">
                 <div class="box">
                     <div class="box-header">
-                        <label for="" class="text-muted">Atur Asal Pengiriman Barang : </label>
-                        <h3>Kabupaten/Kota <b>{{ $origin }}</b></h3>
+                        <label for="" class="text-muted">Asal Pengiriman Barang : </label>
+                        <h3>Kabupaten/Kota <b>{{ $CityName }}</b></h3>
                         @if ($errors->any())
                             <div class="alert alert-danger">
                                 <ul>
@@ -43,6 +43,19 @@
                                 <label for="city">City:</label>
                                 <select class="form-control select2" name="city" id="city" required></select>
                             </div>
+                            <div class="form-group">
+                                <label for="email">Email :</label>
+                                <input class="form-control" type="text" name="email" id="" value="{{ $email }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="telp">Telp :</label>
+                                <input class="form-control" type="text" name="telp" id="" value="{{ $telp }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="telp">Address :</label>
+                                <input class="form-control" type="text" name="address" id="" value="{{ $address }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->
@@ -67,12 +80,7 @@
                     });
                 });
             });
-            $('#city').on('change', function() {
-                const cityId = $(this).val();
-
-                // Submit the form using jQuery
-                $('#form').submit();
-            });
+            // $('#city').on('change', function() { const cityId = $(this).val(); $('#form').submit(); });
         });
     </script>
 @endsection

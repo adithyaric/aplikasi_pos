@@ -64,7 +64,7 @@
                                     @foreach ($penjualans as $penjualan)
                                         <option value="{{ $penjualan->id }}"
                                             {{ old('penjualan_id', $refund->penjualan_id) == $penjualan->id ? 'selected' : '' }}>
-                                            {{ $penjualan->code }}
+                                            {{ $penjualan->outlet->name ?? '__customer' }}, {{ $penjualan->code }}
                                         </option>
                                     @endforeach
                                 </select>

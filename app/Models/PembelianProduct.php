@@ -11,4 +11,14 @@ class PembelianProduct extends Model
     protected $casts = [
         'expired_at' => 'datetime',
     ];
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

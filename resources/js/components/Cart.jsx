@@ -19,7 +19,7 @@ const Cart = () => {
     const [kasId, setKasId] = useState("");
     const [barcode, setBarcode] = useState("");
     const [search, setSearch] = useState("");
-    const [discount, setDiscount] = useState(0);
+    const [discount, setDiscount] = useState("");
     const [total, setTotal] = useState(0);
     const [wishlist, setWishlist] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
@@ -357,7 +357,7 @@ const Cart = () => {
             })
             .catch((err) => {
                 // console.log(err.response.data.message);
-                Swal.showValidationMessage(err.response.data.message);
+                // Swal.showValidationMessage(err.response.data.message);
                 setErrorMessage(err.response.data.message);
             });
     };
