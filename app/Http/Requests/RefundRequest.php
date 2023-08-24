@@ -15,6 +15,7 @@ class RefundRequest extends FormRequest
     {
         return [
             'code' => 'required',
+            'kas_id' => 'required',
             'penjualan_id' => 'required',
             'customer_id' => 'required',
             'outlet_id' => 'required',

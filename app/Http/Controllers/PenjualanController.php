@@ -31,6 +31,10 @@ class PenjualanController extends Controller
 
     public function create()
     {
+        if (auth()->user()->role == 'kasir' | auth()->user()->role == 'admin'){
+            return redirect()->route('outlet.show', auth()->user()->outlet_id);
+        }
+
         return view('penjualan.create', [
             'outlets' => Outlet::get(),
         ]);

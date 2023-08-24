@@ -103,6 +103,7 @@ class CartController extends Controller
             'cart' => 'required|array',
             'cart.*.id' => 'required|exists:products,id',
             'cart.*.pivot.qty' => 'required|integer|min:1',
+            'outlet_id' => 'required',
             'customer_id' => 'required',
             'name' => 'required',
         ]);
@@ -111,6 +112,7 @@ class CartController extends Controller
             $product = Product::find($item['id']);
             $request->user()->wishlist()->attach($product->id, [
                 'qty' => $item['pivot']['qty'],
+                'outlet_id' => $request->outlet_id,
                 'customer_id' => $request->customer_id,
                 'name' => $request->name,
             ]);
@@ -120,9 +122,9 @@ class CartController extends Controller
         return response(['success' => true]);
     }
 
-    public function getWishlist(Request $request)
+    public function getWishlist(Request $request, $outlet_id)
     {
-        $wishlist = $request->user()->wishlist()->withPivot('name', 'customer_id')->get();
+        $wishlist = $request->user()->wishlist()->wherePivot('outlet_id', $outlet_id)->withPivot('name', 'customer_id', 'outlet_id')->get();
         $grouped = $wishlist->groupBy(['pivot.name', 'pivot.customer_id']);
 
         return response($grouped);

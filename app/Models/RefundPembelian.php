@@ -11,6 +11,7 @@ class RefundPembelian extends Model
 
     protected $fillable = [
         'code',
+        'kas_id',
         'customer_id',
         'supplier_id',
         'pembelian_id',
@@ -23,6 +24,11 @@ class RefundPembelian extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class);
     }
 
     public function user()

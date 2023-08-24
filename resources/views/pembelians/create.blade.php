@@ -66,7 +66,7 @@
                                 <label>Kas</label>
                                 <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
                                     style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Supplier</option>
+                                    <option value="" selected disabled>Pilih Kas</option>
                                     @foreach ($kas as $kas)
                                         <option value="{{ $kas->id }}"
                                             {{ old('kas_id') == $kas->id ? 'selected' : '' }}>

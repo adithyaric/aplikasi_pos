@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RefundRequest;
+use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Penjualan;
 use App\Models\Product;
@@ -26,6 +27,7 @@ class RefundController extends Controller
             'customers' => User::where('role', 'customer')->get(),
             'penjualans' => Penjualan::get(),
             'products' => Product::get(),
+            'kas' => Kas::get(),
         ]);
     }
 
@@ -37,6 +39,7 @@ class RefundController extends Controller
             'customers' => User::where('role', 'customer')->get(),
             'penjualans' => Penjualan::get(),
             'products' => Product::get(),
+            'kas' => Kas::get(),
         ]);
     }
 
@@ -65,11 +68,16 @@ class RefundController extends Controller
             ]);
         }
 
+        $kas = Kas::find($request->kas_id);
+        $kas->nominal += $data['total'];
+        $kas->save();
+
         return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
     public function update(RefundRequest $request, Refund $refund)
     {
+        $oldTotal = $refund->total;
         $data = $request->validated();
         $data['total'] = (int) str_replace(',', '', $data['total']);
         $data['user_id'] = auth()->user()->id;
@@ -83,6 +91,10 @@ class RefundController extends Controller
                 'alasan' => $product['alasan'],
             ]);
         }
+
+        $kas = Kas::find($request->kas_id);
+        $kas->nominal += $oldTotal != $data['total'] ? $data['total'] : 0;
+        $kas->save();
 
         return redirect(route('refund.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'alamat',
         'no_telp',
         'password',
+        'outlet_id',
     ];
 
     protected $hidden = [
@@ -39,11 +40,16 @@ class User extends Authenticatable
 
     public function wishlist()
     {
-        return $this->belongsToMany(Product::class, 'user_wishlist')->withPivot('qty', 'name', 'customer_id');
+        return $this->belongsToMany(Product::class, 'user_wishlist')->withPivot('qty', 'name', 'customer_id', 'outlet_id');
     }
 
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
     }
 }

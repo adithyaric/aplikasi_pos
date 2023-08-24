@@ -11,6 +11,7 @@ class Refund extends Model
 
     protected $fillable = [
         'code',
+        'kas_id',
         'customer_id',
         'penjualan_id',
         'outlet_id',
@@ -22,6 +23,11 @@ class Refund extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class);
     }
 
     public function user()

@@ -228,7 +228,7 @@ const Cart = () => {
 
     //Hold
     const loadWishlist = () => {
-        axios.get("/wishlist-pos").then((res) => {
+        axios.get(`/wishlist-pos/${outlet.id}`).then((res) => {
             setWishlist(res.data);
         });
     };
@@ -245,6 +245,7 @@ const Cart = () => {
                     .post("/wishlist-pos", {
                         cart,
                         customer_id: customerId,
+                        outlet_id: outlet.id,
                         name: name,
                     })
                     .then((res) => {

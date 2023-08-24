@@ -19,6 +19,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->string('outlet_id')->nullable();
             $table->string('customer_id')->nullable();
             $table->string('name')->nullable();
             $table->unsignedInteger('qty');

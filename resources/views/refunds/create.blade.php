@@ -73,6 +73,24 @@
                                     </div>
                                 @enderror
                             </div>
+                            <div class="form-group">
+                                <label>Kas</label>
+                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Kas</option>
+                                    @foreach ($kas as $kas)
+                                        <option value="{{ $kas->id }}"
+                                            {{ old('kas_id') == $kas->id ? 'selected' : '' }}>
+                                            {{ $kas->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('kas_id')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                             <hr>
                             <div class="form-group">
                                 <label for="">Total IDR</label>

@@ -15,6 +15,7 @@ class RefundPembelianRequest extends FormRequest
     {
         return [
             'code' => 'required',
+            'kas_id' => 'required',
             'pembelian_id' => 'required',
             'supplier_id' => 'required',
             'outlet_id' => 'required',

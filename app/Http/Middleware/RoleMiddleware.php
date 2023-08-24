@@ -26,6 +26,7 @@ class RoleMiddleware
                 case 'customer':
                     return redirect()->route('market.index');
                 case 'kasir':
+                case 'admin':
                 case 'superadmin':
                     return redirect()->route('dashboard');
                 default:

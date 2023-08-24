@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
+use App\Models\Outlet;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -25,6 +26,7 @@ class AdminController extends Controller
                 'admin',
                 'kasir',
             ],
+            'outlets' => Outlet::get(),
         ]);
     }
 
@@ -52,6 +54,7 @@ class AdminController extends Controller
                 'admin',
                 'kasir',
             ],
+            'outlets' => Outlet::get(),
         ]);
     }
 
@@ -60,6 +63,7 @@ class AdminController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'username' => 'required',
+            'outlet_id' => 'required_if:role,kasir|required_if:role,admin',
             'role' => 'required',
             'status' => 'required',
             'email' => 'required|email|unique:users,email,'.$admin->id,

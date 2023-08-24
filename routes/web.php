@@ -31,7 +31,7 @@ Route::get('/', function () {
     return redirect('/market');
 });
 
-Route::middleware(['role:kasir|superadmin'])->group(function () {
+Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -73,7 +73,7 @@ Route::middleware(['role:kasir|superadmin'])->group(function () {
     Route::resource('/cart', CartController::class);
     Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
     Route::delete('/cart-empty', [CartController::class, 'empty']);
-    Route::get('/wishlist-pos', [CartController::class, 'getWishlist']);
+    Route::get('/wishlist-pos/{outlet_id}', [CartController::class, 'getWishlist']);
     Route::post('/wishlist-pos', [CartController::class, 'addToWishlist']);
     Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
 

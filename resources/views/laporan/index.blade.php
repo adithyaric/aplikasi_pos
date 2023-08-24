@@ -13,6 +13,7 @@
     <!-- Main content -->
     <section class="content">
         <div class="row">
+            @if (auth()->user()->role != 'kasir')
             <div class="col-md-12 col-xs-12">
                 <div class="box">
                     <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPembelian">
@@ -53,6 +54,16 @@
                     </button>
                 </div><!-- /.box -->
             </div><!-- /.col -->
+            @else
+            <div class="col-md-12 col-xs-12">
+                <div class="box">
+                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPenjualanKasir">
+                        <i class="fa fa-print"></i>
+                        Export Laporan Penjualan By Kasir
+                    </button>
+                </div><!-- /.box -->
+            </div><!-- /.col -->
+            @endif
         </div><!-- /.row -->
         <!--Modals-->
         <div id="exportPembelian" class="modal fade" role="dialog">
@@ -91,6 +102,7 @@
                     </div>
                     <form action="{{ route('laporan.pembelian-supplier') }}" method="GET">
                         <div class="modal-body">
+                            @if (auth()->user()->role == 'superadmin')
                             <p>Pilih Outlet</p>
                             <div class="form-group">
                                 <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
@@ -104,6 +116,9 @@
                                 </select>
                             </div>
                             <hr />
+                            @else
+                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
+                            @endif
                             <p>Pilih Supplier</p>
                             <div class="form-group">
                                 <select required class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier" style="width: 100%;">
@@ -143,6 +158,7 @@
                     </div>
                     <form action="{{ route('laporan.penjualan') }}" method="GET">
                         <div class="modal-body">
+                            @if (auth()->user()->role == 'superadmin')
                             <p>Pilih Outlet</p>
                             <div class="form-group">
                                 <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
@@ -156,6 +172,9 @@
                                 </select>
                             </div>
                             <hr />
+                            @else
+                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
+                            @endif
                             <p>Pilih Hari</p>
                             <div class="form-group">
                                 <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
@@ -194,19 +213,20 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @if (auth()->user()->role == 'superadmin')
                             <p>Pilih Outlet</p>
                             <div class="form-group">
                                 <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
                                     <option value="" disabled selected>Pilih Outlet</option>
                                     @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
+                                        <option value="{{ $outlet->id }}"{{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>{{ $outlet->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <hr />
+                            @else
+                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
+                            @endif
                             <p>Pilih Hari</p>
                             <div class="form-group">
                                 <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />

@@ -13,8 +13,8 @@
 
     <ul class="sidebar-menu">
         <li class="{{ request()->is('dashboard*') ? 'active' : '' }}"><a href="/dashboard"><i class="fa fa-tachometer"></i><span>Dashboard</span></a></li>
-        <li class="{{ request()->is('setting*') ? 'active' : '' }}"><a href="/setting"><i class="fa fa-gear"></i><span>Setting</span></a></li>
-        @if (auth()->user()->role == 'superadmin')
+        @if (auth()->user()->role != 'kasir')
+            <li class="{{ request()->is('setting*') ? 'active' : '' }}"><a href="/setting"><i class="fa fa-gear"></i><span>Setting</span></a></li>
             <li class="treeview {{ request()->is('admin*') || request()->is('customer*') || request()->is('supplier*') ? 'active' : '' }}">
                 <a href="#"><i class="fa fa-users"></i><span>Users</span><i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
@@ -58,6 +58,7 @@
                 <li class="{{ request()->is('laporan*') ? 'active' : '' }}">
                     <a href="{{ route('laporan.index') }}"><i class="fa fa-file-excel-o"></i><span>Laporan</span></a>
                 </li>
+                @if (auth()->user()->role != 'kasir')
                 <li class="{{ request()->is('laporan/stock*') ? 'active' : '' }}">
                     <a href="{{ route('laporan.stock') }}"><i class="fa fa-file-text-o"></i><span> - Stock</span></a>
                 </li>
@@ -67,6 +68,7 @@
                 <li class="{{ request()->is('laporan/labarugi*') ? 'active' : '' }}">
                     <a href="{{ route('laporan.labarugi') }}"><i class="fa fa-file-text-o"></i><span> - Laba Rugi</span></a>
                 </li>
+                @endif
             </ul>
         </li>
     </ul>

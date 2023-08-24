@@ -86,6 +86,24 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label>Outlet</label>
+                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
+                                    style="width: 100%;">
+                                    <option value="" selected disabled>Pilih Outlet</option>
+                                    @foreach ($outlets as $outlet)
+                                        <option value="{{ $outlet->id }}"
+                                            {{ old('outlet_id', $admin->outlet_id) == $outlet->id ? 'selected' : '' }}>
+                                            {{ $outlet->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('outlet_id')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label>Status</label>
                                 <select class="form-control select2" name="status" data-placeholder="Pilih Status"
                                     style="width: 100%;">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RefundPembelianRequest;
+use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\Product;
@@ -28,6 +29,7 @@ class RefundPembelianController extends Controller
             'pembelians' => Pembelian::get(),
             'suppliers' => Supplier::get(),
             'products' => Product::get(),
+            'kas' => Kas::get(),
         ]);
     }
 
@@ -40,6 +42,7 @@ class RefundPembelianController extends Controller
             'pembelians' => Pembelian::get(),
             'suppliers' => Supplier::get(),
             'products' => Product::get(),
+            'kas' => Kas::get(),
         ]);
     }
 
@@ -68,11 +71,16 @@ class RefundPembelianController extends Controller
             ]);
         }
 
+        $kas = Kas::find($request->kas_id);
+        $kas->nominal += $data['total'];
+        $kas->save();
+
         return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
 
     public function update(RefundPembelianRequest $request, RefundPembelian $refundPembelian)
     {
+        $oldTotal = $refundPembelian->total;
         $data = $request->validated();
         $data['total'] = (int) str_replace(',', '', $data['total']);
         $data['user_id'] = auth()->user()->id;
@@ -86,6 +94,10 @@ class RefundPembelianController extends Controller
                 'alasan' => $product['alasan'],
             ]);
         }
+
+        $kas = Kas::find($request->kas_id);
+        $kas->nominal += $oldTotal != $data['total'] ? $data['total'] : 0;
+        $kas->save();
 
         return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
