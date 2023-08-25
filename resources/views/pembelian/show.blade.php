@@ -52,7 +52,6 @@
             padding-top: 0px;
             background: #f1f4f7;
             color: #000;
-            ;
         }
 
         @media all {
@@ -86,37 +85,38 @@
                 <a href="{{ route('pembelian.index') }}" style="text-decoration: none;">
                     <button class="btn btn-primary" style="padding: 6px 12px; border-radius: 2px;">Dashboard</button>
                 </a>
-                <h1 style="color: #00598c; margin-top: 10px;">Data Barcode Pembelian</h1>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium autem ut exercitationem vero
-                    facere!</p>
+                <h1 style="color: #00598c; margin-top: 10px;">Data Barcode Pembelian #{{ $pembelian->code }}</h1>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium autem ut exercitationem vero facere!</p>
             </center>
         </div>
     </div><!-- /.row -->
 
-    @foreach ($pembelian->stocks as $stock)
-        <center>
-            <div class="page-break" style="margin-top: 5px;">
-                <table border="0" style="border-collapse: collapse; margin-bottom: 20px;  background-color: white" width="150px" height="auto">
-                    <tr>
-                        <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 12px;">
-                            {{ $stock->product->name }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 12px;">
-                            {!! DNS1D::getBarcodeHTML($stock->product->code, 'C39') !!}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 11px;">
-                            @currency($stock->product->harga_jual)
-                        </td>
-                    </tr>
-                </table>
-
-            </div>
-        </center>
-    @endforeach
+    <div style="width: 50%; margin: auto;">
+        <div class="row">
+            @foreach($pembelian->stocks as $stock)
+                <div class="col-md-6">
+                    <center>
+                        <div>
+                            <table border="0" style="border-collapse: collapse; margin-bottom: 20px; background-color: white" width="150px" height="auto">
+                                <tr>
+                                    <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 12px;">{{$stock->product->name}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 12px;">{!!DNS1D::getBarcodeHTML($stock->product->code,'C39')!!}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 11px;">{{$stock->product->code}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: Arial, Helvetica, sans-serif; text-align: center; font-size: 12px;">@currency($stock->product->harga_jual)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </center>
+                </div>
+            @endforeach
+        </div>
+    </div>
 </body>
 
 </html>
