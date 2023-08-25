@@ -21,6 +21,18 @@ class PembelianController extends Controller
         return response()->json($pembelians);
     }
 
+    public function getItems($pembelian_id)
+    {
+        $pembelian = Pembelian::find($pembelian_id);
+        if ($pembelian) {
+            $items = $pembelian->stocks;
+
+            return response()->json($items);
+        } else {
+            return response()->json([], 404);
+        }
+    }
+
     public function index()
     {
         return view('pembelians.index', [

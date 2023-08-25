@@ -204,5 +204,35 @@
             $('#pembelian').prop('disabled', false);
         });
 
+        $('#pembelian').on('change', function() {
+            let pembelian_id = $(this).val();
+
+            $.ajax({
+                url: '/pembelian-detail/' + pembelian_id + '/items',
+                type: 'GET',
+                success: function(data) {
+                    // update form repeater with fetched data
+                    $('#product-repeater').empty();
+                    data.forEach(function(item) {
+                        let productTemplate = `
+                            <tr>
+                                <td>
+                                    <select required class="form-control select2" name="product[${item.id}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}" ${item.product_id == {{ $product->id }} ? 'selected' : ''}>{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td><input type="text" required value="${item.qty}" class="form-control" name="product[${item.id}][qty]"></td>
+                                <td><input type="text" required value="alasan...${item.subtotal}" placeholder="alasan..." class="form-control" name="product[${item.id}][alasan]"></td>
+                                <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                            </tr>`;
+                        $('#product-repeater').append(productTemplate);
+                    });
+                    $('#product-repeater .select2').select2();
+                }
+            });
+        });
+
     </script>
 @endsection

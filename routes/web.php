@@ -42,6 +42,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/get-penjualan/{outlet_id}', [PenjualanController::class, 'getPenjualan']);
     Route::get('/penjualan-detail/{penjualan_id}/items', [PenjualanController::class, 'getItems']);
     Route::get('/get-pembelian/{outlet_id}', [PembelianController::class, 'getPembelian']);
+    Route::get('/pembelian-detail/{pembelian_id}/items', [PembelianController::class, 'getItems']);
 
     Route::resource('/customer', CustomerController::class);
     Route::resource('/kas', KasController::class);
