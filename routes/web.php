@@ -40,6 +40,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::post('/setting-store', [DashboardController::class, 'store'])->name('setting.store');
     Route::get('/get-customer/{penjualan_id}', [CustomerController::class, 'getCustomer']);
     Route::get('/get-penjualan/{outlet_id}', [PenjualanController::class, 'getPenjualan']);
+    Route::get('/penjualan-detail/{penjualan_id}/items', [PenjualanController::class, 'getItems']);
     Route::get('/get-pembelian/{outlet_id}', [PembelianController::class, 'getPembelian']);
 
     Route::resource('/customer', CustomerController::class);

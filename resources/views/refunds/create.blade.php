@@ -114,8 +114,8 @@
                                 <tbody id="product-repeater">
                                     <tr>
                                         <td>
-                                            <select class="form-control select2" data-placeholder="Pilih Product"
-                                                name="product[0][product_id]" required style="width:100%">
+                                            <select class="form-control select2" data-placeholder="Pilih Product" name="product[0][product_id]" required style="width:100%">
+                                                <option value="" selected disabled>Pilih Product</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
@@ -209,6 +209,32 @@
                 $('#customer').trigger('change.select2');
             });
             $('#customer').prop('disabled', false);
+
+            $.ajax({
+                url: '/penjualan-detail/' + penjualan_id + '/items',
+                type: 'GET',
+                success: function(data) {
+                    // update form repeater with fetched data
+                    $('#product-repeater').empty();
+                    data.forEach(function(item) {
+                        let productTemplate = `
+                            <tr>
+                                <td>
+                                    <select required class="form-control select2" name="product[${item.id}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}" ${item.product_id == {{ $product->id }} ? 'selected' : ''}>{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td><input type="text" required value="${item.qty}" class="form-control" name="product[${item.id}][qty]"></td>
+                                <td><input type="text" required value="alasan...${item.subtotal}" placeholder="alasan..." class="form-control" name="product[${item.id}][alasan]"></td>
+                                <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                            </tr>`;
+                        $('#product-repeater').append(productTemplate);
+                    });
+                    $('#product-repeater .select2').select2();
+                }
+            });
         });
 
     </script>

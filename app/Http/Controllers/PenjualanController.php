@@ -22,6 +22,18 @@ class PenjualanController extends Controller
         return response()->json($penjualans);
     }
 
+    public function getItems($penjualan_id)
+    {
+        $penjualan = Penjualan::find($penjualan_id);
+        if ($penjualan) {
+            $items = $penjualan->items;
+
+            return response()->json($items);
+        } else {
+            return response()->json([], 404);
+        }
+    }
+
     public function index()
     {
         return view('penjualan.index', [
