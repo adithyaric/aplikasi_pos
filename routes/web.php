@@ -48,6 +48,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::resource('/kas', KasController::class);
     Route::resource('/payment', PaymentMethodController::class);
     Route::resource('/outlet', OutletController::class);
+    Route::get('/outlet/{outlet_id}/kas', [OutletController::class, 'getKas']);
     Route::resource('/supplier', SupplierController::class);
     Route::resource('/category', CategoryController::class);
     Route::get('/category-product', [CategoryController::class, 'indexProduct'])->name('category.product.index');

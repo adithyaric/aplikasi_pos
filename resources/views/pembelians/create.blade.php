@@ -28,12 +28,10 @@
                             </div>
                             <div class="form-group">
                                 <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;">
+                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;" id="outlet">
                                     <option value="" selected disabled>Pilih Outlet</option>
                                     @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
+                                        <option value="{{ $outlet->id }}" {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
                                             {{ $outlet->name }}
                                         </option>
                                     @endforeach
@@ -64,15 +62,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Kas</label>
-                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Kas</option>
-                                    @foreach ($kas as $kas)
-                                        <option value="{{ $kas->id }}"
-                                            {{ old('kas_id') == $kas->id ? 'selected' : '' }}>
-                                            {{ $kas->name }}
-                                        </option>
-                                    @endforeach
+                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" style="width: 100%;" id="kas">
+                                    {{-- @foreach ($kas as $kas)<option value="{{ $kas->id }}" {{ old('kas_id') == $kas->id ? 'selected' : '' }}>{{ $kas->name }}</option>@endforeach --}}
                                 </select>
                                 @error('kas_id')
                                     <div class="invalid-feedback text-danger">
@@ -206,6 +197,22 @@
             $.get('/product/' + product_id, function(data) {
                 harga_beli.val(data.harga_beli);
             });
+        });
+
+        $('#kas').prop('disabled', true);
+        $('#outlet').on('change', function() {
+            let outlet_id = $(this).val();
+            $.get('/outlet/' + outlet_id + '/kas', function(data) {
+                $('#kas').find('option').remove();
+                let defaultOption = $('<option>').val('').text('Pilih Kas').prop('disabled', true).prop('selected', true);
+                $('#kas').append(defaultOption);
+                data.forEach(function(kas) {
+                    let option = $('<option>').val(kas.id).text(kas.name);
+                    $('#kas').append(option);
+                });
+                $('#kas').trigger('change.select2');
+            });
+            $('#kas').prop('disabled', false);
         });
     </script>
 @endsection

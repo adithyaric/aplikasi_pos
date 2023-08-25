@@ -75,15 +75,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Kas</label>
-                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Kas</option>
-                                    @foreach ($kas as $kas)
-                                        <option value="{{ $kas->id }}"
-                                            {{ old('kas_id') == $kas->id ? 'selected' : '' }}>
-                                            {{ $kas->name }}
-                                        </option>
-                                    @endforeach
+                                <select id="kas" class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" style="width: 100%;">
+                                    {{-- @foreach ($kas as $kas)<option value="{{ $kas->id }}" {{ old('kas_id') == $kas->id ? 'selected' : '' }}>{{ $kas->name }}</option>@endforeach --}}
                                 </select>
                                 @error('kas_id')
                                     <div class="invalid-feedback text-danger">
@@ -178,6 +171,7 @@
 
         $('#penjualan').prop('disabled', true);
         $('#customer').prop('disabled', true);
+        $('#kas').prop('disabled', true);
 
         $('#outlet').on('change', function() {
             let outlet_id = $(this).val();
@@ -196,6 +190,19 @@
             $('#customer').find('option').remove();
             let defaultOption = $('<option>').val('').text('Pilih Customer').prop('disabled', true).prop('selected', true);
             $('#customer').append(defaultOption);
+
+            $.get('/outlet/' + outlet_id + '/kas', function(data) {
+                $('#kas').find('option').remove();
+                let defaultKasOption = $('<option>').val('').text('Pilih Kas').prop('disabled', true).prop('selected', true);
+                $('#kas').append(defaultKasOption);
+                data.forEach(function(kas) {
+                    let option = $('<option>').val(kas.id).text(kas.name);
+                    $('#kas').append(option);
+                });
+                $('#kas').trigger('change.select2');
+            });
+            $('#kas').prop('disabled', false);
+
         });
 
         $('#penjualan').on('change', function() {

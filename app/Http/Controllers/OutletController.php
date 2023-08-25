@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OutletRequest;
+use App\Models\Kas;
 use App\Models\Outlet;
 use Illuminate\Support\Facades\Storage;
 
 class OutletController extends Controller
 {
+    public function getKas($outlet_id)
+    {
+        $kas = Kas::where('outlet_id', $outlet_id)->get();
+
+        return response()->json($kas);
+    }
+
     public function index()
     {
         return view('outlets.index', [
