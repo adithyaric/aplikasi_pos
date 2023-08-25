@@ -23,7 +23,7 @@ class RefundController extends Controller
     public function create()
     {
         return view('refunds.create', [
-            'outlets' => Outlet::get(),
+            'outlets' => Outlet::whereHas('penjualan')->get(),
             'customers' => User::where('role', 'customer')->get(),
             'penjualans' => Penjualan::get(),
             'products' => Product::get(),

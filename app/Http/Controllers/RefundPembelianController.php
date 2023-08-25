@@ -24,7 +24,7 @@ class RefundPembelianController extends Controller
     public function create()
     {
         return view('refundPembelians.create', [
-            'outlets' => Outlet::get(),
+            'outlets' => Outlet::whereHas('pembelian')->get(),
             'customers' => User::where('role', 'customer')->get(),
             'pembelians' => Pembelian::get(),
             'suppliers' => Supplier::get(),

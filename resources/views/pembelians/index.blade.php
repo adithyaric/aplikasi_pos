@@ -23,6 +23,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Outlet</td>
                                     <td>Nama</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
@@ -32,6 +33,7 @@
                             @foreach ($pembelians as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $value->outlet->name }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>@currency($value->total)</td>
                                     <td>
