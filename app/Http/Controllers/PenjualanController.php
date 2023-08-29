@@ -34,10 +34,17 @@ class PenjualanController extends Controller
         }
     }
 
+    public function marketplace()
+    {
+        return view('penjualan.marketplace', [
+            'penjualan' => Penjualan::has('transaction')->orderBy('created_at', 'desc')->get(),
+        ]);
+    }
+
     public function index()
     {
         return view('penjualan.index', [
-            'penjualan' => Penjualan::orderBy('created_at', 'desc')->get(),
+            'penjualan' => Penjualan::doesntHave('transaction')->orderBy('created_at', 'desc')->get(),
         ]);
     }
 

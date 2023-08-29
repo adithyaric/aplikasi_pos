@@ -72,6 +72,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);
     Route::get('/penjualan/{penjualan}/print', [PenjualanController::class, 'print'])->name('penjualan.print');
+    Route::get('/penjualan-marketplace', [PenjualanController::class, 'marketplace'])->name('penjualan.marketplace');
 
     Route::resource('/cart', CartController::class);
     Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
