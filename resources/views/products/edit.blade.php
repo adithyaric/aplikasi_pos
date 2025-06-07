@@ -102,8 +102,7 @@
                             <div class="form-group">
                                 <label for="">Diskon</label>
                                 <input type="text" class="form-control" name="diskon"
-                                    value="{{ old('diskon', $product->diskon) }}"
-                                    placeholder="Masukkan Diskon">
+                                    value="{{ old('diskon', $product->diskon) }}" placeholder="Masukkan Diskon">
                                 @error('diskon')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
@@ -121,42 +120,42 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id', $product->outlet_id) == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('outlet_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label>Supplier</label>
-                                <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Supplier</option>
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}"
-                                            {{ old('supplier_id', $product->supplier_id) == $supplier->id ? 'selected' : '' }}>
-                                            {{ $supplier->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('supplier_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label>Outlet</label> --}}
+                            {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" --}}
+                            {{-- style="width: 100%;"> --}}
+                            {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
+                            {{-- @foreach ($outlets as $outlet) --}}
+                            {{-- <option value="{{ $outlet->id }}" --}}
+                            {{-- {{ old('outlet_id', $product->outlet_id) == $outlet->id ? 'selected' : '' }}> --}}
+                            {{-- {{ $outlet->name }} --}}
+                            {{-- </option> --}}
+                            {{-- @endforeach --}}
+                            {{-- </select> --}}
+                            {{-- @error('outlet_id') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label>Supplier</label> --}}
+                            {{-- <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier" --}}
+                            {{-- style="width: 100%;"> --}}
+                            {{-- <option value="" selected disabled>Pilih Supplier</option> --}}
+                            {{-- @foreach ($suppliers as $supplier) --}}
+                            {{-- <option value="{{ $supplier->id }}" --}}
+                            {{-- {{ old('supplier_id', $product->supplier_id) == $supplier->id ? 'selected' : '' }}> --}}
+                            {{-- {{ $supplier->name }} --}}
+                            {{-- </option> --}}
+                            {{-- @endforeach --}}
+                            {{-- </select> --}}
+                            {{-- @error('supplier_id') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Category</label>
                                 <select class="form-control select2" name="category_id" data-placeholder="Pilih Category"

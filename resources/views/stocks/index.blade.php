@@ -25,19 +25,19 @@
                                     <td>Harga Beli</td>
                                     <td>Qty</td>
                                     <td>Created</td>
-                                    <td>Expired</td>
+                                    {{-- <td>Expired</td> --}}
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($stocks as $stock)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $stock->product->outlet->name }}</td>
+                                        <td>{{ $stock->pembelian->outlet->name }}</td>
                                         <td>{{ $stock->product->name }}</td>
                                         <td>@currency($stock->harga_beli)</td>
                                         <td>{{ $stock->qty }}</td>
                                         <td>{{ $stock->created_at->format('h:i a / d-M-Y') }}</td>
-                                        <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td>
+                                        {{-- <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td> --}}
                                     </tr>
                                 @endforeach
                             </tbody>

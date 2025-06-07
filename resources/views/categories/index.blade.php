@@ -26,8 +26,8 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
-                                    <td>Tipe</td>
-                                    <td>Name Kategori</td>
+                                    {{-- <td>Tipe</td> --}}
+                                    {{-- <td>Name Outlet</td> --}}
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -35,8 +35,8 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->name }}</td>
-                                    <td>{{ $value->type }}</td>
-                                    <td>{{ $value->outlet->name }}</td>
+                                    {{-- <td>{{ $value->type }}</td> --}}
+                                    {{-- <td>{{ $value->outlet?->name }}</td> --}}
                                     <td>
                                         <a class="btn btn-warning" href="{{ $type == 'product' ? route('category.product.edit', $value->id) : route('category.pengeluaran.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('category.destroy', $value->id) }}" method="post"

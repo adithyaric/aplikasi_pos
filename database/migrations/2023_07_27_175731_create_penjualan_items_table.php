@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('penjualan_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Penjualan::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Penjualan::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
             $table->integer('qty');
             $table->bigInteger('price');
             $table->bigInteger('subtotal');

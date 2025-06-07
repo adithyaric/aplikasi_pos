@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->string('customer_id')->nullable();
             $table->string('kasir_id')->nullable();
-            $table->foreignIdFor(Outlet::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Outlet::class)->nullable()->constrained()->cascadeOnDelete();
             $table->bigInteger('discount')->nullable()->default(20);
             $table->bigInteger('total')->nullable()->default(20);
             $table->timestamps();

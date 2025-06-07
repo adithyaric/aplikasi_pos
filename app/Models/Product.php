@@ -17,8 +17,8 @@ class Product extends Model
         'desc',
         'warna',
         'ukuran',
-        'outlet_id',
-        'supplier_id',
+        'outlet_id', //unsued, currently just for experiment
+        'supplier_id', //unsued, currently just for experiment
         'harga_beli',
         'harga_jual',
         'diskon',
@@ -30,15 +30,15 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function outlet()
-    {
-        return $this->belongsTo(Outlet::class);
-    }
+    // public function outlet()
+    // {
+    //     return $this->belongsTo(Outlet::class);
+    // }
 
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
+    // public function supplier()
+    // {
+    //     return $this->belongsTo(Supplier::class);
+    // }
 
     public function stocks()
     {

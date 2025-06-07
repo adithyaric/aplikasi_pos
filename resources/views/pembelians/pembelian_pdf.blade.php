@@ -53,7 +53,7 @@
                 <th>Qty</th>
                 {{-- <th>Subtotal</th> --}}
                 <th>Harga Jual</th>
-                <th>Expired At</th>
+                {{-- <th>Expired At</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -64,7 +64,7 @@
                     <td>{{ $stock->qty }}</td>
                     {{-- <td>@currency($stock->subtotal)</td> --}}
                     <td>@currency($stock->product->harga_jual)</td>
-                    <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td>
+                    {{-- <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td> --}}
                 </tr>
             @endforeach
         </tbody>

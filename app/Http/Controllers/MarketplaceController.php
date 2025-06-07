@@ -180,9 +180,9 @@ class MarketplaceController extends Controller
             foreach ($cartItems as $item) {
                 $now = Carbon::now();
                 $stocks = Stock::where('product_id', $item->id)
-                    ->where('created_at', '<=', $now)
-                    ->where('expired_at', '>=', $now)
-                    ->orderBy('expired_at', 'asc')
+                    // ->where('created_at', '<=', $now)
+                    // ->where('expired_at', '>=', $now)
+                    // ->orderBy('expired_at', 'asc')
                     ->lockForUpdate()
                     ->get();
                 if ($stocks->isEmpty()) {

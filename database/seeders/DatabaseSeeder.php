@@ -88,67 +88,67 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        for ($i = 1; $i <= 5; $i++) {
-            Product::create([
-                'pic' => 'pic'.$i,
-                'code' => 'code'.$i,
-                'name' => 'Product '.$i,
-                'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
-                'desc' => 'Description '.$i,
-                'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
-                'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
-                'outlet_id' => Outlet::inRandomOrder()->first()->id,
-                'supplier_id' => Supplier::inRandomOrder()->first()->id,
-                'harga_jual' => round(rand(10000, 100000), -4),
-                'diskon' => rand(0, 50),
-                'berat' => round(rand(1, 10)),
-            ]);
-        }
-
-        for ($i = 1; $i <= 3; $i++) {
-            Voucher::create([
-                'name' => 'Voucher '.$i,
-                'code' => 'Code'.$i,
-                'type' => ($i % 2 == 0) ? 'nominal' : 'percentage',
-                'limit' => round(rand(1, 10)),
-                'value' => round(rand(10000, 100000), -4),
-                'min_purchase' => round(rand(100000, 1000000), -5),
-                'start_at' => now()->addDays($i),
-                'end_at' => now()->addDays($i + 7),
-                'desc' => 'Description '.$i,
-            ]);
-        }
-
-        // for ($i = 1; $i <= 3; $i++) {
-        //     Pengeluaran::create([
-        //         'category_id' => Category::where('type', 'pengeluaran')->inRandomOrder()->first()->id,
-        //         'tanggal' => now()->addDays($i),
-        //         'biaya' => round(rand(10000, 100000), -4),
+        // for ($i = 1; $i <= 5; $i++) {
+        //     Product::create([
+        //         'pic' => 'pic'.$i,
+        //         'code' => 'code'.$i,
+        //         'name' => 'Product '.$i,
+        //         'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
         //         'desc' => 'Description '.$i,
-        //         'kas' => round(rand(10000, 100000), -4),
-        //         'jumlah' => round(rand(1, 10)),
+        //         'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
+        //         'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
+        //         'outlet_id' => Outlet::inRandomOrder()->first()->id,
+        //         'supplier_id' => Supplier::inRandomOrder()->first()->id,
+        //         'harga_jual' => round(rand(10000, 100000), -4),
+        //         'diskon' => rand(0, 50),
+        //         'berat' => round(rand(1, 10)),
         //     ]);
         // }
 
-        for ($i = 1; $i <= 3; $i++) {
-            $pembelian = Pembelian::create([
-                'code' => 'Code'.$i,
-                'outlet_id' => Outlet::inRandomOrder()->first()->id,
-                'supplier_id' => Supplier::inRandomOrder()->first()->id,
-                'total' => round(rand(100000, 1000000), -5),
-            ]);
+        // for ($i = 1; $i <= 3; $i++) {
+        //     Voucher::create([
+        //         'name' => 'Voucher '.$i,
+        //         'code' => 'Code'.$i,
+        //         'type' => ($i % 2 == 0) ? 'nominal' : 'percentage',
+        //         'limit' => round(rand(1, 10)),
+        //         'value' => round(rand(10000, 100000), -4),
+        //         'min_purchase' => round(rand(100000, 1000000), -5),
+        //         'start_at' => now()->addDays($i),
+        //         'end_at' => now()->addDays($i + 7),
+        //         'desc' => 'Description '.$i,
+        //     ]);
+        // }
 
-            for ($j = 0; $j < 5; $j++) {
-                Stock::create([
-                    'pembelian_id' => $pembelian->id,
-                    'product_id' => Product::inRandomOrder()->first()->id,
-                    'subtotal' => round(rand(10000, 100000), -4),
-                    'harga_beli' => round(rand(10000, 100000), -4),
-                    'qty' => round(rand(1, 10)),
-                    'created_at' => now(),
-                    'expired_at' => now()->addDays(rand(30, 365)),
-                ]);
-            }
-        }
+        // // for ($i = 1; $i <= 3; $i++) {
+        // //     Pengeluaran::create([
+        // //         'category_id' => Category::where('type', 'pengeluaran')->inRandomOrder()->first()->id,
+        // //         'tanggal' => now()->addDays($i),
+        // //         'biaya' => round(rand(10000, 100000), -4),
+        // //         'desc' => 'Description '.$i,
+        // //         'kas' => round(rand(10000, 100000), -4),
+        // //         'jumlah' => round(rand(1, 10)),
+        // //     ]);
+        // // }
+
+        // for ($i = 1; $i <= 3; $i++) {
+        //     $pembelian = Pembelian::create([
+        //         'code' => 'Code'.$i,
+        //         'outlet_id' => Outlet::inRandomOrder()->first()->id,
+        //         'supplier_id' => Supplier::inRandomOrder()->first()->id,
+        //         'total' => round(rand(100000, 1000000), -5),
+        //     ]);
+
+        //     for ($j = 0; $j < 5; $j++) {
+        //         Stock::create([
+        //             'pembelian_id' => $pembelian->id,
+        //             'product_id' => Product::inRandomOrder()->first()->id,
+        //             'subtotal' => round(rand(10000, 100000), -4),
+        //             'harga_beli' => round(rand(10000, 100000), -4),
+        //             'qty' => round(rand(1, 10)),
+        //             'created_at' => now(),
+        //             'expired_at' => now()->addDays(rand(30, 365)),
+        //         ]);
+        //     }
+        // }
     }
 }

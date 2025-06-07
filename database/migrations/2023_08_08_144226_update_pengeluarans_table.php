@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::table('pengeluarans', function (Blueprint $table) {
             $table->dropColumn('kas');
-            $table->foreignIdFor(Kas::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Kas::class)->nullable()->constrained()->cascadeOnDelete();
         });
     }
 

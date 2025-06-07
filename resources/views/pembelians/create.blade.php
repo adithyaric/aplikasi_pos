@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        <td>Expired</td>
+                                        {{-- <td>Expired</td> --}}
                                         <td>Harga Beli</td>
                                         <td>Sub Total</td>
                                         <td>Aksi</td>
@@ -94,20 +94,19 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input class="form-control qty" name="product[0][qty]" required value="0">
+                                            <input type="number" class="form-control qty" name="product[0][qty]" required value="0" min="0">
                                         </td>
+                                        {{-- <td> --}}
+                                            {{-- <input class="form-control" name="product[0][expired]" required type="date"> --}}
+                                        {{-- </td> --}}
                                         <td>
-                                            <input class="form-control" name="product[0][expired]" required type="date">
-                                        </td>
-                                        <td>
-                                            <input class="form-control harga_beli numeral-mask" name="product[0][harga_beli]" required value="0">
+                                            <input type="number" class="form-control harga_beli numeral-mask" name="product[0][harga_beli]" required value="0" min="0">
                                         </td>
                                         <td>
                                             <input class="form-control subtotal" name="product[0][subtotal]" required readonly>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)"
-                                                type="button">Remove</button>
+                                            <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -148,9 +147,8 @@
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td><input type="date" required class="form-control" name="product[${productIndex}][expired]"></td>
-            <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
+            <td><input type="number" required value="0" min="0" class="form-control qty" name="product[${productIndex}][qty]"></td>
+            <td><input type="number" required value="0" min="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
             <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
 

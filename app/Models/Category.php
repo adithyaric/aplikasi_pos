@@ -12,11 +12,11 @@ class Category extends Model
     protected $fillable = [
         'name',
         'type',
-        'outlet_id',
+        'outlet_id', //unsued, currently just for experiment
     ];
 
-    public function outlet()
-    {
-        return $this->belongsTo(Outlet::class);
-    }
+    // public function outlet()
+    // {
+    //     return $this->belongsTo(Outlet::class);
+    // }
 }

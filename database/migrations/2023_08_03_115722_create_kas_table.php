@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('kas', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->foreignIdFor(Outlet::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Outlet::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('nominal')->nullable()->default(0);
             $table->timestamps();
         });

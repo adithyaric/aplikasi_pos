@@ -11,7 +11,7 @@ class CreateStocksTable extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
             $table->integer('harga_beli')->nullable();
             $table->integer('qty');
             $table->timestamp('expired_at')->nullable();

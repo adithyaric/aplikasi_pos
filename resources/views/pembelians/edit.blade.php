@@ -88,7 +88,7 @@
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        <td>Expired</td>
+                                        {{-- <td>Expired</td> --}}
                                         <td>Harga Beli</td>
                                         <td>Sub Total</td>
                                         <td>Aksi</td>
@@ -107,9 +107,9 @@
                                             <td>
                                                 <input class="form-control qty" name="product[{{ $key }}][qty]" required value="{{ $stock->qty }}">
                                             </td>
-                                            <td>
-                                                <input class="form-control" name="product[{{ $key }}][expired]" required value="{{ $stock->expired_at->format('Y-m-d') }}" type="date">
-                                            </td>
+                                            {{-- <td> --}}
+                                                {{-- <input class="form-control" name="product[{{ $key }}][expired]" required value="{{ $stock->expired_at->format('Y-m-d') }}" type="date"> --}}
+                                            {{-- </td> --}}
                                             <td>
                                                 <input class="form-control harga_beli numeral-mask" name="product[{{ $key }}][harga_beli]" required value="{{ $stock->harga_beli }}">
                                             </td>

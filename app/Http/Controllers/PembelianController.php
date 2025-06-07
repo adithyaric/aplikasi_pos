@@ -120,7 +120,7 @@ class PembelianController extends Controller
                         'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
                         'qty' => (int) $productData->qty,
                         'subtotal' => (int) $productData->subtotal,
-                        'expired_at' => $productData->expired_at,
+                        // 'expired_at' => $productData->expired_at,
                     ]
                 );
                 $product = Product::find($productData->product_id);
@@ -135,7 +135,7 @@ class PembelianController extends Controller
                             'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
                             'qty' => (int) $productData['qty'],
                             'subtotal' => (int) $productData['subtotal'],
-                            'expired_at' => $productData['expired'],
+                            // 'expired_at' => $productData['expired'],
                         ]
                     );
                 }

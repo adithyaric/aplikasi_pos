@@ -54,14 +54,22 @@
                     </div>
                     <div class="section-4-sku-information u-s-p-y-14">
                         <h6 class="information-heading u-s-m-b-8">Sku Information:</h6>
-                        @if ($product->stocks()->where('created_at', '<=', now())->where('expired_at', '>=', now())->sum('qty') > 0)
+                        @if (
+                        $product->stocks()
+                        // ->where('created_at', '<=', now())
+                        // ->where('expired_at', '>=', now())
+                        ->sum('qty') > 0
+                        )
                             <div class="availability">
                                 <span>Availability:</span>
                                 <span>In Stock</span>
                             </div>
                             <div class="left">
                                 <span>Only:</span>
-                                <span>{{ $product->stocks()->where('created_at', '<=', now())->where('expired_at', '>=', now())->sum('qty'); }}</span>
+                                <span>{{ $product->stocks()
+                                // ->where('created_at', '<=', now())
+                                // ->where('expired_at', '>=', now())
+                                ->sum('qty'); }}</span>
                             </div>
                             <div class="left">
                                 <span>Weight:</span>

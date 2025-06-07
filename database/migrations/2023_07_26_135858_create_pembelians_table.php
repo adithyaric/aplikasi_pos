@@ -19,9 +19,9 @@ return new class extends Migration
         Schema::create('pembelians', function (Blueprint $table) {
             $table->id();
             $table->string('code')->nullable();
-            $table->foreignIdFor(Outlet::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Supplier::class)->constrained()->cascadeOnDelete();
-            // $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Outlet::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Supplier::class)->nullable()->constrained()->cascadeOnDelete();
+            // $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
             // $table->string('qty')->nullable();
             // $table->date('expired')->nullable();
             // $table->integer('harga_beli')->nullable();

@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->foreignIdFor(Penjualan::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Penjualan::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('payment_method')->nullable();
         });
     }

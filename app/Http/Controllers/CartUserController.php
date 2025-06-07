@@ -21,7 +21,12 @@ class CartUserController extends Controller
         $product = Product::find($request->id);
         $cartItem = Cart::session(auth()->id())->get($product->id);
         $cartQuantity = $cartItem ? $cartItem->quantity : 0;
-        if ($product->stocks()->where('created_at', '<=', now())->where('expired_at', '>=', now())->sum('qty') >= $request->quantity + $cartQuantity) {
+        if (
+            $product->stocks()
+            // ->where('created_at', '<=', now())
+            // ->where('expired_at', '>=', now())
+                ->sum('qty') >= $request->quantity + $cartQuantity
+        ) {
             try {
                 Cart::session(auth()->id())->add([
                     'id' => $product->id,
@@ -44,7 +49,12 @@ class CartUserController extends Controller
     public function updateCart(Request $request)
     {
         $product = Product::find($request->id);
-        if ($product->stocks()->where('created_at', '<=', now())->where('expired_at', '>=', now())->sum('qty') >= $request->quantity) {
+        if (
+            $product->stocks()
+            // ->where('created_at', '<=', now())
+            // ->where('expired_at', '>=', now())
+                ->sum('qty') >= $request->quantity
+        ) {
             Cart::session(auth()->id())->update($request->id, [
                 'quantity' => [
                     'relative' => false,

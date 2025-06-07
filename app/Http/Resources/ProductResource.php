@@ -20,8 +20,8 @@ class ProductResource extends JsonResource
             'code' => $this->barcode,
             'harga_jual' => $this->harga_jual,
             'stocks' => $this->stocks()
-                ->where('created_at', '<=', $now)
-                ->where('expired_at', '>=', $now)
+                // ->where('created_at', '<=', $now)
+                // ->where('expired_at', '>=', $now)
                 ->sum('qty'),
             'image_url' => asset($this->pic),
         ];

@@ -8,7 +8,11 @@ class StockController extends Controller
 {
     public function index()
     {
-        return view('stocks.index', ['stocks' => Stock::get()->sortBy('product_id')->sortBy('expired_at')]);
+        return view('stocks.index', [
+            'stocks' => Stock::get()
+                ->sortBy('product_id')
+            // ->sortBy('expired_at')
+        ]);
     }
 
     public function show(Stock $stock)

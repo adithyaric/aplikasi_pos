@@ -19,7 +19,7 @@
                 <td>@currency($penjualan->total)</td>
                 <td>
                     @foreach ($penjualan->items as $item)
-                        {{ $item->product->name }} ({{ $item->product->supplier->name }})@if (!$loop->last), @endif
+                        {{ $item->product->name }} ({{ $item->product->supplier?->name }})@if (!$loop->last), @endif
                     @endforeach
                 </td>
             </tr>

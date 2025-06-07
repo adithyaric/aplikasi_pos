@@ -25,6 +25,7 @@
                                     <td>No</td>
                                     <td>Outlet</td>
                                     <td>Nama</td>
+                                    <td>pembelianProducts</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
                                     <td>Posting</td>
@@ -35,6 +36,13 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->outlet->name }}</td>
                                     <td>{{ $value->code }}</td>
+                                    <td>
+                                        <ul>
+                                            @foreach ($value->pembelianProducts as $pembelianProduct)
+                                            <li>{{ $pembelianProduct->product->name }} : @currency($pembelianProduct->harga_beli) x{{ $pembelianProduct->qty }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
                                     <td>@currency($value->total)</td>
                                     <td>
                                         @if (!$value->is_published)

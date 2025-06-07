@@ -18,8 +18,8 @@ return new class extends Migration
         Schema::create('refund_pembelians', function (Blueprint $table) {
             $table->id();
             $table->string('code')->nullable();
-            $table->foreignIdFor(Pembelian::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Outlet::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Pembelian::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Outlet::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('customer_id')->nullable();
             $table->timestamp('tanggal')->nullable();
             $table->string('total')->nullable();

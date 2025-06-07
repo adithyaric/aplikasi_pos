@@ -16,24 +16,24 @@
                     <form action="{{ route('category.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="box-body">
-                            <div class="form-group">
-                                <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('outlet_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label>Outlet</label> --}}
+                            {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" --}}
+                            {{-- style="width: 100%;"> --}}
+                            {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
+                            {{-- @foreach ($outlets as $outlet) --}}
+                            {{-- <option value="{{ $outlet->id }}" --}}
+                            {{-- {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}> --}}
+                            {{-- {{ $outlet->name }} --}}
+                            {{-- </option> --}}
+                            {{-- @endforeach --}}
+                            {{-- </select> --}}
+                            {{-- @error('outlet_id') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Nama Category</label>
                                 <input type="text" class="form-control" name="name" value="{{ old('name') }}"

@@ -19,8 +19,8 @@ class CartController extends Controller
             foreach ($cart as $item) {
                 $now = Carbon::now();
                 $stockQty = $item->stocks()
-                    ->where('created_at', '<=', $now)
-                    ->where('expired_at', '>=', $now)
+                    // ->where('created_at', '<=', $now)
+                    // ->where('expired_at', '>=', $now)
                     ->sum('qty');
                 $item->availableStock = $stockQty;
             }
@@ -38,8 +38,8 @@ class CartController extends Controller
             $product = Product::where('code', $barcode)->first();
             $now = Carbon::now();
             $stockQty = $product->stocks()
-                ->where('created_at', '<=', $now)
-                ->where('expired_at', '>=', $now)
+                // ->where('created_at', '<=', $now)
+                // ->where('expired_at', '>=', $now)
                 ->sum('qty');
             $cart = $request->user()->cart()->where('code', $barcode)->first();
             if ($cart) {
@@ -77,8 +77,8 @@ class CartController extends Controller
             if ($cart) {
                 $now = Carbon::now();
                 $stockQty = $product->stocks()
-                    ->where('created_at', '<=', $now)
-                    ->where('expired_at', '>=', $now)
+                    // ->where('created_at', '<=', $now)
+                    // ->where('expired_at', '>=', $now)
                     ->sum('qty');
 
                 if ($stockQty < $request->qty) {

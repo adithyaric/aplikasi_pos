@@ -25,7 +25,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
-                                    <td>Nama Outlet</td>
+                                    {{-- <td>Nama Outlet</td> --}}
                                     <td>Nama</td>
                                     <td>Kategori</td>
                                     <td>Qty</td>
@@ -36,11 +36,14 @@
                             @foreach ($products as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->outlet->name }}</td>
+                                    {{-- <td>{{ $value->outlet->name }}</td> --}}
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->category->name }}</td>
                                     <td>
-                                        {{ $value->stocks()->where('created_at', '<=', $carbon::now())->where('expired_at', '>=', $carbon::now())->sum('qty') }}
+                                        {{ $value->stocks()
+                                        // ->where('created_at', '<=', $carbon::now())
+                                        // ->where('expired_at', '>=', $carbon::now())
+                                        ->sum('qty') }}
                                     </td>
                                     {{-- <td>@currency($value->stocks()->orderByRaw('ABS(DATEDIFF(expired_at, NOW()))')->first()->harga_beli)</td> --}}
                                     <td>@currency($value->harga_beli)</td>

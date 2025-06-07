@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('pengeluarans', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Category::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Category::class)->nullable()->constrained()->cascadeOnDelete();
             $table->timestamp('tanggal')->nullable();
             $table->string('biaya')->nullable();
             $table->string('desc')->nullable();

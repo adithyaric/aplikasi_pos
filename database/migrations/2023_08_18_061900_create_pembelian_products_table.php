@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('pembelian_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Pembelian::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Pembelian::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
             $table->integer('harga_beli');
             $table->integer('qty');
             $table->integer('subtotal');

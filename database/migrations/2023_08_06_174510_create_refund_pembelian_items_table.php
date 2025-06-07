@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('refund_pembelian_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(RefundPembelian::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(RefundPembelian::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Product::class)->nullable()->constrained()->cascadeOnDelete();
             $table->integer('qty');
             $table->text('alasan')->nullable();
             $table->timestamps();
