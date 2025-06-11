@@ -19,10 +19,18 @@ class CartController extends Controller
             foreach ($cart as $item) {
                 $now = Carbon::now();
                 $stockQty = $item->stocks()
-                    // ->where('created_at', '<=', $now)
-                    // ->where('expired_at', '>=', $now)
+                    ->available()
                     ->sum('qty');
                 $item->availableStock = $stockQty;
+
+                // Get available serial numbers for serialized products
+                if ($item->is_serialized) {
+                    $item->availableSerials = $item->stocks()
+                        ->available()
+                        ->whereNotNull('serial_number')
+                        ->pluck('serial_number', 'id')
+                        ->toArray();
+                }
             }
 
             // Return the cart data with the available stocks
@@ -33,26 +41,60 @@ class CartController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate(['barcode' => 'required|exists:products,code']);
+            $request->validate([
+                'barcode' => 'required|exists:products,code',
+                'serial_number' => 'nullable|string'
+            ]);
+
             $barcode = $request->barcode;
             $product = Product::where('code', $barcode)->first();
             $now = Carbon::now();
-            $stockQty = $product->stocks()
-                // ->where('created_at', '<=', $now)
-                // ->where('expired_at', '>=', $now)
-                ->sum('qty');
-            $cart = $request->user()->cart()->where('code', $barcode)->first();
-            if ($cart) {
-                if ($stockQty <= $cart->pivot->qty) {
-                    return response(['message' => 'Product available only: '.$stockQty], 400);
+
+            if ($product->is_serialized && $request->serial_number) {
+                // For serialized products, check specific serial number
+                $stock = $product->stocks()
+                    ->available()
+                    ->where('serial_number', $request->serial_number)
+                    ->first();
+
+                if (! $stock) {
+                    return response(['message' => 'Serial number not available'], 400);
                 }
-                $cart->pivot->qty = $cart->pivot->qty + 1;
-                $cart->pivot->save();
+
+                // Check if this serial is already in cart
+                $cart = $request->user()->cart()
+                    ->where('code', $barcode)
+                    ->wherePivot('serial_number', $request->serial_number)
+                    ->first();
+
+                if ($cart) {
+                    return response(['message' => 'Serial number already in cart'], 400);
+                }
+
+                $request->user()->cart()->attach($product->id, [
+                    'qty' => 1,
+                    'serial_number' => $request->serial_number,
+                    'stock_id' => $stock->id
+                ]);
             } else {
-                if ($stockQty < 1) {
-                    return response(['message' => 'Product out of stock'], 400);
+                // For non-serialized products
+                $stockQty = $product->stocks()
+                    ->available()
+                    ->sum('qty');
+
+                $cart = $request->user()->cart()->where('code', $barcode)->first();
+                if ($cart) {
+                    if ($stockQty <= $cart->pivot->qty) {
+                        return response(['message' => 'Product available only: '.$stockQty], 400);
+                    }
+                    $cart->pivot->qty = $cart->pivot->qty + 1;
+                    $cart->pivot->save();
+                } else {
+                    if ($stockQty < 1) {
+                        return response(['message' => 'Product out of stock'], 400);
+                    }
+                    $request->user()->cart()->attach($product->id, ['qty' => 1]);
                 }
-                $request->user()->cart()->attach($product->id, ['qty' => 1]);
             }
 
             return response('success', 204);
@@ -69,16 +111,22 @@ class CartController extends Controller
             $request->validate([
                 'product_id' => 'required|exists:products,id',
                 'qty' => 'required|integer|min:1',
+                'serial_number' => 'nullable|string'
             ]);
 
             $product = Product::find($request->product_id);
+
+            if ($product->is_serialized) {
+                // For serialized products, quantity should always be 1
+                return response(['message' => 'Cannot change quantity for serialized products'], 400);
+            }
+
             $cart = $request->user()->cart()->where('products.id', $request->product_id)->first();
 
             if ($cart) {
                 $now = Carbon::now();
                 $stockQty = $product->stocks()
-                    // ->where('created_at', '<=', $now)
-                    // ->where('expired_at', '>=', $now)
+                    ->available()
                     ->sum('qty');
 
                 if ($stockQty < $request->qty) {
@@ -88,6 +136,27 @@ class CartController extends Controller
                     $cart->pivot->save();
                 }
             }
+
+            return response(['success' => true]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+
+            return response(['message' => 'An error occurred while processing your request.'], 500);
+        }
+    }
+
+    public function removeSerial(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'serial_number' => 'required|string'
+            ]);
+
+            $request->user()->cart()
+                ->wherePivot('product_id', $request->product_id)
+                ->wherePivot('serial_number', $request->serial_number)
+                ->detach();
 
             return response(['success' => true]);
         } catch (Exception $e) {

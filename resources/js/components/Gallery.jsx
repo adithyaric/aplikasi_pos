@@ -20,7 +20,15 @@ const Gallery = ({ products, addProductToCart }) => {
                         <ul>
                             <li> Kode {p.barcode}</li>
                             <li> Nama {p.name}</li>
-                            <li> Stock {p.stocks}</li>
+                            <li>
+                                Serials:{" "}
+                                {p.stocks
+                                    .filter(
+                                        (s) => s.available && s.serial_number
+                                    )
+                                    .map((s) => s.serial_number)
+                                    .join(", ") || "N/A"}
+                            </li>
                             <li>{formatRupiah(p.harga_jual)}</li>
                         </ul>
                     </div>

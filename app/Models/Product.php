@@ -19,10 +19,17 @@ class Product extends Model
         'ukuran',
         'outlet_id', //unsued, currently just for experiment
         'supplier_id', //unsued, currently just for experiment
+        'brand', // Add for Lenovo, Samsung, etc.
+        'model', // Add for specific model info
+        'is_serialized', // Boolean: true for unique items, false for bulk
         'harga_beli',
         'harga_jual',
         'diskon',
         'berat',
+    ];
+
+    protected $casts = [
+        'is_serialized' => 'boolean',
     ];
 
     public function category()
@@ -58,5 +65,11 @@ class Product extends Model
     public function penjualanItems()
     {
         return $this->hasMany(PenjualanItem::class);
+    }
+
+    // Get total available stock
+    public function getTotalStockAttribute()
+    {
+        return $this->stocks()->sum('qty');
     }
 }

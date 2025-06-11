@@ -47,6 +47,44 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label for="">Brand</label>
+                                <input type="text" class="form-control" name="brand" value="{{ old('brand') }}"
+                                    placeholder="Masukkan brand">
+                                @error('brand')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="">Model</label>
+                                <input type="text" class="form-control" name="model" value="{{ old('model') }}"
+                                    placeholder="Masukkan model">
+                                @error('model')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="">Serialized</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_serialized" id="serialized_yes" value="1" {{ old('is_serialized') == '1' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="serialized_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_serialized" id="serialized_no" value="0" {{ old('is_serialized') == '0' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="serialized_no">No</label>
+                                    </div>
+                                </div>
+                                @error('is_serialized')
+                                    <div class="invalid-feedback text-danger d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="">Deskripsi</label>
                                 <input type="text" class="form-control" name="desc" value="{{ old('desc') }}"
                                     placeholder="Masukkan Deskripsi">

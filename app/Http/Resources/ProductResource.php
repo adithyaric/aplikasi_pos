@@ -18,12 +18,19 @@ class ProductResource extends JsonResource
             'desc' => $this->desc,
             'image' => $this->pic,
             'code' => $this->barcode,
+            'brand' => $this->brand,
+            'model' => $this->model,
             'harga_jual' => $this->harga_jual,
-            'stocks' => $this->stocks()
-                // ->where('created_at', '<=', $now)
-                // ->where('expired_at', '>=', $now)
-                ->sum('qty'),
             'image_url' => asset($this->pic),
+            'is_serialized' => $this->is_serialized,
+            'total_stock' => $this->total_stock,
+            'stocks' => $this->stocks->map(fn ($stock) => [
+                'id' => $stock->id,
+                'serial_number' => $stock->serial_number,
+                'qty' => $stock->qty,
+                'expired_at' => optional($stock->expired_at)->toDateString(),
+                'available' => $stock->qty > 0,
+            ]),
         ];
     }
 }

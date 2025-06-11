@@ -11,8 +11,8 @@
 - [x] Product
 - [x] Category
 - [x] Stock -> Purchase Order -> Penerimaan Barang (Baru Masuk Stock)
-- [ ] Order Outlet
-    - [ ] List Pesan Order Dari Outlet
+- [x] Order Outlet
+    - [x] List Pesan Order Dari Outlet
     - [ ] Acc -> Pilih Product & QTY -> Send Stock (Auto stock berkurang / pindah)
 - Return Outlet
     - [ ] List Return Outlet
@@ -22,9 +22,9 @@
 
 - Adopsi POS yang sudah ada (newpos.demoo.net)
     Hal Yang Berbeda dengan newpo.demoo.net
-    - [ ] POS Multi Outlet **Tapi Penjualan Hanya 1 Outlet**
-    - [ ] Stock Barang Sendiri - Sendiri
-    - [ ] Stock Barang Request Ke Warehouse (Acc Warehouse)
+    - [x] POS Multi Outlet **Tapi Penjualan Hanya 1 Outlet**
+    - [x] Stock Barang Sendiri - Sendiri
+    - [x] Stock Barang Request Ke Warehouse (Acc Warehouse)
         - Contoh : Kak aku minta diisi stock Laptop Asus
     - [ ] Return Ke Warehouse (Acc Warehouse)
         - Contoh : Pilih Barang & QTY -> Send Stock (Waiting Acc Warehouse) -> Setelah Acc Stock Berkurang
@@ -33,4 +33,4 @@
     - [ ] Search Stock
         - Group By Name (Biar Tugas Admin Menyamakan Namanya)
             - Stock Harus Kelihatan Dari All Outlet - Warehouse & Statusnya
-    - [ ] Outlet Bisa Memberi Status Pada Product (Free & On Keep)
+    - [ ] Outlet Bisa Memberi Status Pada Product (Free & On Keep) -> wishlist (hanya sebagai status saja)

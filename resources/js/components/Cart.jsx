@@ -23,6 +23,11 @@ const Cart = () => {
     const [total, setTotal] = useState(0);
     const [wishlist, setWishlist] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
+    // Add these state variables to your existing Cart component
+    const [serialModal, setSerialModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedSerial, setSelectedSerial] = useState("");
+    const [availableSerials, setAvailableSerials] = useState([]);
     const outlet = window.outlet;
 
     useEffect(() => {
@@ -43,6 +48,7 @@ const Cart = () => {
         axios.get(`/product${query}`).then((res) => {
             const products = res.data.data;
             setProducts(products);
+            console.log(products);
         });
     };
 
@@ -64,48 +70,162 @@ const Cart = () => {
         });
     };
 
-    const addToCart = (barcode) => {
+    const addToCart = (barcode, serialNumber = null) => {
         let product = products.find((p) => p.barcode === barcode);
         if (!!product) {
-            let cartItem = cart.find((c) => c.id === product.id);
-            if (!!cartItem) {
-                setCart(
-                    cart.map((c) => {
-                        if (c.id === product.id && product.qty > c.pivot.qty) {
-                            c.pivot.qty = c.pivot.qty + 1;
+            console.log("product : ", product);
+            console.log("product stocks: ", product.stocks);
+            console.log("serial number: ", serialNumber);
+
+            if (product.is_serialized && !serialNumber) {
+                // Show serial selection modal
+                console.log("Show serial selection modal");
+                setSelectedProduct(product);
+
+                // Convert to array instead of object
+                const serials = [];
+                if (product.stocks && Array.isArray(product.stocks)) {
+                    product.stocks.forEach((stock) => {
+                        if (stock.serial_number && stock.qty > 0) {
+                            serials.push({
+                                id: stock.id,
+                                serial: stock.serial_number,
+                            });
                         }
-                        return c;
-                    })
-                );
-            } else {
-                if (product.qty > 0) {
-                    product = {
-                        ...product,
-                        pivot: { qty: 1, product_id: product.id, user_id: 1 },
-                    };
-                    setCart([...cart, product]);
+                    });
+                }
+
+                console.log("serials : ", serials);
+                setAvailableSerials(serials);
+                setSerialModal(true);
+                return;
+            }
+
+            // For non-serialized products
+            if (!product.is_serialized) {
+                let cartItem = cart.find((c) => c.id === product.id);
+                if (!!cartItem) {
+                    setCart(
+                        cart.map((c) => {
+                            if (
+                                c.id === product.id &&
+                                product.qty > c.pivot.qty
+                            ) {
+                                c.pivot.qty += 1;
+                            }
+                            return c;
+                        })
+                    );
+                } else {
+                    if (product.qty > 0) {
+                        product = {
+                            ...product,
+                            pivot: {
+                                qty: 1,
+                                product_id: product.id,
+                                user_id: 1,
+                            },
+                        };
+                        setCart([...cart, product]);
+                    }
                 }
             }
+
+            const payload = { barcode };
+            if (serialNumber) payload.serial_number = serialNumber;
+
             axios
-                .post("/cart", { barcode })
+                .post("/cart", payload)
                 .then((res) => {
                     loadCart();
+                    setSerialModal(false);
+                    setSelectedSerial("");
                     console.log(res);
                 })
                 .catch((err) => {
                     console.log("Error!", err.response.data.message, "error");
-                    Swal.fire(
-                        "Error!",
-                        err.response.data.message,
-                        "error"
-                    ).then(() => {
-                        setState((prevState) => ({
-                            ...prevState,
-                            error: true,
-                        }));
-                    });
+                    Swal.fire("Error!", err.response.data.message, "error");
                 });
         }
+    };
+
+    const handleSerialSelection = () => {
+        if (selectedSerial && selectedProduct) {
+            addToCart(selectedProduct.barcode, selectedSerial);
+        }
+    };
+
+    const removeSerial = (productId, serialNumber) => {
+        axios
+            .post("/cart/remove-serial", {
+                product_id: productId,
+                serial_number: serialNumber,
+            })
+            .then(() => loadCart())
+            .catch((err) => {
+                console.log("Error!", err.response.data.message, "error");
+                Swal.fire("Error!", err.response.data.message, "error");
+            });
+    };
+
+    // This must be placed in the return section (not inside a component)
+    const SerialSelectionModal = () => {
+        if (!serialModal) return null;
+
+        return (
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">
+                            Select Serial Number for {selectedProduct?.name}
+                        </h5>
+                        <button
+                            type="button"
+                            className="close"
+                            onClick={() => setSerialModal(false)}
+                        >
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="form-group">
+                            <label>Available Serial Numbers:</label>
+                            <select
+                                className="form-control"
+                                value={selectedSerial}
+                                onChange={(e) =>
+                                    setSelectedSerial(e.target.value)
+                                }
+                            >
+                                <option value="">Choose Serial Number</option>
+                                {availableSerials.map(({ id, serial }) => (
+                                    <option key={id} value={serial}>
+                                        {serial}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleSerialSelection}
+                            disabled={!selectedSerial}
+                        >
+                            Add to Cart
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => setSerialModal(false)}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     const updateCart = (product_id, newQty) => {
@@ -290,47 +410,6 @@ const Cart = () => {
             });
     };
 
-    //Submit
-    // const handleClickSubmit = (event) => {
-    //     Swal.fire({
-    //         title: "Received Amount",
-    //         input: "text",
-    //         inputValue: getTotal(cart) - discount,
-    //         showCancelButton: true,
-    //         confirmButtonText: "Send",
-    //         showLoaderOnConfirm: true,
-    //         preConfirm: (amount) => {
-    //             return axios
-    //                 .post("/penjualan", {
-    //                     customer_id: customerId,
-    //                     outlet_id: outlet.id,
-    //                     kas_id: kasId,
-    //                     total: amount,
-    //                     discount: discount,
-    //                     cart: cart,
-    //                 })
-    //                 .then((res) => {
-    //                     loadCart();
-    //                     loadWishlist();
-    //                     loadProducts();
-    //                     setBarcode("");
-    //                     setCustomerId("");
-    //                     setSearch("");
-    //                     setDiscount(0);
-    //                     Swal.fire(
-    //                         "Success!",
-    //                         "Pesanan berhasil dibuat",
-    //                         "success"
-    //                     );
-    //                 })
-    //                 .catch((err) => {
-    //                     Swal.showValidationMessage(err.response.data.message);
-    //                 });
-    //         },
-    //         allowOutsideClick: () => !Swal.isLoading(),
-    //     });
-    // };
-
     // Handle form submission
     const handleSubmit = (event) => {
         // Get the total amount from the input field
@@ -352,7 +431,11 @@ const Cart = () => {
                 loadCustomers();
                 loadKas();
                 loadWishlist();
-                Swal.fire("Success!", "Pesanan berhasil dibuat", "success").then(() => {
+                Swal.fire(
+                    "Success!",
+                    "Pesanan berhasil dibuat",
+                    "success"
+                ).then(() => {
                     window.location.reload(false); // <-- added this line to refresh the page
                 });
             })
@@ -368,6 +451,7 @@ const Cart = () => {
 
     return (
         <div className="row">
+            <SerialSelectionModal />
             <div className="col-12 col-sm-12">
                 <Wishlist
                     wishlist={wishlist}

@@ -19,7 +19,9 @@ class ProductController extends Controller
         if ($request->search) {
             $products = $products->where('name', 'LIKE', "%{$request->search}%")
                 ->orWhere('code', 'LIKE', "%{$request->search}%")
-                ->orWhere('harga_jual', 'LIKE', "%{$request->search}%");
+                ->orWhere('harga_jual', 'LIKE', "%{$request->search}%")
+                ->orWhere('brand', 'LIKE', "%{$request->search}%")
+                ->orWhere('model', 'LIKE', "%{$request->search}%");
         }
         if (request()->wantsJson()) {
             $products = $products->latest()->paginate(10);
@@ -65,7 +67,17 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        return $product;
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->name,
+            'code' => $product->code,
+            'brand' => $product->brand,
+            'model' => $product->model,
+            'harga_beli' => $product->harga_beli,
+            'harga_jual' => $product->harga_jual,
+            'is_serialized' => $product->is_serialized,
+            'total_stock' => $product->total_stock,
+        ]);
     }
 
     public function edit(Product $product)

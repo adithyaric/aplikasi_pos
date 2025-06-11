@@ -30,35 +30,34 @@
                                     <td>Kategori</td>
                                     <td>Qty</td>
                                     <td>Harga Beli</td>
+                                    <td>Serialized</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
-                            @foreach ($products as $value)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    {{-- <td>{{ $value->outlet->name }}</td> --}}
-                                    <td>{{ $value->name }}</td>
-                                    <td>{{ $value->category->name }}</td>
-                                    <td>
-                                        {{ $value->stocks()
-                                        // ->where('created_at', '<=', $carbon::now())
-                                        // ->where('expired_at', '>=', $carbon::now())
-                                        ->sum('qty') }}
-                                    </td>
-                                    {{-- <td>@currency($value->stocks()->orderByRaw('ABS(DATEDIFF(expired_at, NOW()))')->first()->harga_beli)</td> --}}
-                                    <td>@currency($value->harga_beli)</td>
-                                    <td>
-                                        <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>
-                                        <form action="{{ route('product.destroy', $value->id) }}" method="post"
-                                            style="display: inline;">
-                                            @method('delete')
-                                            @csrf
-                                            <button class="border-0 btn btn-danger"
-                                                onclick="return confirm('Are you sure?')">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tbody>
+                                @foreach ($products as $value)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        {{-- <td>{{ $value->outlet->name }}</td> --}}
+                                        <td>{{ $value->name }}</td>
+                                        <td>{{ $value->category->name }}</td>
+                                        <td>
+                                            {{ $value->stocks()->sum('qty') }}
+                                        </td>
+                                        <td>@currency($value->harga_beli)</td>
+                                        <td>{{ $value->is_serialized ? 'Yes' : 'No' }}</td>
+                                        <td>
+                                            <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>
+                                            <form action="{{ route('product.destroy', $value->id) }}" method="post" style="display: inline;">
+                                                @method('delete')
+                                                @csrf
+                                                <button class="border-0 btn btn-danger"
+                                                    onclick="return confirm('Are you sure?')">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->

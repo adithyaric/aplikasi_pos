@@ -16,6 +16,9 @@ class Stock extends Model
         'harga_beli',
         'qty',
         'expired_at',
+        'serial_number', // For individual items like laptops
+        'imei', // For phones
+        'condition', // new, used, refurbished
     ];
 
     public function pembelian()
@@ -26,6 +29,11 @@ class Stock extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function scopeAvailable($query)
+    {
+        return $query->where('qty', '>', 0);
     }
 
     protected $casts = [

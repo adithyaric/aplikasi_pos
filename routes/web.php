@@ -76,6 +76,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
 
     Route::resource('/cart', CartController::class);
     Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
+    Route::post('/cart/remove-serial', [CartController::class, 'removeSerial']);
     Route::delete('/cart-empty', [CartController::class, 'empty']);
     Route::get('/wishlist-pos/{outlet_id}', [CartController::class, 'getWishlist']);
     Route::post('/wishlist-pos', [CartController::class, 'addToWishlist']);

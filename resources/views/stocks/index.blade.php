@@ -20,6 +20,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Code</td>
                                     <td>Nama Outlet</td>
                                     <td>Nama Product</td>
                                     <td>Harga Beli</td>
@@ -32,6 +33,7 @@
                                 @foreach ($stocks as $stock)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $stock->serial_number ?? $stock->product->code }}</td>
                                         <td>{{ $stock->pembelian->outlet->name }}</td>
                                         <td>{{ $stock->product->name }}</td>
                                         <td>@currency($stock->harga_beli)</td>

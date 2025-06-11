@@ -88,36 +88,39 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // for ($i = 1; $i <= 5; $i++) {
-        //     Product::create([
-        //         'pic' => 'pic'.$i,
-        //         'code' => 'code'.$i,
-        //         'name' => 'Product '.$i,
-        //         'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
-        //         'desc' => 'Description '.$i,
-        //         'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
-        //         'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
-        //         'outlet_id' => Outlet::inRandomOrder()->first()->id,
-        //         'supplier_id' => Supplier::inRandomOrder()->first()->id,
-        //         'harga_jual' => round(rand(10000, 100000), -4),
-        //         'diskon' => rand(0, 50),
-        //         'berat' => round(rand(1, 10)),
-        //     ]);
-        // }
+        for ($i = 1; $i <= 5; $i++) {
+            Product::create([
+                'pic' => 'pic'.$i,
+                'code' => 'code'.$i,
+                'name' => 'Product '.$i,
+                'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
+                'desc' => 'Description '.$i,
+                'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
+                'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
+                // 'outlet_id' => Outlet::inRandomOrder()->first()->id,
+                // 'supplier_id' => Supplier::inRandomOrder()->first()->id,
+                'brand' => 'brand'.$i,
+                'model' => 'model'.$i,
+                'is_serialized' => rand(0, 1),
+                'harga_jual' => round(rand(10000, 100000), -4),
+                'diskon' => rand(0, 50),
+                'berat' => round(rand(1, 10)),
+            ]);
+        }
 
-        // for ($i = 1; $i <= 3; $i++) {
-        //     Voucher::create([
-        //         'name' => 'Voucher '.$i,
-        //         'code' => 'Code'.$i,
-        //         'type' => ($i % 2 == 0) ? 'nominal' : 'percentage',
-        //         'limit' => round(rand(1, 10)),
-        //         'value' => round(rand(10000, 100000), -4),
-        //         'min_purchase' => round(rand(100000, 1000000), -5),
-        //         'start_at' => now()->addDays($i),
-        //         'end_at' => now()->addDays($i + 7),
-        //         'desc' => 'Description '.$i,
-        //     ]);
-        // }
+        for ($i = 1; $i <= 3; $i++) {
+            Voucher::create([
+                'name' => 'Voucher '.$i,
+                'code' => 'Code'.$i,
+                'type' => ($i % 2 == 0) ? 'nominal' : 'percentage',
+                'limit' => round(rand(1, 10)),
+                'value' => round(rand(10000, 100000), -4),
+                'min_purchase' => round(rand(100000, 1000000), -5),
+                'start_at' => now()->addDays($i),
+                'end_at' => now()->addDays($i + 7),
+                'desc' => 'Description '.$i,
+            ]);
+        }
 
         // // for ($i = 1; $i <= 3; $i++) {
         // //     Pengeluaran::create([

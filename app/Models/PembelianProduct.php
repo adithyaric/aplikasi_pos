@@ -6,10 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class PembelianProduct extends Model
 {
-    protected $fillable = ['pembelian_id', 'product_id', 'harga_beli', 'qty', 'subtotal', 'expired_at'];
+    protected $fillable = [
+        'pembelian_id',
+        'product_id',
+        'harga_beli',
+        'qty',
+        'subtotal',
+        'expired_at',
+        'serial_numbers' // JSON array for serialized items
+    ];
 
     protected $casts = [
         'expired_at' => 'datetime',
+        'serial_numbers' => 'array',
     ];
 
     public function pembelian()
