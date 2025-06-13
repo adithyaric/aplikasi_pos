@@ -17,6 +17,8 @@ const Cart = () => {
     const [customerId, setCustomerId] = useState("");
     const [kas, setKas] = useState([]);
     const [kasId, setKasId] = useState("");
+    const [kasir, setKasir] = useState([]);
+    const [kasirId, setKasirId] = useState("");
     const [barcode, setBarcode] = useState("");
     const [search, setSearch] = useState("");
     const [discount, setDiscount] = useState("");
@@ -39,6 +41,7 @@ const Cart = () => {
         loadProducts();
         loadCustomers();
         loadKas();
+        loadKasir();
         loadWishlist();
     }, []);
 
@@ -330,6 +333,14 @@ const Cart = () => {
         });
     };
 
+    //Data Kasir
+    const loadKasir = () => {
+        axios.get("/kasir").then((res) => {
+            const kasir = res.data;
+            setKasir(kasir);
+        });
+    };
+
     const handleOnChangeBarcode = (event) => {
         setBarcode(event.target.value);
     };
@@ -421,6 +432,7 @@ const Cart = () => {
                 customer_id: customerId,
                 outlet_id: outlet.id,
                 kas_id: kasId,
+                kasir_id: kasirId,
                 total: totalAmount,
                 discount: discount,
                 cart: cart,
@@ -430,6 +442,7 @@ const Cart = () => {
                 loadProducts();
                 loadCustomers();
                 loadKas();
+                loadKasir();
                 loadWishlist();
                 Swal.fire(
                     "Success!",
@@ -458,7 +471,7 @@ const Cart = () => {
                     handleMoveToCart={handleMoveToCart}
                 />
             </div>
-            <div className="col-md-6 col-lg-4">
+            <div className="col-md-6 col-lg-5">
                 <Barcodes
                     barcode={barcode}
                     handleScanBarcode={handleScanBarcode}
@@ -488,12 +501,15 @@ const Cart = () => {
                     kas={kas}
                     kasId={kasId}
                     setKasId={setKasId}
+                    kasir={kasir}
+                    kasirId={kasirId}
+                    setKasirId={setKasirId}
                 />
                 <hr />
                 {/* <Kas kas={kas} kasId={kasId} setKasId={setKasId} /> */}
             </div>
             <hr />
-            <div className="col-md-6 col-lg-8">
+            <div className="col-md-6 col-lg-7">
                 <div className="form-group">
                     <input
                         type="text"

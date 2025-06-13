@@ -4,7 +4,7 @@
 - [x] Superadmin
 - [ ] Admin Warehouse
 - [ ] Admin Outlet
-- [ ] Cashier Outlet
+- [x] Kasir Outlet (sales)
 
 **⁠WAREHOUSE**
 
@@ -13,10 +13,10 @@
 - [x] Stock -> Purchase Order -> Penerimaan Barang (Baru Masuk Stock)
 - [x] Order Outlet
     - [x] List Pesan Order Dari Outlet
-    - [ ] Acc -> Pilih Product & QTY -> Send Stock (Auto stock berkurang / pindah)
+    - [ ] Acc -> Pilih Product & QTY -> `Send Stock (Auto stock berkurang / pindah)`
 - Return Outlet
-    - [ ] List Return Outlet
-    - [ ] Acc -> Check Product & QTY -> Submit (Auto Stock Bertambah)
+    - [x] List Return Outlet (Refund)
+    - [ ] Acc -> Check Product & QTY -> `Submit (Auto Stock Bertambah)`
 
 **⁠POS**
 
@@ -28,9 +28,9 @@
         - Contoh : Kak aku minta diisi stock Laptop Asus
     - [ ] Return Ke Warehouse (Acc Warehouse)
         - Contoh : Pilih Barang & QTY -> Send Stock (Waiting Acc Warehouse) -> Setelah Acc Stock Berkurang
-    - [ ] Saat POS pilih SALES yang menjualkan (Berfungsi untuk poin)
+    - [x] Saat POS pilih SALES yang menjualkan (Berfungsi untuk poin)
     - [ ] Voucher (Diskon Tambahan)
-    - [ ] Search Stock
+    - [x] Search Stock
         - Group By Name (Biar Tugas Admin Menyamakan Namanya)
             - Stock Harus Kelihatan Dari All Outlet - Warehouse & Statusnya
     - [ ] Outlet Bisa Memberi Status Pada Product (Free & On Keep) -> wishlist (hanya sebagai status saja)

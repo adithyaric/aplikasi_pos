@@ -20,6 +20,7 @@ const Gallery = ({ products, addProductToCart }) => {
                         <ul>
                             <li> Kode {p.barcode}</li>
                             <li> Nama {p.name}</li>
+                            <li>Total Stock: {p.total_stock}</li>
                             <li>
                                 Serials:{" "}
                                 {p.stocks

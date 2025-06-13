@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Exports\ExportUser;
 use App\Imports\ImportUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
+    public function kasir(Request $request)
+    {
+        if ($request->wantsJson()) {
+            return response(User::where('role', 'kasir')->get());
+        }
+    }
+
     public function importUsers(Request $request)
     {
         $request->validate([

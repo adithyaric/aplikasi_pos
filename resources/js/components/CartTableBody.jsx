@@ -11,21 +11,27 @@ const CartTableBody = ({
         <>
             {cart.map((c, index) => (
                 <tr key={index}>
-                    <td>{c.name}</td>
-                    <td className="col-2 col-sm-2">
+                    <td>
+                        {c.is_serialized && c.pivot.serial_number && (
+                            <span className="badge bg-aqua">
+                                SN: {c.pivot.serial_number}
+                            </span>
+                        )}
+                        <span>{c.name}</span>
+                    </td>
+                    <td>
                         <input
                             type="number"
-                            className="form-control form-control-sm qty"
+                            className="form-control form-control-sm qty text-center"
+                            style={{ maxWidth: "60px" }}
                             value={c.pivot.qty}
                             onChange={(event) =>
                                 handleChangeQty(c.id, event.target.value)
                             }
                         />
                     </td>
-                    <td className="col-2 col-sm-2">
-                        {formatRupiah(c.harga_jual)}
-                    </td>
-                    <td className="col-3 col-sm-3">
+                    <td>{formatRupiah(c.harga_jual)}</td>
+                    <td>
                         <button
                             className="btn btn-sm"
                             onClick={() => handleClickIncrease(c.id)}

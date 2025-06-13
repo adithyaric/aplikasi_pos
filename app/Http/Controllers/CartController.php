@@ -11,31 +11,28 @@ class CartController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->wantsJson()) {
-            // Get the cart data
-            $cart = $request->user()->cart()->get();
+        // Get the cart data
+        $cart = $request->user()->cart()->get();
 
-            // Add the available stock for each product
-            foreach ($cart as $item) {
-                $now = Carbon::now();
-                $stockQty = $item->stocks()
+        // Add the available stock for each product
+        foreach ($cart as $item) {
+            $now = Carbon::now();
+            $stockQty = $item->stocks()
+                ->available()
+                ->sum('qty');
+            $item->availableStock = $stockQty;
+
+            // Get available serial numbers for serialized products
+            if ($item->is_serialized) {
+                $item->availableSerials = $item->stocks()
                     ->available()
-                    ->sum('qty');
-                $item->availableStock = $stockQty;
-
-                // Get available serial numbers for serialized products
-                if ($item->is_serialized) {
-                    $item->availableSerials = $item->stocks()
-                        ->available()
-                        ->whereNotNull('serial_number')
-                        ->pluck('serial_number', 'id')
-                        ->toArray();
-                }
+                    ->whereNotNull('serial_number')
+                    ->pluck('serial_number', 'id')
+                    ->toArray();
             }
-
-            // Return the cart data with the available stocks
-            return response($cart);
         }
+        // Return the cart data with the available stocks
+        return response($cart);
     }
 
     public function store(Request $request)

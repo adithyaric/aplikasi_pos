@@ -22,6 +22,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Artisan;
@@ -44,6 +45,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/get-pembelian/{outlet_id}', [PembelianController::class, 'getPembelian']);
     Route::get('/pembelian-detail/{pembelian_id}/items', [PembelianController::class, 'getItems']);
 
+    Route::get('/kasir', [UserController::class, 'kasir'])->name('kasir.index');
     Route::resource('/customer', CustomerController::class);
     Route::resource('/kas', KasController::class);
     Route::resource('/payment', PaymentMethodController::class);

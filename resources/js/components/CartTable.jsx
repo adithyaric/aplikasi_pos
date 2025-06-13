@@ -2,6 +2,7 @@ import React from "react";
 import { formatRupiah } from "../utils";
 import CartTableBody from "./CartTableBody";
 import Kas from "./Kas";
+import Kasir from "./Kasir";
 
 const CartTable = ({
     cart,
@@ -20,18 +21,21 @@ const CartTable = ({
     kas,
     kasId,
     setKasId,
+    kasir,
+    kasirId,
+    setKasirId,
 }) => {
     return (
         <>
-            <div className="table-responsive">
+            <div className="table-responsive text-nowrap">
                 <table className="table table-sm table-bordered">
                     <thead>
                         <tr>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Per Item</th>
-                            <th>Aksi</th>
-                            <th className="text-right">Subtotal</th>
+                            <th className="w-50">Product Name</th>
+                            <th className="w-10">Quantity</th>
+                            <th className="w-15">Per Item</th>
+                            <th className="w-15">Aksi</th>
+                            <th className="text-right w-10">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -130,6 +134,13 @@ const CartTable = ({
                                         kasId={kasId}
                                         setKasId={setKasId}
                                     />
+                                    <Kasir
+                                        key={kasirId}
+                                        kasir={kasir}
+                                        kasirId={kasirId}
+                                        setKasirId={setKasirId}
+                                    />
+
                                     <p>Total Amount</p>
                                     <div className="form-group">
                                         <input
