@@ -176,55 +176,71 @@ const Cart = () => {
         if (!serialModal) return null;
 
         return (
-            <div className="modal-dialog">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title">
-                            Select Serial Number for {selectedProduct?.name}
-                        </h5>
-                        <button
-                            type="button"
-                            className="close"
-                            onClick={() => setSerialModal(false)}
-                        >
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label>Available Serial Numbers:</label>
-                            <select
-                                className="form-control"
-                                value={selectedSerial}
-                                onChange={(e) =>
-                                    setSelectedSerial(e.target.value)
-                                }
+            <div
+                className="modal"
+                style={{
+                    display: "block",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    zIndex: 1050,
+                }}
+            >
+                <div className="modal-dialog" style={{ marginTop: "50px" }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">
+                                Select Serial Number for {selectedProduct?.name}
+                            </h5>
+                            <button
+                                type="button"
+                                className="close"
+                                onClick={() => setSerialModal(false)}
                             >
-                                <option value="">Choose Serial Number</option>
-                                {availableSerials.map(({ id, serial }) => (
-                                    <option key={id} value={serial}>
-                                        {serial}
-                                    </option>
-                                ))}
-                            </select>
+                                <span>&times;</span>
+                            </button>
                         </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleSerialSelection}
-                            disabled={!selectedSerial}
-                        >
-                            Add to Cart
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={() => setSerialModal(false)}
-                        >
-                            Cancel
-                        </button>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Available Serial Numbers:</label>
+                                <select
+                                    className="form-control"
+                                    value={selectedSerial}
+                                    onChange={(e) =>
+                                        setSelectedSerial(e.target.value)
+                                    }
+                                >
+                                    <option value="">
+                                        Choose Serial Number
+                                    </option>
+                                    {availableSerials.map(({ id, serial }) => (
+                                        <option key={id} value={serial}>
+                                            {serial}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleSerialSelection}
+                                disabled={!selectedSerial}
+                            >
+                                Add to Cart
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setSerialModal(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -268,7 +284,10 @@ const Cart = () => {
     const handleClickDecrease = (product_id) => {
         const currentQty = cart.find((c) => c.id === product_id).pivot.qty;
         if (currentQty > 1) {
-            updateCart(product_id, currentQty - 1);
+            updateCart(product_id, Number(currentQty) - 1);
+        }else{
+            // delete the product
+            handleClickDelete(product_id);
         }
     };
 

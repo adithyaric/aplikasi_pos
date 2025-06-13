@@ -21,10 +21,16 @@ class ProductController extends Controller
                 ->orWhere('code', 'LIKE', "%{$request->search}%")
                 ->orWhere('harga_jual', 'LIKE', "%{$request->search}%")
                 ->orWhere('brand', 'LIKE', "%{$request->search}%")
-                ->orWhere('model', 'LIKE', "%{$request->search}%")->orWhereHas('stocks', function ($query) use ($request) {
+                ->orWhere('model', 'LIKE', "%{$request->search}%")
+                ->orWhereHas('stocks', function ($query) use ($request) {
                     $query->where('serial_number', 'LIKE', "%{$request->search}%");
                 });
         }
+
+        $products = $products->with(['stocks' => function ($query) {
+            $query->where('qty', '>', 0);
+        }]);
+
         if (request()->wantsJson()) {
             $products = $products->latest()->paginate(10);
 

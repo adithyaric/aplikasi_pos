@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
-                    <div class="box-body table-responsive">
+                    <div class="box-body table-responsive text-nowrap">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -38,31 +38,33 @@
                                     <td>{{ $value->outlet->name ?? '___customer' }}</td>
                                     <td>{{ $value->kasir->name ?? '___customer' }}</td>
                                     <td>
-                                        <table class="table table-sm table-bordered">
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Banyak</th>
-                                                <th>Harga Jual</th>
-                                                <th>Sub total</th>
-                                            </tr>
-                                            @php $totalCost = 0; @endphp
-                                            @foreach ($value->items as $item)
+                                        <div class="table-responsive text-nowrap">
+                                            <table class="table table-sm table-bordered">
                                                 <tr>
-                                                    <td>{{ $item->product->name }}</td>
-                                                    <td>{{ $item->qty }}</td>
-                                                    <td>@currency($item->price)</td>
-                                                    <td>@currency($item->qty * $item->price)</td>
+                                                    <th>Product</th>
+                                                    <th>Banyak</th>
+                                                    <th>Harga Jual</th>
+                                                    <th>Sub total</th>
                                                 </tr>
-                                            @php $totalCost += $item->qty * $item->price; @endphp
-                                            @endforeach
-                                            <tr>
-                                                <th>Diskon : @currency($value->discount)</th>
-                                                <th colspan="3" class="text-right">Total : @currency($totalCost)</th>
-                                            </tr>
-                                            <tr>
-                                                <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $value->discount)</th>
-                                            </tr>
-                                        </table>
+                                                @php $totalCost = 0; @endphp
+                                                @foreach ($value->items as $item)
+                                                    <tr>
+                                                        <td>{{ $item->serial_number ? $item->serial_number : $item->product?->code }} - {{ $item->product->name }}</td>
+                                                        <td>{{ $item->qty }}</td>
+                                                        <td>@currency($item->price)</td>
+                                                        <td>@currency($item->qty * $item->price)</td>
+                                                    </tr>
+                                                @php $totalCost += $item->qty * $item->price; @endphp
+                                                @endforeach
+                                                <tr>
+                                                    <th>Diskon : @currency($value->discount)</th>
+                                                    <th colspan="3" class="text-right">Total : @currency($totalCost)</th>
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $value->discount)</th>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </td>
                                     <td>
                                         <a class="btn btn-info" href="{{ route('penjualan.show', $value->id) }}">Show</a>

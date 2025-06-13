@@ -121,7 +121,7 @@ class CartController extends Controller
             $cart = $request->user()->cart()->where('products.id', $request->product_id)->first();
 
             if ($cart) {
-                $now = Carbon::now();
+                // $now = Carbon::now();
                 $stockQty = $product->stocks()
                     ->available()
                     ->sum('qty');

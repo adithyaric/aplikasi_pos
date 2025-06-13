@@ -12,9 +12,11 @@ class PenjualanItem extends Model
     protected $fillable = [
         'penjualan_id',
         'product_id',
+        'stock_id',
         'qty',
         'price',
         'subtotal',
+        'serial_number',
     ];
 
     public function penjualan()
@@ -25,5 +27,10 @@ class PenjualanItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class);
     }
 }

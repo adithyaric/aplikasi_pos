@@ -98,37 +98,48 @@ class PenjualanController extends Controller
                     'price' => $item->harga_jual,
                     'qty' => $item->pivot->qty,
                     'product_id' => $item->id,
+                    'serial_number' => $item->pivot->serial_number,
+                    'stock_id' => $item->pivot->stock_id,
                 ]);
 
-                $now = Carbon::now();
-                $stocks = Stock::where('product_id', $item->id)
-                    // ->where('created_at', '<=', $now)
-                    // ->where('expired_at', '>=', $now)
-                    // ->orderBy('expired_at', 'asc')
-                    ->get();
-
-                if ($stocks->isEmpty()) {
-                    throw new Exception('Stock not found or expired');
-                }
-
-                $remainingQty = $item->pivot->qty;
-                foreach ($stocks as $stock) {
-                    if ($remainingQty <= 0) {
-                        break;
+                if ($item->is_serialized) {
+                    // For serialized items, update specific stock
+                    $stock = Stock::find($item->pivot->stock_id);
+                    if (! $stock || $stock->qty < $item->pivot->qty) {
+                        throw new Exception('Stock not found or insufficient quantity');
                     }
-
-                    if ($stock->qty >= $remainingQty) {
-                        $stock->qty -= $remainingQty;
-                        $remainingQty = 0;
-                    } else {
-                        $remainingQty -= $stock->qty;
-                        $stock->qty = 0;
-                    }
+                    $stock->qty -= $item->pivot->qty;
                     $stock->save();
-                }
+                } else {
+                    // Existing FIFO logic for non-serialized items
+                    $now = Carbon::now();
+                    $stocks = Stock::where('product_id', $item->id)
+                        ->where('qty', '>', 0)
+                        ->get();
 
-                if ($remainingQty > 0) {
-                    throw new Exception('Insufficient stock quantity');
+                    if ($stocks->isEmpty()) {
+                        throw new Exception('Stock not found or expired');
+                    }
+
+                    $remainingQty = $item->pivot->qty;
+                    foreach ($stocks as $stock) {
+                        if ($remainingQty <= 0) {
+                            break;
+                        }
+
+                        if ($stock->qty >= $remainingQty) {
+                            $stock->qty -= $remainingQty;
+                            $remainingQty = 0;
+                        } else {
+                            $remainingQty -= $stock->qty;
+                            $stock->qty = 0;
+                        }
+                        $stock->save();
+                    }
+
+                    if ($remainingQty > 0) {
+                        throw new Exception('Insufficient stock quantity');
+                    }
                 }
             }
 
