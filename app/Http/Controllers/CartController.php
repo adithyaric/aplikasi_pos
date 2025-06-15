@@ -169,6 +169,7 @@ class CartController extends Controller
             'cart' => 'required|array',
             'cart.*.id' => 'required|exists:products,id',
             'cart.*.pivot.qty' => 'required|integer|min:1',
+            'cart.*.pivot.stock_id' => 'nullable|exists:stocks,id',
             'outlet_id' => 'required',
             'customer_id' => 'required',
             'name' => 'required',
@@ -176,12 +177,21 @@ class CartController extends Controller
 
         foreach ($request->cart as $item) {
             $product = Product::find($item['id']);
+            $stockId = $item['pivot']['stock_id'] ?? null;
+
             $request->user()->wishlist()->attach($product->id, [
                 'qty' => $item['pivot']['qty'],
                 'outlet_id' => $request->outlet_id,
                 'customer_id' => $request->customer_id,
                 'name' => $request->name,
+                'stock_id' => $stockId
             ]);
+
+            // Update stock status if it's a specific stock item
+            if ($stockId) {
+                \App\Models\Stock::where('id', $stockId)
+                    ->update(['status' => 'on_keep']);
+            }
         }
         $request->user()->cart()->detach();
 
@@ -206,11 +216,40 @@ class CartController extends Controller
         $wishlistItems = $request->user()->wishlist()
             ->wherePivot('name', $request->name)
             ->wherePivot('customer_id', $request->customer_id)
+            ->withPivot('stock_id', 'qty')
             ->get();
 
         foreach ($wishlistItems as $item) {
-            $request->user()->wishlist()->detach($item->id);
-            $request->user()->cart()->attach($item->id, ['qty' => $item->pivot->qty]);
+            // For serialized products, detach using both product_id and stock_id
+            if ($item->is_serialized && $item->pivot->stock_id) {
+                $request->user()->wishlist()
+                    ->wherePivot('product_id', $item->id)
+                    ->wherePivot('stock_id', $item->pivot->stock_id)
+                    ->detach();
+            } else {
+                // For non-serialized products, just detach by product_id
+                $request->user()->wishlist()->detach($item->id);
+            }
+
+            // Rest of your existing cart attachment logic...
+            $pivotData = [
+                'qty' => $item->pivot->qty,
+                'stock_id' => $item->pivot->stock_id
+            ];
+
+            if ($item->is_serialized && $item->pivot->stock_id) {
+                $stock = \App\Models\Stock::find($item->pivot->stock_id);
+                if ($stock && $stock->serial_number) {
+                    $pivotData['serial_number'] = $stock->serial_number;
+                }
+            }
+
+            $request->user()->cart()->attach($item->id, $pivotData);
+
+            if ($item->pivot->stock_id) {
+                \App\Models\Stock::where('id', $item->pivot->stock_id)
+                    ->update(['status' => 'free']);
+            }
         }
 
         return response(['success' => true]);

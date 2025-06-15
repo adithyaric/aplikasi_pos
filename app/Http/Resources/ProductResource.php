@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
             'total_stock' => $this->total_stock,
             'stocks' => $this->stocks->map(fn ($stock) => [
                 'id' => $stock->id,
+                'status' => $stock->status,
                 'serial_number' => $stock->serial_number,
                 'qty' => $stock->qty,
                 'expired_at' => optional($stock->expired_at)->toDateString(),

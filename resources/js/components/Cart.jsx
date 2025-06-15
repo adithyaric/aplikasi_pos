@@ -93,6 +93,7 @@ const Cart = () => {
                             serials.push({
                                 id: stock.id,
                                 serial: stock.serial_number,
+                                status: stock.status,
                             });
                         }
                     });
@@ -216,11 +217,13 @@ const Cart = () => {
                                     <option value="">
                                         Choose Serial Number
                                     </option>
-                                    {availableSerials.map(({ id, serial }) => (
-                                        <option key={id} value={serial}>
-                                            {serial}
-                                        </option>
-                                    ))}
+                                    {availableSerials.map(
+                                        ({ id, serial, status }) => (
+                                            <option key={id} value={serial}>
+                                                [{status}] - {serial}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
                             </div>
                         </div>

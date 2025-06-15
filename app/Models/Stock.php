@@ -19,6 +19,7 @@ class Stock extends Model
         'serial_number', // For individual items like laptops
         'imei', // For phones
         'condition', // new, used, refurbished
+        'status', // free, on-keep
     ];
 
     public function pembelian()

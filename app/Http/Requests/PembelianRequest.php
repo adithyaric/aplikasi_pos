@@ -23,6 +23,12 @@ class PembelianRequest extends FormRequest
             // 'harga_beli' => 'required',
             'subtotal' => 'nullable',
             'total' => 'nullable',
+            'product' => 'required|array',
+            'product.*.product_id' => 'required|exists:products,id',
+            'product.*.qty' => 'required|numeric|min:1',
+            'product.*.harga_beli' => 'required|min:0',
+            'product.*.subtotal' => 'required|min:0',
+            'product.*.serial_numbers' => 'nullable|string',
         ];
     }
 }

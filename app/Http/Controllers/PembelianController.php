@@ -10,7 +10,6 @@ use App\Models\PembelianProduct;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Supplier;
-use Illuminate\Http\Request;
 use PDF;
 
 class PembelianController extends Controller
@@ -51,21 +50,9 @@ class PembelianController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(PembelianRequest $request)
     {
-        $request->validate([
-            'code' => 'required|unique:pembelians,code',
-            'outlet_id' => 'required|exists:outlets,id',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'kas_id' => 'required|exists:kas,id',
-            'total' => 'required|numeric',
-            'product' => 'required|array',
-            'product.*.product_id' => 'required|exists:products,id',
-            'product.*.qty' => 'required|numeric|min:1',
-            'product.*.harga_beli' => 'required|min:0',
-            'product.*.subtotal' => 'required|min:0',
-            'product.*.serial_numbers' => 'nullable|string',
-        ]);
+        $request->validated();
 
         $pembelian = Pembelian::create([
             'code' => $request->code,

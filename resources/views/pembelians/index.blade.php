@@ -25,7 +25,7 @@
                                     <td>No</td>
                                     <td>Outlet</td>
                                     <td>Nama</td>
-                                    <td>pembelianProducts</td>
+                                    <td>items</td>
                                     <td>Total</td>
                                     <td>Aksi</td>
                                     <td>Posting</td>
@@ -38,8 +38,13 @@
                                     <td>{{ $value->code }}</td>
                                     <td>
                                         <ul>
-                                            @foreach ($value->pembelianProducts as $pembelianProduct)
-                                            <li>{{ $pembelianProduct->product->name }} : @currency($pembelianProduct->harga_beli) x{{ $pembelianProduct->qty }}</li>
+                                            @foreach ($value->pembelianProducts as $item)
+                                                <li>
+                                                    @if (!empty($item->serial_numbers))
+                                                        <small>[{{ implode(', ', $item->serial_numbers) }}]</small>
+                                                    @endif
+                                                    {{ $item->product->name }}: @currency($item->harga_beli) × {{ $item->qty }}
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </td>

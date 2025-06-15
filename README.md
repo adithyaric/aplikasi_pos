@@ -33,4 +33,4 @@
     - [x] Search Stock
         - Group By Name (Biar Tugas Admin Menyamakan Namanya)
             - Stock Harus Kelihatan Dari All Outlet - Warehouse & Statusnya
-    - [ ] Outlet Bisa Memberi Status Pada Product (Free & On Keep) -> wishlist (hanya sebagai status saja)
+    - [x] Outlet Bisa Memberi Status Pada Product (Free & On Keep) -> wishlist (hanya sebagai status saja)

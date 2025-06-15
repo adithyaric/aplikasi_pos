@@ -88,7 +88,7 @@
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        {{-- <td>Expired</td> --}}
+                                        <td>Serial Numbers</td>
                                         <td>Harga Beli</td>
                                         <td>Sub Total</td>
                                         <td>Aksi</td>
@@ -98,26 +98,48 @@
                                     @foreach ($pembelian->pembelianProducts as $key => $stock)
                                         <tr>
                                             <td>
-                                                <select class="form-control select2 product" data-placeholder="Pilih Product" name="product[{{ $key }}][product_id]" required style="width:100%">
+                                                <select class="form-control select2 product"
+                                                    data-placeholder="Pilih Product"
+                                                    name="product[{{ $key }}][product_id]" required
+                                                    style="width:100%">
                                                     @foreach ($products as $product)
-                                                        <option {{ $stock->product_id == $product->id ? 'selected' : '' }} value="{{ $product->id }}">{{ $product->name }}</option>
+                                                        <option {{ $stock->product_id == $product->id ? 'selected' : '' }}
+                                                            value="{{ $product->id }}"
+                                                            data-serialized="{{ $product->is_serialized ? 1 : 0 }}">
+                                                            {{ $product->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
                                             <td>
-                                                <input class="form-control qty" name="product[{{ $key }}][qty]" required value="{{ $stock->qty }}">
-                                            </td>
-                                            {{-- <td> --}}
-                                                {{-- <input class="form-control" name="product[{{ $key }}][expired]" required value="{{ $stock->expired_at->format('Y-m-d') }}" type="date"> --}}
-                                            {{-- </td> --}}
-                                            <td>
-                                                <input class="form-control harga_beli numeral-mask" name="product[{{ $key }}][harga_beli]" required value="{{ $stock->harga_beli }}">
+                                                <input type="number" class="form-control qty"
+                                                    name="product[{{ $key }}][qty]" required
+                                                    value="{{ $stock->product->is_serialized ? ($stock->serial_numbers ? count($stock->serial_numbers) : 1) : $stock->qty }}"
+                                                    min="1" {{ $stock->product->is_serialized ? 'readonly' : '' }}>
                                             </td>
                                             <td>
-                                                <input class="form-control subtotal" name="product[{{ $key }}][subtotal]" required readonly>
+                                                <div class="serial-container"
+                                                    style="display: {{ $stock->product->is_serialized ? 'block' : 'none' }};">
+                                                    <textarea class="form-control serial-numbers" name="product[{{ $key }}][serial_numbers]"
+                                                        placeholder="Enter serial numbers (one per line)" rows="3">{{ $stock->serial_numbers ? implode("\n", $stock->serial_numbers) : '' }}</textarea>
+                                                    <small class="text-muted">Enter one serial number per line</small>
+                                                </div>
+                                                <div class="no-serial-message"
+                                                    style="display: {{ $stock->product->is_serialized ? 'none' : 'block' }};">
+                                                    <small class="text-muted">No serial numbers needed</small>
+                                                </div>
                                             </td>
                                             <td>
-                                                <a class="btn btn-danger btn-group-sm" href="{{ route('pembelian.stock.destroy', $stock->id) }}">
+                                                <input type="text" class="form-control harga_beli numeral-mask"
+                                                    name="product[{{ $key }}][harga_beli]" required
+                                                    value="{{ $stock->harga_beli }}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control subtotal"
+                                                    name="product[{{ $key }}][subtotal]" required readonly>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-danger btn-group-sm"
+                                                    href="{{ route('pembelian.stock.destroy', $stock->id) }}">
                                                     <li class="fa fa-trash"></li>
                                                 </a>
                                             </td>
@@ -147,7 +169,7 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        let productIndex = @json($key) + 1;
+        let productIndex = {{ count($pembelian->pembelianProducts) }};
 
         function addBahanBaku() {
             productIndex++;
@@ -155,13 +177,22 @@
         <tr>
             <td>
                 <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                    <option value="" disabled selected>Pilih Produk</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }}</option>
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" required value="0" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td><input type="date" required class="form-control" name="product[${productIndex}][expired]"></td>
+            <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
+            <td>
+                <div class="serial-container" style="display: none;">
+                    <textarea class="form-control serial-numbers" name="product[${productIndex}][serial_numbers]" placeholder="Enter serial numbers (one per line)" rows="3"></textarea>
+                    <small class="text-muted">Enter one serial number per line</small>
+                </div>
+                <div class="no-serial-message" style="display: block;">
+                    <small class="text-muted">No serial numbers needed</small>
+                </div>
+            </td>
             <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
             <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
@@ -173,6 +204,19 @@
 
         $(document).on('change', '.qty, .harga_beli', function() {
             updateSubtotalAndTotal();
+        });
+
+        // Handle serial number input changes
+        $(document).on('input', '.serial-numbers', function() {
+            let serialText = $(this).val();
+            let serialLines = serialText.split('\n').filter(line => line.trim() !== '');
+            let qtyInput = $(this).closest('tr').find('.qty');
+            let isProductSerialized = $(this).closest('tr').find('.product option:selected').data('serialized');
+
+            if (isProductSerialized) {
+                qtyInput.val(serialLines.length);
+                updateSubtotalAndTotal();
+            }
         });
 
         function updateSubtotalAndTotal() {
@@ -205,8 +249,44 @@
         $(document).on('change', '.product', function() {
             let harga_beli = $(this).closest('tr').find('.harga_beli');
             let product_id = $(this).val();
+            let isProductSerialized = $(this).find('option:selected').data('serialized');
+            let row = $(this).closest('tr');
+            let serialContainer = row.find('.serial-container');
+            let noSerialMessage = row.find('.no-serial-message');
+            let qtyInput = row.find('.qty');
+            let serialTextarea = row.find('.serial-numbers');
+
+            // Show/hide serial number input based on product type
+            if (isProductSerialized) {
+                serialContainer.show();
+                noSerialMessage.hide();
+                qtyInput.prop('readonly', true);
+
+                // Only set qty to 1 if this is a new row (no existing serial numbers)
+                if (!serialTextarea.val()) {
+                    qtyInput.val(1);
+                }
+            } else {
+                serialContainer.hide();
+                noSerialMessage.show();
+                qtyInput.prop('readonly', false);
+
+                // Only reset qty if this is a new row
+                if (!qtyInput.val() || qtyInput.val() == 0) {
+                    qtyInput.val(1);
+                }
+            }
+
             $.get('/product/' + product_id, function(data) {
                 harga_beli.val(data.harga_beli);
+                updateSubtotalAndTotal();
+            });
+        });
+
+        // Handle product change on page load for existing rows
+        $(document).ready(function() {
+            $('.product').each(function() {
+                $(this).trigger('change');
             });
         });
     </script>

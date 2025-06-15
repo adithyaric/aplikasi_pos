@@ -23,7 +23,8 @@ class ProductController extends Controller
                 ->orWhere('brand', 'LIKE', "%{$request->search}%")
                 ->orWhere('model', 'LIKE', "%{$request->search}%")
                 ->orWhereHas('stocks', function ($query) use ($request) {
-                    $query->where('serial_number', 'LIKE', "%{$request->search}%");
+                    $query->where('serial_number', 'LIKE', "%{$request->search}%")
+                        ->orWhere('status', 'LIKE', "%{$request->search}%");
                 });
         }
 
