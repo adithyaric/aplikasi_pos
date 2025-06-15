@@ -11,6 +11,9 @@ class ProductResource extends JsonResource
     {
         $now = Carbon::now();
 
+        // Sort stocks by status and serial_number
+        $sortedStocks = $this->stocks->sortBy('status')->sortBy('serial_number');
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -24,14 +27,14 @@ class ProductResource extends JsonResource
             'image_url' => asset($this->pic),
             'is_serialized' => $this->is_serialized,
             'total_stock' => $this->total_stock,
-            'stocks' => $this->stocks->map(fn ($stock) => [
+            'stocks' => $sortedStocks->map(fn ($stock) => [
                 'id' => $stock->id,
                 'status' => $stock->status,
                 'serial_number' => $stock->serial_number,
                 'qty' => $stock->qty,
                 'expired_at' => optional($stock->expired_at)->toDateString(),
                 'available' => $stock->qty > 0,
-            ]),
+            ])->values(), // values() to reset keys after sorting
         ];
     }
 }

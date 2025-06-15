@@ -9,6 +9,7 @@ import Customers from "./Customers";
 import CartTable from "./CartTable";
 import Gallery from "./Gallery";
 import Wishlist from "./Wishlist";
+import SerialSelectionModal from "./SerialSelectionModal.jsx";
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
@@ -172,84 +173,6 @@ const Cart = () => {
             });
     };
 
-    // This must be placed in the return section (not inside a component)
-    const SerialSelectionModal = () => {
-        if (!serialModal) return null;
-
-        return (
-            <div
-                className="modal"
-                style={{
-                    display: "block",
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    zIndex: 1050,
-                }}
-            >
-                <div className="modal-dialog" style={{ marginTop: "50px" }}>
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">
-                                Select Serial Number for {selectedProduct?.name}
-                            </h5>
-                            <button
-                                type="button"
-                                className="close"
-                                onClick={() => setSerialModal(false)}
-                            >
-                                <span>&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>Available Serial Numbers:</label>
-                                <select
-                                    className="form-control"
-                                    value={selectedSerial}
-                                    onChange={(e) =>
-                                        setSelectedSerial(e.target.value)
-                                    }
-                                >
-                                    <option value="">
-                                        Choose Serial Number
-                                    </option>
-                                    {availableSerials.map(
-                                        ({ id, serial, status }) => (
-                                            <option key={id} value={serial}>
-                                                [{status}] - {serial}
-                                            </option>
-                                        )
-                                    )}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={handleSerialSelection}
-                                disabled={!selectedSerial}
-                            >
-                                Add to Cart
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => setSerialModal(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
     const updateCart = (product_id, newQty) => {
         const updatedCart = cart.map((c) => {
             if (c.id === product_id) {
@@ -288,7 +211,7 @@ const Cart = () => {
         const currentQty = cart.find((c) => c.id === product_id).pivot.qty;
         if (currentQty > 1) {
             updateCart(product_id, Number(currentQty) - 1);
-        }else{
+        } else {
             // delete the product
             handleClickDelete(product_id);
         }
@@ -407,7 +330,7 @@ const Cart = () => {
                         loadWishlist();
                         loadProducts();
                         setBarcode("");
-                        setCustomerId("");
+                        // setCustomerId("");
                         setSearch("");
                         setDiscount(0);
                         Swal.fire(
@@ -486,7 +409,15 @@ const Cart = () => {
 
     return (
         <div className="row">
-            <SerialSelectionModal />
+            <SerialSelectionModal
+                serialModal={serialModal}
+                setSerialModal={setSerialModal}
+                selectedProduct={selectedProduct}
+                selectedSerial={selectedSerial}
+                setSelectedSerial={setSelectedSerial}
+                availableSerials={availableSerials}
+                handleSerialSelection={handleSerialSelection}
+            />
             <div className="col-12 col-sm-12">
                 <Wishlist
                     wishlist={wishlist}

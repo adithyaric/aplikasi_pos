@@ -11,6 +11,7 @@ return new class extends Migration
     {
         Schema::table('stocks', function (Blueprint $table) {
             $table->string('status')->default('free')->after('condition'); // free or on_keep
+            $table->softDeletes();
         });
 
         Schema::table('user_wishlist', function (Blueprint $table) {
@@ -22,6 +23,7 @@ return new class extends Migration
     {
         Schema::table('stocks', function (Blueprint $table) {
             $table->dropColumn('status');
+            // $table->dropColumn('deleted_at');
         });
 
         Schema::table('user_wishlist', function (Blueprint $table) {

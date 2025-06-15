@@ -28,8 +28,14 @@ class ProductController extends Controller
                 });
         }
 
+        // Sort products by code
+        $products = $products->orderBy('code');
+
+        // Load stocks with sorting and quantity condition
         $products = $products->with(['stocks' => function ($query) {
-            $query->where('qty', '>', 0);
+            $query->where('qty', '>', 0)
+                ->orderBy('status')
+                ->orderBy('serial_number');
         }]);
 
         if (request()->wantsJson()) {
