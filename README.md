@@ -12,10 +12,10 @@
 - [x] Category
 - [x] Stock -> Purchase Order -> Penerimaan Barang (Baru Masuk Stock)
 - [x] Order Outlet
-    - [x] List Pesan Order Dari Outlet
+    - [ ] List Pesan Order Dari Outlet
     - [ ] Acc -> Pilih Product & QTY -> `Send Stock (Auto stock berkurang / pindah)`
 - Return Outlet
-    - [x] List Return Outlet (Refund)
+    - [ ] List Return Outlet (Refund)
     - [ ] Acc -> Check Product & QTY -> `Submit (Auto Stock Bertambah)`
 
 **⁠POS**
@@ -28,8 +28,10 @@
         - Contoh : Kak aku minta diisi stock Laptop Asus
     - [ ] Return Ke Warehouse (Acc Warehouse)
         - Contoh : Pilih Barang & QTY -> Send Stock (Waiting Acc Warehouse) -> Setelah Acc Stock Berkurang
-    - [x] Saat POS pilih SALES yang menjualkan (Berfungsi untuk poin)
+    - [x] Saat POS pilih `SALES` yang menjualkan (Berfungsi untuk poin)
     - [ ] Voucher (Diskon Tambahan)
+      - kasir bisa kasih max diskon jika di set oleh admin
+      - contoh : kasir 1 bisa memasukkan nominal diskon sebesar 50k, jika ingin kasih potogan tambahan maka pakai voucher
     - [x] Search Stock
         - Group By Name (Biar Tugas Admin Menyamakan Namanya)
             - Stock Harus Kelihatan Dari All Outlet - Warehouse & Statusnya

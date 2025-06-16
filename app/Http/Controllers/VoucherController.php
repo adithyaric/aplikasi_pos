@@ -15,8 +15,7 @@ class VoucherController extends Controller
             ->when(auth()->user()->role === 'kasir', function ($query) {
                 $query->where('kasir_id', auth()->id())->orWhereNull('kasir_id');
             })
-            // ->where('start_at', '<=', now())
-            // ->where('end_at', '>=', now())
+            ->where('limit', '>', 0)
             ->get();
 
         if (request()->wantsJson()) {

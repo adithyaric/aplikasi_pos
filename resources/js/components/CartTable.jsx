@@ -1,7 +1,7 @@
 import React from "react";
 import { formatRupiah } from "../utils";
 import CartTableBody from "./CartTableBody";
-import Kas from "./Kas";
+// import Kas from "./Kas";
 import Kasir from "./Kasir";
 
 const CartTable = ({
@@ -18,9 +18,9 @@ const CartTable = ({
     handleDiscountChange,
     handleClickWishlist,
     handleChangeTotal,
-    kas,
-    kasId,
-    setKasId,
+    // kas,
+    // kasId,
+    // setKasId,
     kasir,
     kasirId,
     setKasirId,
@@ -61,6 +61,7 @@ const CartTable = ({
                                     placeholder="Discount..."
                                     value={discount}
                                     onChange={handleDiscountChange}
+                                    readOnly
                                 />
                             </td>
                         </tr>
@@ -129,11 +130,11 @@ const CartTable = ({
                                     </button>
                                 </div>
                                 <div className="modal-body">
-                                    <Kas
+                                    {/* <Kas
                                         kas={kas}
                                         kasId={kasId}
                                         setKasId={setKasId}
-                                    />
+                                    /> */}
                                     <Kasir
                                         key={kasirId}
                                         kasir={kasir}
@@ -153,7 +154,7 @@ const CartTable = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="modal-footer">
+                                <div className="">
                                     <button
                                         className="btn btn-primary"
                                         type="submit"

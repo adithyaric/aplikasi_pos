@@ -120,24 +120,24 @@
                             {{-- </div> --}}
                             {{-- @enderror --}}
                             {{-- </div> --}}
-                            <div class="form-group">
-                                <label>Product</label>
-                                <select class="form-control select2" id="product" name="product_id"
-                                    data-placeholder="Pilih Product" style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Product</option>
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}"
-                                            {{ old('product_id', $voucher->product_id) == $product->id ? 'selected' : '' }}>
-                                            {{ $product->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('product_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                            {{-- <label>Product</label> --}}
+                            {{-- <select class="form-control select2" id="product" name="product_id" --}}
+                            {{-- data-placeholder="Pilih Product" style="width: 100%;"> --}}
+                            {{-- <option value="" selected disabled>Pilih Product</option> --}}
+                            {{-- @foreach ($products as $product) --}}
+                            {{-- <option value="{{ $product->id }}" --}}
+                            {{-- {{ old('product_id', $voucher->product_id) == $product->id ? 'selected' : '' }}> --}}
+                            {{-- {{ $product->name }} --}}
+                            {{-- </option> --}}
+                            {{-- @endforeach --}}
+                            {{-- </select> --}}
+                            {{-- @error('product_id') --}}
+                            {{-- <div class="invalid-feedback text-danger"> --}}
+                            {{-- {{ $message }} --}}
+                            {{-- </div> --}}
+                            {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Kasir</label>
                                 <select class="form-control select2" id="kasir" name="kasir_id"

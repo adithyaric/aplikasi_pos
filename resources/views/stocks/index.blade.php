@@ -26,6 +26,7 @@
                                     <td>Harga Beli</td>
                                     <td>Qty</td>
                                     <td>Created</td>
+                                    <td>Status</td>
                                     {{-- <td>Expired</td> --}}
                                 </tr>
                             </thead>
@@ -39,7 +40,7 @@
                                         <td>@currency($stock->harga_beli)</td>
                                         <td>{{ $stock->qty }}</td>
                                         <td>{{ $stock->created_at->format('h:i a / d-M-Y') }}</td>
-                                        {{-- <td>{{ $stock->expired_at->format('h:i a / d-M-Y') }}</td> --}}
+                                        <td>{{ $stock->status }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

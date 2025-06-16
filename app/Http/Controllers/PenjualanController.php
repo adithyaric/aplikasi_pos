@@ -7,6 +7,7 @@ use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Penjualan;
 use App\Models\Stock;
+use App\Models\Voucher;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -63,7 +64,7 @@ class PenjualanController extends Controller
     {
         $request->validate([
             'customer_id' => 'required',
-            'kas_id' => 'required',
+            // 'kas_id' => 'required',
             'kasir_id' => 'required',
             'total' => 'required',
         ]);
@@ -81,15 +82,19 @@ class PenjualanController extends Controller
                 'code' => $nextInvoiceCode,
                 'customer_id' => $request->customer_id,
                 'outlet_id' => $request->outlet_id,
-                'kas_id' => $request->kas_id,
+                // 'kas_id' => $request->kas_id,
                 'kasir_id' => $request->kasir_id,
+                'voucher_id' => $request->voucher_id,
                 'discount' => $request->discount,
                 'total' => $request->total,
             ]);
 
-            $kas = Kas::find($request->kas_id);
-            $kas->nominal += $request->total;
-            $kas->save();
+            if (isset($request->voucher_id)) {
+                Voucher::find($request->voucher_id)->update(['limit' => 0]);
+            }
+            // $kas = Kas::find($request->kas_id);
+            // $kas->nominal += $request->total;
+            // $kas->save();
 
             $cart = $request->user()->cart()->get();
             foreach ($cart as $item) {

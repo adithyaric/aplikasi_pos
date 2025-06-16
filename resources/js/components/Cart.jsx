@@ -10,14 +10,18 @@ import CartTable from "./CartTable";
 import Gallery from "./Gallery";
 import Wishlist from "./Wishlist";
 import SerialSelectionModal from "./SerialSelectionModal.jsx";
+import Vouchers from "./Vouchers.jsx";
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
     const [products, setProducts] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [customerId, setCustomerId] = useState("");
-    const [kas, setKas] = useState([]);
-    const [kasId, setKasId] = useState("");
+    const [vouchers, setVouchers] = useState([]);
+    const [voucherId, setVoucherId] = useState("");
+    // const [kas, setKas] = useState([]);
+    // const [kasId, setKasId] = useState("");
+    //! Ganti ke sales
     const [kasir, setKasir] = useState([]);
     const [kasirId, setKasirId] = useState("");
     const [barcode, setBarcode] = useState("");
@@ -41,12 +45,14 @@ const Cart = () => {
         loadCart();
         loadProducts();
         loadCustomers();
-        loadKas();
+        loadVouchers();
+        // loadKas();
         loadKasir();
         loadWishlist();
     }, []);
 
     //Data Products
+    // TODO products by outlet
     const loadProducts = (search = "") => {
         const query = !!search ? `?search=${search}` : "";
         axios.get(`/product${query}`).then((res) => {
@@ -270,13 +276,22 @@ const Cart = () => {
         });
     };
 
-    //Data Kas
-    const loadKas = () => {
-        axios.get(`/kas?outlet_id=${outlet.id}`).then((res) => {
-            const kas = res.data;
-            setKas(kas);
+    //Data Vouchers
+    const loadVouchers = () => {
+        axios.get("/voucher").then((res) => {
+            const vouchers = res.data;
+            setVouchers(vouchers);
+            setVoucherId(vouchers[0].id);
         });
     };
+
+    //Data Kas
+    // const loadKas = () => {
+    //     axios.get(`/kas?outlet_id=${outlet.id}`).then((res) => {
+    //         const kas = res.data;
+    //         setKas(kas);
+    //     });
+    // };
 
     //Data Kasir
     const loadKasir = () => {
@@ -375,8 +390,9 @@ const Cart = () => {
         axios
             .post("/penjualan", {
                 customer_id: customerId,
+                voucher_id: voucherId,
                 outlet_id: outlet.id,
-                kas_id: kasId,
+                // kas_id: kasId,
                 kasir_id: kasirId,
                 total: totalAmount,
                 discount: discount,
@@ -386,7 +402,8 @@ const Cart = () => {
                 loadCart();
                 loadProducts();
                 loadCustomers();
-                loadKas();
+                loadVouchers();
+                // loadKas();
                 loadKasir();
                 loadWishlist();
                 Swal.fire(
@@ -430,6 +447,13 @@ const Cart = () => {
                     handleScanBarcode={handleScanBarcode}
                     handleOnChangeBarcode={handleOnChangeBarcode}
                 />
+                <Vouchers
+                    key={voucherId}
+                    vouchers={vouchers}
+                    voucherId={voucherId}
+                    setVoucherId={setVoucherId}
+                    setDiscount={setDiscount}
+                />
                 <Customers
                     key={customerId}
                     customers={customers}
@@ -451,9 +475,9 @@ const Cart = () => {
                     handleChangeTotal={handleChangeTotal}
                     total={total}
                     errorMessage={errorMessage}
-                    kas={kas}
-                    kasId={kasId}
-                    setKasId={setKasId}
+                    // kas={kas}
+                    // kasId={kasId}
+                    // setKasId={setKasId}
                     kasir={kasir}
                     kasirId={kasirId}
                     setKasirId={setKasirId}

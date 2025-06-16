@@ -43,6 +43,7 @@ const Customers = ({ customers, customerId, setCustomerId }) => {
         <div className="form-group row">
             <div className="col-sm-8">
                 <select
+                    id="customer"
                     ref={selectRef}
                     className="form-control"
                     defaultValue={customerId}

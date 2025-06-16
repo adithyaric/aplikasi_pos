@@ -2,7 +2,7 @@
 
 @section('title', 'Pilih Outlets')
 
-@section('body_class', 'sidebar-collapse')
+{{-- @section('body_class', 'sidebar-collapse') --}}
 
 @section('container')
     <style>
