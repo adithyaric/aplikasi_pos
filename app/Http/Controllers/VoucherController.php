@@ -4,20 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VoucherRequest;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\Voucher;
 
 class VoucherController extends Controller
 {
     public function index()
     {
-        return view('vouchers.index', [
-            'vouchers' => Voucher::get(),
-        ]);
+        $vouchers = Voucher::query()
+            ->when(auth()->user()->role === 'kasir', function ($query) {
+                $query->where('kasir_id', auth()->id())->orWhereNull('kasir_id');
+            })
+            // ->where('start_at', '<=', now())
+            // ->where('end_at', '>=', now())
+            ->get();
+
+        if (request()->wantsJson()) {
+            return response()->json($vouchers);
+        }
+
+        return view('vouchers.index', compact('vouchers'));
     }
 
     public function create()
     {
         return view('vouchers.create', [
+            'kasirs' => User::where('role', 'kasir')->get(),
             'products' => Product::get(),
         ]);
     }
@@ -28,6 +40,9 @@ class VoucherController extends Controller
         [$start_at, $end_at] = explode(' - ', $request->daterange);
         $data['start_at'] = $start_at;
         $data['end_at'] = $end_at;
+        $data['type'] = 'nominal';
+        $data['jenis'] = 'keseluruhan';
+        $data['limit'] = 1;
         unset($data['daterange']);
 
         Voucher::create($data);
@@ -47,6 +62,7 @@ class VoucherController extends Controller
         return view('vouchers.edit', [
             'voucher' => $voucher,
             'products' => Product::get(),
+            'kasirs' => User::where('role', 'kasir')->get(),
             'defaultDateRange' => $voucher->start_at.' - '.$voucher->end_at,
         ]);
     }
@@ -57,6 +73,9 @@ class VoucherController extends Controller
         [$start_at, $end_at] = explode(' - ', $request->daterange);
         $data['start_at'] = $start_at;
         $data['end_at'] = $end_at;
+        $data['type'] = 'nominal';
+        $data['jenis'] = 'keseluruhan';
+        $data['limit'] = 1;
         unset($data['daterange']);
 
         $voucher->update($data);

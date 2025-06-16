@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Penjualan extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'code',
@@ -15,6 +15,7 @@ class Penjualan extends Model
         'outlet_id',
         'kasir_id',
         'kas_id',
+        'voucher_id',
         'discount',
         'total',
     ];
@@ -43,6 +44,11 @@ class Penjualan extends Model
         return $this->belongsTo(Kas::class);
     }
 
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class);
+    }
+
     public function transaction()
     {
         return $this->hasOne(Transaction::class);
@@ -51,5 +57,10 @@ class Penjualan extends Model
     public function items()
     {
         return $this->hasMany(PenjualanItem::class);
+    }
+
+    public function getFinalTotalAttribute()
+    {
+        return $this->total - $this->discount;
     }
 }

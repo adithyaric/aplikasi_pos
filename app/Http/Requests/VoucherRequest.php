@@ -16,15 +16,16 @@ class VoucherRequest extends FormRequest
         return [
             'name' => 'required',
             'code' => 'required',
-            'type' => 'required',
-            'jenis' => 'required',
-            'limit' => 'required',
+            // 'type' => 'required',
+            // 'jenis' => 'required',
+            // 'limit' => 'required',
             'value' => 'required',
-            'min_purchase' => 'required',
+            'min_purchase' => 'nullable',
             'start_at' => 'nullable',
             'end_at' => 'nullable',
             'desc' => 'required',
             'product_id' => 'nullable',
+            'kasir_id' => 'nullable',
         ];
     }
 }
