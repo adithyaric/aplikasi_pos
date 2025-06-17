@@ -28,8 +28,8 @@
         - Contoh : Kak aku minta diisi stock Laptop Asus
     - [ ] Return Ke Warehouse (Acc Warehouse)
         - Contoh : Pilih Barang & QTY -> Send Stock (Waiting Acc Warehouse) -> Setelah Acc Stock Berkurang
-    - [x] Saat POS pilih `SALES` yang menjualkan (Berfungsi untuk poin)
-    - [ ] Voucher (Diskon Tambahan)
+    - [ ] Saat POS pilih `SALES` yang menjualkan (Berfungsi untuk poin)
+    - [x] Voucher (Diskon Tambahan)
       - kasir bisa kasih max diskon jika di set oleh admin
       - contoh : kasir 1 bisa memasukkan nominal diskon sebesar 50k, jika ingin kasih potogan tambahan maka pakai voucher
     - [x] Search Stock

@@ -58,10 +58,11 @@
                                                 @endforeach
                                                 <tr>
                                                     <th>Diskon : @currency($value->discount)</th>
+                                                    <th>Vocuher : @currency($value->voucher?->value)</th>
                                                     <th colspan="3" class="text-right">Total : @currency($totalCost)</th>
                                                 </tr>
                                                 <tr>
-                                                    <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $value->discount)</th>
+                                                    <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $value->discount - $value->voucher?->value)</th>
                                                 </tr>
                                             </table>
                                         </div>

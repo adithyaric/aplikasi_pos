@@ -29,7 +29,7 @@
                                 <tr>
                                     <td colspan="2">Kas/Metode Pembayaran</td>
                                     <td colspan="2">
-                                        {{ $penjualan->kas->name ?? $penjualan->transaction->payment->name }}
+                                        {{ $penjualan->kas->name ?? $penjualan->transaction?->payment?->name }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -58,12 +58,15 @@
                                     </tr>
                                     @php $totalCost += $item->qty * $item->price; @endphp
                                 @endforeach
-                                @php $kembali = abs(($totalCost - $penjualan->discount) - $penjualan->total); @endphp
+                                @php $kembali = abs(($totalCost - $penjualan->discount - $penjualan->voucher?->value) - $penjualan->total); @endphp
                                 <tr>
                                     <th colspan="4" class="text-sm text-right">Total : @currency($totalCost)</th>
                                 </tr>
                                 <tr>
                                     <th colspan="4" class="text-sm text-right">Diskon : -@currency($penjualan->discount)</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="text-sm text-right">Voucher : -@currency($penjualan->voucher?->value)</th>
                                 </tr>
                                 <tr>
                                     <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $penjualan->discount)</th>

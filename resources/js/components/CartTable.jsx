@@ -13,17 +13,20 @@ const CartTable = ({
     handleClickDelete,
     handleEmptyCart,
     getTotal,
+    limitDiscount,
     total,
     errorMessage,
     handleDiscountChange,
     handleClickWishlist,
     handleChangeTotal,
+    handleSubmit,
     // kas,
     // kasId,
     // setKasId,
     kasir,
     kasirId,
     setKasirId,
+    voucherDiscount,
 }) => {
     return (
         <>
@@ -57,18 +60,21 @@ const CartTable = ({
                             <td>
                                 <input
                                     type="number"
+                                    min={0}
+                                    max={limitDiscount}
                                     className="form-control form-control-sm"
                                     placeholder="Discount..."
                                     value={discount}
                                     onChange={handleDiscountChange}
-                                    readOnly
                                 />
                             </td>
                         </tr>
                         <tr>
                             <th colSpan="4">Grand Total</th>
                             <th className="text-right">
-                                {formatRupiah(getTotal(cart) - discount)}
+                                {formatRupiah(
+                                    getTotal(cart) - discount - voucherDiscount
+                                )}
                             </th>
                         </tr>
                     </tbody>
@@ -120,6 +126,9 @@ const CartTable = ({
                         <div className="modal-dialog">
                             <div className="modal-content">
                                 <div className="modal-header">
+                                    <span className="bg-danger">
+                                        {errorMessage}
+                                    </span>
                                     <h4 className="modal-title">Checkout</h4>
                                     <button
                                         type="button"
@@ -135,12 +144,12 @@ const CartTable = ({
                                         kasId={kasId}
                                         setKasId={setKasId}
                                     /> */}
-                                    <Kasir
+                                    {/* <Kasir
                                         key={kasirId}
                                         kasir={kasir}
                                         kasirId={kasirId}
                                         setKasirId={setKasirId}
-                                    />
+                                    /> */}
 
                                     <p>Total Amount</p>
                                     <div className="form-group">
@@ -151,15 +160,17 @@ const CartTable = ({
                                             className="form-control total"
                                             value={total}
                                             onChange={handleChangeTotal}
+                                            readOnly
                                         />
                                     </div>
                                 </div>
-                                <div className="">
+                                <div className="modal-footer">
                                     <button
                                         className="btn btn-primary"
-                                        type="submit"
+                                        type="button"
+                                        onClick={handleSubmit}
                                     >
-                                        OK
+                                        Process
                                     </button>
                                     <button
                                         type="button"

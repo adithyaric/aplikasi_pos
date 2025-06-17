@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
 
-const Vouchers = ({ vouchers, voucherId, setVoucherId, setDiscount }) => {
+const Vouchers = ({
+    vouchers,
+    voucherId,
+    setVoucherId,
+    setVoucherDiscount,
+}) => {
     const handleVoucherChange = (e) => {
         const selectedVoucherId = e.target.value;
         setVoucherId(selectedVoucherId);
 
         // Find the selected voucher and apply its value as discount
         const selectedVoucher = vouchers.find((v) => v.id == selectedVoucherId);
-        if (selectedVoucher) {
-            setDiscount(selectedVoucher.value);
-        } else {
-            setDiscount(0); // Reset discount if no voucher selected
-        }
+        setVoucherDiscount(selectedVoucher ? selectedVoucher.value : 0);
     };
 
     return (

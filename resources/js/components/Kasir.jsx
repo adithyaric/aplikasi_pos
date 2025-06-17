@@ -5,7 +5,6 @@ const Kasir = ({ kasir, kasirId, setKasirId }) => {
             <div className="col-sm-12">
                 <select
                     className="form-control"
-                    value={kasirId}
                     onChange={(e) => setKasirId(e.target.value)}
                     required
                 >

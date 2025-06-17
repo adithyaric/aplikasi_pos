@@ -65,7 +65,7 @@ class PenjualanController extends Controller
         $request->validate([
             'customer_id' => 'required',
             // 'kas_id' => 'required',
-            'kasir_id' => 'required',
+            'kasir_id' => 'nullable',
             'total' => 'required',
         ]);
 

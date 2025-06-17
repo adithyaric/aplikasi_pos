@@ -26,7 +26,8 @@ const Cart = () => {
     const [kasirId, setKasirId] = useState("");
     const [barcode, setBarcode] = useState("");
     const [search, setSearch] = useState("");
-    const [discount, setDiscount] = useState("");
+    const [discount, setDiscount] = useState(0);
+    const [voucherDiscount, setVoucherDiscount] = useState(0);
     const [total, setTotal] = useState(0);
     const [wishlist, setWishlist] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
@@ -36,10 +37,11 @@ const Cart = () => {
     const [selectedSerial, setSelectedSerial] = useState("");
     const [availableSerials, setAvailableSerials] = useState([]);
     const outlet = window.outlet;
+    const limitDiscount = window.user?.limit_discount || 0;
 
     useEffect(() => {
-        setTotal(getTotal(cart) - discount);
-    }, [cart, discount]);
+        setTotal(getTotal(cart) - discount - voucherDiscount);
+    }, [cart, discount, voucherDiscount]);
 
     useEffect(() => {
         loadCart();
@@ -311,10 +313,16 @@ const Cart = () => {
     };
 
     const handleDiscountChange = (event) => {
-        const value = parseInt(event.target.value, 10);
-        if (!isNaN(value) && value >= 0) {
-            setDiscount(value);
+        let value = parseInt(event.target.value, 10);
+
+        if (isNaN(value)) {
+            setDiscount(0);
+            return;
         }
+
+        // Clamp value between 0 and limitDiscount
+        value = Math.min(Math.max(value, 0), limitDiscount);
+        setDiscount(value);
     };
 
     //Hold
@@ -384,7 +392,8 @@ const Cart = () => {
     // Handle form submission
     const handleSubmit = (event) => {
         // Get the total amount from the input field
-        const totalAmount = $(".total").val();
+        // const totalAmount = $(".total").val();
+        const totalAmount = getTotal(cart);
 
         // Send the POST request with the data
         axios
@@ -406,12 +415,13 @@ const Cart = () => {
                 // loadKas();
                 loadKasir();
                 loadWishlist();
+                $("#tombolSubmit").modal("hide");
                 Swal.fire(
                     "Success!",
                     "Pesanan berhasil dibuat",
                     "success"
                 ).then(() => {
-                    window.location.reload(false); // <-- added this line to refresh the page
+                    window.location.reload(true); // <-- added this line to refresh the page
                 });
             })
             .catch((err) => {
@@ -422,7 +432,7 @@ const Cart = () => {
     };
 
     // Add an onClick event handler to the "OK" button in the modal footer
-    $(".modal-footer .btn-primary").on("click", handleSubmit);
+    // $("#checkout").on("click", handleSubmit);
 
     return (
         <div className="row">
@@ -452,7 +462,7 @@ const Cart = () => {
                     vouchers={vouchers}
                     voucherId={voucherId}
                     setVoucherId={setVoucherId}
-                    setDiscount={setDiscount}
+                    setVoucherDiscount={setVoucherDiscount}
                 />
                 <Customers
                     key={customerId}
@@ -463,6 +473,7 @@ const Cart = () => {
                 <CartTable
                     cart={cart}
                     discount={discount}
+                    voucherDiscount={voucherDiscount}
                     handleChangeQty={handleChangeQty}
                     handleClickIncrease={handleClickIncrease}
                     handleClickDecrease={handleClickDecrease}
@@ -471,8 +482,9 @@ const Cart = () => {
                     getTotal={getTotal}
                     handleEmptyCart={handleEmptyCart}
                     handleClickWishlist={handleClickWishlist}
-                    // handleClickSubmit={handleClickSubmit}
+                    handleSubmit={handleSubmit}
                     handleChangeTotal={handleChangeTotal}
+                    limitDiscount={limitDiscount}
                     total={total}
                     errorMessage={errorMessage}
                     // kas={kas}
