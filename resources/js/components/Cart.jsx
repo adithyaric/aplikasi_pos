@@ -17,11 +17,12 @@ const Cart = () => {
     const [products, setProducts] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [customerId, setCustomerId] = useState("");
+    const [salesmans, setSalesmans] = useState([]);
+    const [salesmanId, setSalesmanId] = useState("");
     const [vouchers, setVouchers] = useState([]);
     const [voucherId, setVoucherId] = useState("");
     // const [kas, setKas] = useState([]);
     // const [kasId, setKasId] = useState("");
-    //! Ganti ke sales
     const [kasir, setKasir] = useState([]);
     const [kasirId, setKasirId] = useState("");
     const [barcode, setBarcode] = useState("");
@@ -54,10 +55,21 @@ const Cart = () => {
     }, []);
 
     //Data Products
-    // TODO products by outlet
     const loadProducts = (search = "") => {
-        const query = !!search ? `?search=${search}` : "";
-        axios.get(`/product${query}`).then((res) => {
+        let queryParams = [];
+
+        if (search) {
+            queryParams.push(`search=${search}`);
+        }
+
+        if (outlet && outlet.id) {
+            queryParams.push(`outlet_id=${outlet.id}`);
+        }
+
+        const queryString =
+            queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
+
+        axios.get(`/product${queryString}`).then((res) => {
             const products = res.data.data;
             setProducts(products);
             console.log(products);
@@ -168,19 +180,6 @@ const Cart = () => {
         }
     };
 
-    const removeSerial = (productId, serialNumber) => {
-        axios
-            .post("/cart/remove-serial", {
-                product_id: productId,
-                serial_number: serialNumber,
-            })
-            .then(() => loadCart())
-            .catch((err) => {
-                console.log("Error!", err.response.data.message, "error");
-                Swal.fire("Error!", err.response.data.message, "error");
-            });
-    };
-
     const updateCart = (product_id, newQty) => {
         const updatedCart = cart.map((c) => {
             if (c.id === product_id) {
@@ -261,8 +260,10 @@ const Cart = () => {
     };
 
     const getTotal = (cart) => {
-        const total = cart.map((c) => c.pivot.qty * c.harga_jual);
-        return sum(total);
+        return cart.reduce(
+            (sum, item) => sum + item.pivot.qty * item.harga_jual,
+            0
+        );
     };
 
     const handleChangeTotal = (event) => {
@@ -271,20 +272,44 @@ const Cart = () => {
 
     //Data Customers
     const loadCustomers = () => {
-        axios.get("/customer").then((res) => {
-            const customers = res.data;
-            setCustomers(customers);
-            setCustomerId(customers[0].id);
-        });
+        axios
+            .get("/customer")
+            .then((res) => {
+                const customers = res.data;
+                setCustomers(customers);
+                // Only set customerId if there are customers
+                if (customers.length > 0) {
+                    setCustomerId(customers[0].id);
+                } else {
+                    setCustomerId(null);
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading customers:", error);
+                setCustomers([]);
+                setCustomerId(null);
+            });
     };
 
-    //Data Vouchers
+    // Data Vouchers
     const loadVouchers = () => {
-        axios.get("/voucher").then((res) => {
-            const vouchers = res.data;
-            setVouchers(vouchers);
-            setVoucherId(vouchers[0].id);
-        });
+        axios
+            .get("/voucher")
+            .then((res) => {
+                const vouchers = res.data ?? [];
+                setVouchers(vouchers);
+
+                if (vouchers.length > 0 && vouchers[0]?.id) {
+                    setVoucherId(vouchers[0].id);
+                } else {
+                    setVoucherId(null); // or undefined or a fallback value
+                }
+            })
+            .catch((error) => {
+                console.error("Failed to load vouchers:", error);
+                setVouchers([]);
+                setVoucherId(null); // handle the error case gracefully
+            });
     };
 
     //Data Kas
@@ -464,12 +489,12 @@ const Cart = () => {
                     setVoucherId={setVoucherId}
                     setVoucherDiscount={setVoucherDiscount}
                 />
-                <Customers
+                {/* <Customers
                     key={customerId}
                     customers={customers}
                     customerId={customerId}
                     setCustomerId={setCustomerId}
-                />
+                /> */}
                 <CartTable
                     cart={cart}
                     discount={discount}

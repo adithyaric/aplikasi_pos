@@ -70,6 +70,18 @@ const CartTable = ({
                             </td>
                         </tr>
                         <tr>
+                            <td colSpan="4">Voucher</td>
+                            <td>
+                                <input
+                                    type="number"
+                                    className="form-control form-control-sm"
+                                    placeholder="Voucher..."
+                                    value={voucherDiscount}
+                                    readOnly
+                                />
+                            </td>
+                        </tr>
+                        <tr>
                             <th colSpan="4">Grand Total</th>
                             <th className="text-right">
                                 {formatRupiah(

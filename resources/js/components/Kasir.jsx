@@ -10,7 +10,7 @@ const Kasir = ({ kasir, kasirId, setKasirId }) => {
                 >
                     <option value="" selected disabled>Pilih Kasir</option>
                     {kasir.map((kasir) => (
-                        <option key={kasir.id} value={kasir.id}>
+                        <option key={`kasir-${ kasir.id }`} value={kasir.id}>
                             {`${kasir.name}`}
                         </option>
                     ))}

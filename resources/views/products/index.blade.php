@@ -25,7 +25,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
-                                    {{-- <td>Nama Outlet</td> --}}
+                                    <td>Nama Outlet</td>
                                     <td>Nama</td>
                                     <td>Kategori</td>
                                     <td>Qty</td>
@@ -38,7 +38,7 @@
                                 @foreach ($products as $value)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        {{-- <td>{{ $value->outlet->name }}</td> --}}
+                                        <td>{{ $value->outlet?->name }}</td>
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->category->name }}</td>
                                         <td>

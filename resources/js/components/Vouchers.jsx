@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 const Vouchers = ({
     vouchers,
@@ -10,7 +10,6 @@ const Vouchers = ({
         const selectedVoucherId = e.target.value;
         setVoucherId(selectedVoucherId);
 
-        // Find the selected voucher and apply its value as discount
         const selectedVoucher = vouchers.find((v) => v.id == selectedVoucherId);
         setVoucherDiscount(selectedVoucher ? selectedVoucher.value : 0);
     };
@@ -21,12 +20,11 @@ const Vouchers = ({
                 <select
                     id="voucher"
                     className="form-control"
-                    // value={voucherId}
                     onChange={handleVoucherChange}
                 >
                     <option value="">Select a voucher</option>
                     {vouchers.map((voucher) => (
-                        <option key={voucher.id} value={voucher.id}>
+                        <option key={`voucher-${ voucher.id }`} value={voucher.id}>
                             {voucher.name}, {voucher.value}
                         </option>
                     ))}

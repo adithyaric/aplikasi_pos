@@ -19,6 +19,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundPembelianController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SalesmanController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
@@ -52,6 +53,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::resource('/outlet', OutletController::class);
     Route::get('/outlet/{outlet_id}/kas', [OutletController::class, 'getKas']);
     Route::resource('/supplier', SupplierController::class);
+    Route::resource('/salesman', SalesmanController::class);
     Route::resource('/category', CategoryController::class);
     Route::get('/category-product', [CategoryController::class, 'indexProduct'])->name('category.product.index');
     Route::get('/category-product-create', [CategoryController::class, 'createProduct'])->name('category.product.create');

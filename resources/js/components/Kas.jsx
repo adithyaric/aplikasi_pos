@@ -9,9 +9,11 @@ const Kas = ({ kas, kasId, setKasId }) => {
                     onChange={(e) => setKasId(e.target.value)}
                     required
                 >
-                    <option value="" selected disabled>Pilih Metode Pembayaran</option>
+                    <option value="" selected disabled>
+                        Pilih Metode Pembayaran
+                    </option>
                     {kas.map((kas) => (
-                        <option key={kas.id} value={kas.id}>
+                        <option key={`kas-${kas.id}`} value={kas.id}>
                             {`${kas.name}`}
                         </option>
                     ))}

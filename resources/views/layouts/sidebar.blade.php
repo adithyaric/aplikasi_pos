@@ -15,12 +15,12 @@
         <li class="{{ request()->is('dashboard*') ? 'active' : '' }}"><a href="/dashboard"><i class="fa fa-tachometer"></i><span>Dashboard</span></a></li>
         @if (auth()->user()->role != 'kasir')
             <li class="{{ request()->is('setting*') ? 'active' : '' }}"><a href="/setting"><i class="fa fa-gear"></i><span>Setting</span></a></li>
-            <li class="treeview {{ request()->is('admin*') || request()->is('customer*') || request()->is('supplier*') ? 'active' : '' }}">
+            <li class="treeview {{ request()->is('admin*') || request()->is('customer*') || request()->is('salesman*') ? 'active' : '' }}">
                 <a href="#"><i class="fa fa-users"></i><span>Users</span><i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->is('admin*') ? 'active' : '' }}"><a href="/admin"><i class="fa fa-users"></i><span>Admins</span></a></li>
                     <li class="{{ request()->is('customer*') ? 'active' : '' }}"><a href="/customer"><i class="fa fa-users"></i><span>Customers</span></a></li>
-                    <li class="{{ request()->is('supplier*') ? 'active' : '' }}"><a href="/supplier"><i class="fa fa-truck"></i><span>Suppliers</span></a></li>
+                    <li class="{{ request()->is('salesman*') ? 'active' : '' }}"><a href="/salesman"><i class="fa fa-user-secret"></i><span>Salesmans</span></a></li>
                 </ul>
             </li>
             <li class="treeview {{ request()->is('category-product*') || request()->is('product*') || request()->is('stock*') ? 'active' : '' }}">

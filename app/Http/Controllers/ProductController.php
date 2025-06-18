@@ -15,7 +15,8 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $products = new Product();
+        $products = Product::query();
+
         if ($request->search) {
             $products = $products->where('name', 'LIKE', "%{$request->search}%")
                 ->orWhere('code', 'LIKE', "%{$request->search}%")
@@ -28,15 +29,16 @@ class ProductController extends Controller
                 });
         }
 
-        // Sort products by code
-        $products = $products->orderBy('code');
+        if ($request->has('outlet_id')) {
+            $products = $products->where('outlet_id', $request->outlet_id);
+        }
 
-        // Load stocks with sorting and quantity condition
-        $products = $products->with(['stocks' => function ($query) {
-            $query->where('qty', '>', 0)
-                ->orderBy('status')
-                ->orderBy('serial_number');
-        }]);
+        $products = $products->orderBy('code')
+            ->with(['stocks' => function ($query) {
+                $query->where('qty', '>', 0)
+                    ->orderBy('status')
+                    ->orderBy('serial_number');
+            }]);
 
         if (request()->wantsJson()) {
             $products = $products->latest()->paginate(10);

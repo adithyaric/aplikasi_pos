@@ -25,7 +25,7 @@ class ProductRequest extends FormRequest
             'brand' => 'nullable',
             'model' => 'nullable',
             'is_serialized' => 'nullable',
-            // 'outlet_id' => 'required',
+            'outlet_id' => 'required',
             // 'supplier_id' => 'required',
             'harga_beli' => 'required',
             'harga_jual' => 'required',

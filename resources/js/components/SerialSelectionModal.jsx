@@ -81,7 +81,7 @@ const SerialSelectionModal = ({
                                 <option value="">Choose Serial Number</option>
                                 {availableSerials.map(
                                     ({ id, serial, status }) => (
-                                        <option key={id} value={serial}>
+                                        <option key={`serial-${ id }`} value={serial}>
                                             [{status}] - {serial}
                                         </option>
                                     )

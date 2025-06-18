@@ -10,7 +10,7 @@ const CartTableBody = ({
     return (
         <>
             {cart.map((c, index) => (
-                <tr key={index}>
+                <tr key={`item-${ index }`}>
                     <td>
                         {c.is_serialized && c.pivot.serial_number && (
                             <span className="badge bg-aqua">

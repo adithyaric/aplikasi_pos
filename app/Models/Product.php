@@ -37,10 +37,10 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    // public function outlet()
-    // {
-    //     return $this->belongsTo(Outlet::class);
-    // }
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
+    }
 
     // public function supplier()
     // {

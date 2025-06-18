@@ -60,7 +60,7 @@
                                 @endforeach
                                 @php $kembali = abs(($totalCost - $penjualan->discount - $penjualan->voucher?->value) - $penjualan->total); @endphp
                                 <tr>
-                                    <th colspan="4" class="text-sm text-right">Total : @currency($totalCost)</th>
+                                    <th colspan="4" class="text-sm text-right">Sub Total : @currency($totalCost)</th>
                                 </tr>
                                 <tr>
                                     <th colspan="4" class="text-sm text-right">Diskon : -@currency($penjualan->discount)</th>
@@ -69,13 +69,13 @@
                                     <th colspan="4" class="text-sm text-right">Voucher : -@currency($penjualan->voucher?->value)</th>
                                 </tr>
                                 <tr>
-                                    <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $penjualan->discount)</th>
+                                    <th colspan="4" class="text-right">Grand Total : @currency($totalCost - $penjualan->discount - $penjualan->voucher?->value)</th>
                                 </tr>
+                                {{-- <tr> --}}
+                                    {{-- <th colspan="4" class="text-sm text-right">Di Bayar : @currency($penjualan->total)</th> --}}
+                                {{-- </tr> --}}
                                 <tr>
-                                    <th colspan="4" class="text-sm text-right">Di Bayar : @currency($penjualan->total)</th>
-                                </tr>
-                                <tr>
-                                    <th colspan="4" class="text-sm text-right">Kembali: @currency($kembali)</th>
+                                    <th colspan="4" class="text-sm text-right">Hemat: @currency($kembali)</th>
                                 </tr>
                             </tbody>
                         </table>
