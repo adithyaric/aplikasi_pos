@@ -16,6 +16,7 @@ class Penjualan extends Model
         'kasir_id',
         'kas_id',
         'voucher_id',
+        'salesman_id',
         'discount',
         'total',
     ];
@@ -47,6 +48,11 @@ class Penjualan extends Model
     public function voucher()
     {
         return $this->belongsTo(Voucher::class);
+    }
+
+    public function salesman()
+    {
+        return $this->belongsTo(Salesman::class);
     }
 
     public function transaction()

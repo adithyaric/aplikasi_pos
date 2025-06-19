@@ -38,7 +38,7 @@
                         </div>
                         <div class="form-group">
                             <label for="">Nomor Telp</label>
-                            <input type="text" class="form-control" name="no_telp" value="{{ old('no_telp') }}"
+                            <input type="number" class="form-control" name="no_telp" value="{{ old('no_telp') }}"
                                 placeholder="Masukkan Nomor Telp">
                             @error('no_telp')
                             <div class="invalid-feedback text-danger">

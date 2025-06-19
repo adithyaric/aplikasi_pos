@@ -49,6 +49,7 @@ const Cart = () => {
         loadProducts();
         loadCustomers();
         loadVouchers();
+        loadSalesmans();
         // loadKas();
         loadKasir();
         loadWishlist();
@@ -312,6 +313,27 @@ const Cart = () => {
             });
     };
 
+    // Data Salesmans
+    const loadSalesmans = () => {
+        axios
+            .get("/salesman")
+            .then((res) => {
+                const salesmans = res.data ?? [];
+                setSalesmans(salesmans);
+
+                if (salesmans.length > 0 && salesmans[0]?.id) {
+                    setSalesmanId(salesmans[0].id);
+                } else {
+                    setSalesmanId(null); // or undefined or a fallback value
+                }
+            })
+            .catch((error) => {
+                console.error("Failed to load salesmans:", error);
+                setSalesmans([]);
+                setSalesmanId(null); // handle the error case gracefully
+            });
+    };
+
     //Data Kas
     // const loadKas = () => {
     //     axios.get(`/kas?outlet_id=${outlet.id}`).then((res) => {
@@ -426,7 +448,7 @@ const Cart = () => {
                 customer_id: customerId,
                 voucher_id: voucherId,
                 outlet_id: outlet.id,
-                // kas_id: kasId,
+                salesman_id: salesmanId,
                 kasir_id: kasirId,
                 total: totalAmount,
                 discount: discount,
@@ -437,6 +459,7 @@ const Cart = () => {
                 loadProducts();
                 loadCustomers();
                 loadVouchers();
+                loadSalesmans();
                 // loadKas();
                 loadKasir();
                 loadWishlist();
@@ -515,6 +538,9 @@ const Cart = () => {
                     // kas={kas}
                     // kasId={kasId}
                     // setKasId={setKasId}
+                    salesmans={salesmans}
+                    salesmanId={salesmanId}
+                    setSalesmanId={setSalesmanId}
                     kasir={kasir}
                     kasirId={kasirId}
                     setKasirId={setKasirId}

@@ -15,4 +15,9 @@ class Salesman extends Model
         'alamat',
         'no_telp',
     ];
+
+    public function penjualan()
+    {
+        return $this->hasMany(Penjualan::class);
+    }
 }

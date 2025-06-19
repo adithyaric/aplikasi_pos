@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SalesmanRequest;
 use App\Models\Salesman;
+use Illuminate\Http\Request;
 
 class SalesmanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $salesmans = Salesman::get();
         if ($request->wantsJson()) {

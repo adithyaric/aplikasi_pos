@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PDF;
 
 class PenjualanController extends Controller
@@ -82,7 +83,7 @@ class PenjualanController extends Controller
                 'code' => $nextInvoiceCode,
                 'customer_id' => $request->customer_id,
                 'outlet_id' => $request->outlet_id,
-                // 'kas_id' => $request->kas_id,
+                'salesman_id' => $request->salesman_id,
                 'kasir_id' => $request->kasir_id,
                 'voucher_id' => $request->voucher_id,
                 'discount' => $request->discount,

@@ -21,10 +21,11 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Kode Invoice</td>
-                                    <td>Customer</td>
-                                    <td>Kas/Metode Pembayaran</td>
+                                    {{-- <td>Customer</td> --}}
+                                    {{-- <td>Kas/Metode Pembayaran</td> --}}
                                     <td>Outlet</td>
                                     <td>Kasir</td>
+                                    <td>Salesman</td>
                                     <td>Detail</td>
                                     <td>Aksi</td>
                                 </tr>
@@ -33,10 +34,11 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
-                                    <td>{{ $value->customer->name }}</td>
-                                    <td>{{ $value->kas?->name ?? $value->transaction?->payment?->name }}</td>
+                                    {{-- <td>{{ $value->customer->name }}</td> --}}
+                                    {{-- <td>{{ $value->kas?->name ?? $value->transaction?->payment?->name }}</td> --}}
                                     <td>{{ $value->outlet->name ?? '___customer' }}</td>
                                     <td>{{ $value->kasir->name ?? '___customer' }}</td>
+                                    <td>{{ $value->salesman?->name }}</td>
                                     <td>
                                         <div class="table-responsive text-nowrap">
                                             <table class="table table-sm table-bordered">

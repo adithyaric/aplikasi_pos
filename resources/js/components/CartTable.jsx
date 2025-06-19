@@ -2,6 +2,7 @@ import React from "react";
 import { formatRupiah } from "../utils";
 import CartTableBody from "./CartTableBody";
 // import Kas from "./Kas";
+import Salesmans from "./Salesmans";
 import Kasir from "./Kasir";
 
 const CartTable = ({
@@ -23,6 +24,9 @@ const CartTable = ({
     // kas,
     // kasId,
     // setKasId,
+    salesmans,
+    salesmanId,
+    setSalesmanId,
     kasir,
     kasirId,
     setKasirId,
@@ -162,6 +166,12 @@ const CartTable = ({
                                         kasirId={kasirId}
                                         setKasirId={setKasirId}
                                     /> */}
+                                    <Salesmans
+                                        key={salesmanId}
+                                        salesmans={salesmans}
+                                        salesmanId={salesmanId}
+                                        setSalesmanId={setSalesmanId}
+                                    />
 
                                     <p>Total Amount</p>
                                     <div className="form-group">
