@@ -100,7 +100,7 @@
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        <td>Alasan</td>
+                                        <td>Serial</td>
                                         <td>Aksi</td>
                                     </tr>
                                 </thead>
@@ -151,7 +151,7 @@
                 </select>
             </td>
             <td><input type="text" required value="0" class="form-control" name="product[${productIndex}][qty]"></td>
-            <td><input type="text" required value="" placeholder="alasan..." class="form-control" name="product[${productIndex}][alasan]"></td>
+            <td><input type="text" required value="" placeholder="" class="form-control" name="product[${productIndex}][alasan]"></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
 
         </tr>`;
@@ -234,7 +234,7 @@
                                     </select>
                                 </td>
                                 <td><input type="text" required value="${item.qty}" class="form-control" name="product[${item.id}][qty]"></td>
-                                <td><input type="text" required value="alasan...${item.subtotal}" placeholder="alasan..." class="form-control" name="product[${item.id}][alasan]"></td>
+                                <td><input type="text" required value="${item.serial_number ? item.serial_number : ''}" placeholder=" " class="form-control" name="product[${item.id}][alasan]"></td>
                                 <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
                             </tr>`;
                         $('#product-repeater').append(productTemplate);

@@ -9,6 +9,7 @@ use App\Models\Penjualan;
 use App\Models\Product;
 use App\Models\Refund;
 use App\Models\RefundItem;
+use App\Models\Stock;
 use App\Models\User;
 
 class RefundController extends Controller
@@ -51,6 +52,7 @@ class RefundController extends Controller
         ]);
     }
 
+    //Menambah market Stocks
     public function store(RefundRequest $request)
     {
         $data = $request->validated();
@@ -66,6 +68,34 @@ class RefundController extends Controller
                 'qty' => $product['qty'],
                 'alasan' => $product['alasan'],
             ]);
+
+            $productModel = Product::find($product['product_id']);
+
+            if ($productModel->is_serialized) {
+                Stock::create([
+                    'product_id' => $product['product_id'],
+                    'serial_number' => $product['alasan'],
+                    'qty' => 1,
+                    'harga_beli' => $productModel->harga_beli,
+                    'condition' => 'used',
+                    'status' => 'free',
+
+                ]);
+            } else {
+                $stock = Stock::where('product_id', $product['product_id'])->first();
+
+                if ($stock) {
+                    $stock->qty += $product['qty'];
+                    $stock->save();
+                } else {
+                    Stock::create([
+                        'product_id' => $product['product_id'],
+                        'qty' => $product['qty'],
+                        'harga_beli' => $productModel->harga_beli,
+                        'status' => 'free',
+                    ]);
+                }
+            }
         }
 
         $kas = Kas::find($request->kas_id);

@@ -54,6 +54,7 @@ class RefundPembelianController extends Controller
         ]);
     }
 
+    //Menambah pembelian Stock & Mengurangi market Stocks
     public function store(RefundPembelianRequest $request)
     {
         $data = $request->validated();
@@ -69,6 +70,50 @@ class RefundPembelianController extends Controller
                 'qty' => $product['qty'],
                 'alasan' => $product['alasan'],
             ]);
+
+            $productModel = Product::find($product['product_id']);
+
+            if ($productModel->is_serialized) {
+                StockPembelian::create([
+                    'product_id' => $product['product_id'],
+                    'serial_number' => $product['alasan'],
+                    'pembelian_id' => $refundPembelian->pembelian_id,
+                    'qty' => 1,
+                    'harga_beli' => $productModel->harga_beli,
+                    'status' => 'available',
+                ]);
+
+                // For serialized market stock
+                $marketStock = Stock::where('product_id', $product['product_id'])
+                    ->where('serial_number', $product['alasan'])
+                    ->first();
+
+                if ($marketStock) {
+                    $marketStock->qty -= 1;
+                    $marketStock->save();
+                }
+            } else {
+                $stockPembelian = StockPembelian::where('product_id', $product['product_id'])->first();
+                if ($stockPembelian) {
+                    $stockPembelian->qty += $product['qty'];
+                    $stockPembelian->save();
+                } else {
+                    StockPembelian::create([
+                        'product_id' => $product['product_id'],
+                        'pembelian_id' => $refundPembelian->pembelian_id,
+                        'qty' => $product['qty'],
+                        'harga_beli' => $productModel->harga_beli,
+                        'status' => 'available',
+                    ]);
+                }
+
+                // For non-serialized market stock
+                $marketStock = Stock::where('product_id', $product['product_id'])->first();
+                if ($marketStock) {
+                    $marketStock->qty -= $product['qty'];
+                    $marketStock->save();
+                }
+            }
         }
 
         $kas = Kas::find($request->kas_id);
@@ -77,7 +122,6 @@ class RefundPembelianController extends Controller
 
         return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
-
     public function update(RefundPembelianRequest $request, RefundPembelian $refundPembelian)
     {
         $oldTotal = $refundPembelian->total;
