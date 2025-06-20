@@ -9,6 +9,7 @@ use App\Models\Pembelian;
 use App\Models\PembelianProduct;
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\StockPembelian;
 use App\Models\Supplier;
 use PDF;
 
@@ -121,7 +122,6 @@ class PembelianController extends Controller
             foreach ($request as $productData) {
                 $product = Product::find($productData->product_id);
                 if ($product->is_serialized && ! empty($productData->serial_numbers)) {
-                    // For serialized items (laptops), create individual stock entries
                     $serialNumbers = is_array($productData->serial_numbers)
                         ? $productData->serial_numbers
                         : explode("\n", trim($productData->serial_numbers));
@@ -129,6 +129,7 @@ class PembelianController extends Controller
                     foreach ($serialNumbers as $serial) {
                         $serial = trim($serial);
                         if (! empty($serial)) {
+                            // Create market stock
                             Stock::updateOrCreate(
                                 [
                                     'pembelian_id' => $pembelian->id,
@@ -143,20 +144,36 @@ class PembelianController extends Controller
                                     'condition' => 'new',
                                 ]
                             );
+
+                            // Decrease StockPembelian quantity
+                            StockPembelian::where([
+                                'pembelian_id' => $pembelian->id,
+                                'product_id' => $productData->product_id,
+                                'serial_number' => $serial
+                            ])->decrement('qty', 1);
                         }
                     }
                 } else {
-                    // For bulk items (cables, adapters)
+                    // For bulk items
+                    $qty = (int) $productData->qty;
+
+                    // Create market stock
                     Stock::updateOrCreate(
                         ['pembelian_id' => $pembelian->id, 'product_id' => $productData->product_id],
                         [
                             'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
-                            'qty' => (int) $productData->qty,
+                            'qty' => $qty,
                             'subtotal' => (int) $productData->subtotal,
                             'expired_at' => $productData->expired_at ?? null,
                             'condition' => 'new',
                         ]
                     );
+
+                    // Decrease StockPembelian quantity
+                    StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $productData->product_id
+                    ])->decrement('qty', $qty);
                 }
 
                 $product->update(['harga_beli' => (int) str_replace(',', '', $productData->harga_beli)]);
@@ -182,6 +199,39 @@ class PembelianController extends Controller
                             'serial_numbers' => $serialNumbers,
                         ]
                     );
+
+                    // Add StockPembelian for non-published products
+                    if (Product::find($productData['product_id'])->is_serialized && ! empty($serialNumbers)) {
+                        foreach ($serialNumbers as $serial) {
+                            StockPembelian::updateOrCreate(
+                                [
+                                    'pembelian_id' => $pembelian->id,
+                                    'product_id' => $productData['product_id'],
+                                    'serial_number' => $serial
+                                ],
+                                [
+                                    'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
+                                    'qty' => 1,
+                                    'subtotal' => (int) str_replace(',', '', $productData['harga_beli']),
+                                    'expired_at' => $productData['expired'] ?? null,
+                                    'condition' => 'new',
+                                    'status' => 'available',
+                                ]
+                            );
+                        }
+                    } else {
+                        StockPembelian::updateOrCreate(
+                            ['pembelian_id' => $pembelian->id, 'product_id' => $productData['product_id']],
+                            [
+                                'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
+                                'qty' => (int) $productData['qty'],
+                                'subtotal' => (int) $productData['subtotal'],
+                                'expired_at' => $productData['expired'] ?? null,
+                                'condition' => 'new',
+                                'status' => 'available',
+                            ]
+                        );
+                    }
                 }
             }
         }

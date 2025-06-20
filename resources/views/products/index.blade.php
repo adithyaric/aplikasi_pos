@@ -28,7 +28,8 @@
                                     <td>Nama Outlet</td>
                                     <td>Nama</td>
                                     <td>Kategori</td>
-                                    <td>Qty</td>
+                                    <td>Stock Market</td>
+                                    <td>Stock Warehouse</td>
                                     <td>Harga Beli</td>
                                     <td>Serialized</td>
                                     <td>Aksi</td>
@@ -41,9 +42,8 @@
                                         <td>{{ $value->outlet?->name }}</td>
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->category->name }}</td>
-                                        <td>
-                                            {{ $value->stocks()->sum('qty') }}
-                                        </td>
+                                        <td>{{ $value->stocks()->sum('qty') }}</td>
+                                        <td>{{ $value->stockPembelians()->sum('qty') }}</td>
                                         <td>@currency($value->harga_beli)</td>
                                         <td>{{ $value->is_serialized ? 'Yes' : 'No' }}</td>
                                         <td>

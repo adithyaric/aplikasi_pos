@@ -47,9 +47,16 @@ class Product extends Model
     //     return $this->belongsTo(Supplier::class);
     // }
 
+    // Market stocks (after published)
     public function stocks()
     {
         return $this->hasMany(Stock::class);
+    }
+
+    // Warehouse stocks (before published)
+    public function stockPembelians()
+    {
+        return $this->hasMany(StockPembelian::class);
     }
 
     public function reviews()

@@ -12,8 +12,8 @@
 - [x] Category
 - [x] Stock -> Purchase Order -> Penerimaan Barang (Baru Masuk Stock)
 - [x] Order Outlet
-    - [ ] List Pesan Order Dari Outlet
-    - [ ] Acc -> Pilih Product & QTY -> `Send Stock (Auto stock berkurang / pindah)`
+    - [x] List Pesan Order Dari Outlet
+    - [x] Acc -> Pilih Product & QTY -> `Send Stock (Auto stock berkurang / pindah)`
 - Return Outlet
     - [ ] List Return Outlet (Refund)
     - [ ] Acc -> Check Product & QTY -> `Submit (Auto Stock Bertambah)`

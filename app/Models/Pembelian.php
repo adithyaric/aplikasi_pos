@@ -33,9 +33,16 @@ class Pembelian extends Model
         return $this->belongsTo(Kas::class);
     }
 
+    // Market stocks (after published)
     public function stocks()
     {
         return $this->hasMany(Stock::class);
+    }
+
+    // Warehouse stocks (before published)
+    public function stockPembelians()
+    {
+        return $this->hasMany(StockPembelian::class);
     }
 
     public function pembelianProducts()
