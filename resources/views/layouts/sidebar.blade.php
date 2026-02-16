@@ -31,13 +31,19 @@
                     {{-- <li class="{{ request()->is('stock*') ? 'active' : '' }}"><a href="/stock"><i class="fa fa-cubes"></i><span>Stocks</span></a></li> --}}
                 </ul>
             </li>
-            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan*') || request()->is('refund*') || request()->is('request-orders*') ? 'active' : '' }}">
+            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan*') || request()->is('refund*')
+                || request()->is('request-orders*')
+                || request()->is('picking-lists*')
+                || request()->is('delivery-orders*')
+            ? 'active' : '' }}">
                 <a href="#"><i class="fa fa-exchange"></i><span>Transactions</span><i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     {{-- <li class="{{ request()->is('category-pengeluaran*') ? 'active' : '' }}"><a href="/category-pengeluaran"><i class="fa fa-tags"></i><span>Category Pengeluaran</span></a></li> --}}
                     {{-- <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}"><a href="/pengeluaran"><i class="fa fa-folder-open"></i><span>Pengeluaran</span></a></li> --}}
                     <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>Gudang Minta Supplier</span></a></li>
                     <li class="{{ request()->is('request-orders*') ? 'active' : '' }}"><a href="/request-orders"><i class="fa fa-cube"></i><span>Outlet Minta Gudang</span></a></li>
+                    <li class="{{ request()->is('picking-lists*') ? 'active' : '' }}"><a href="/picking-lists"><i class="fa fa-cube"></i><span>PICKING & PACKING</span></a></li>
+                    <li class="{{ request()->is('delivery-orders*') ? 'active' : '' }}"><a href="/delivery-orders"><i class="fa fa-cube"></i><span>OUTBOUND (Kirim ke Outlet)</span></a></li>
                     {{-- <li class="{{ request()->is('penjualan') ? 'active' : '' }}"><a href="/penjualan"><i class="fa fa-shopping-cart"></i><span>Penjualan</span></a></li> --}}
                     {{-- <li class="{{ request()->is('penjualan-marketplace') ? 'active' : '' }}"><a href="/penjualan-marketplace"><i class="fa fa-shopping-cart"></i><span>Penjualan Marketplace</span></a></li> --}}
                     {{-- <li class="{{ in_array(Route::currentRouteName(), ['refund.index', 'refund.show', 'refund.create', 'refund.edit']) ? 'active' : '' }}"><a href="/refund"><i class="fa fa-refresh"></i><span>Refund/Return Order</span></a></li> --}}

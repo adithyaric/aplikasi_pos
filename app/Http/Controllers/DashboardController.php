@@ -100,8 +100,8 @@ class DashboardController extends Controller
 
         return view('dashboard.setting', [
             'provinces' => [],
-            'origin' => 'lorem',
-            'CityName' => 'lorem',
+            'origin' => '-',
+            'CityName' => '-',
             'email' => json_decode(Storage::disk('public')->get('settings.json'), true)['email'],
             'telp' => json_decode(Storage::disk('public')->get('settings.json'), true)['telp'],
             'address' => json_decode(Storage::disk('public')->get('settings.json'), true)['address'],

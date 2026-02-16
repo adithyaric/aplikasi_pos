@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/market');
+    return redirect('/dashboard');
 });
 
 Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
@@ -128,27 +128,26 @@ Route::middleware(['role:superadmin'])->group(function () {
     Route::resource('/admin', AdminController::class);
 });
 
-Route::get('/market/{category?}', [MarketplaceController::class, 'index'])->name('market.index');
-Route::get('/marketdetail/{id}', [MarketplaceController::class, 'show'])->name('market.show');
-Route::post('/marketstore', [MarketplaceController::class, 'store'])->name('market.store');
+// Route::get('/market/{category?}', [MarketplaceController::class, 'index'])->name('market.index');
+// Route::get('/marketdetail/{id}', [MarketplaceController::class, 'show'])->name('market.show');
+// Route::post('/marketstore', [MarketplaceController::class, 'store'])->name('market.store');
 
-Route::get('/cities', [MarketplaceController::class, 'cities']);
-Route::middleware(['role:customer'])->group(function () {
-    Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
-    Route::match(['get', 'post'], '/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
-    Route::resource('/wishlist', WishlistController::class);
-    Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
-    Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
-    Route::controller(CartUserController::class)->group(function () {
-        Route::get('marketcart', 'index')->name('marketcart.index');
-        Route::post('marketcart', 'addToCart')->name('marketcart.store');
-        Route::post('market-update-cart', 'updateCart')->name('marketcart.update');
-        Route::post('market-remove', 'removeCart')->name('marketcart.remove');
-        Route::post('market-clear', 'clearAllCart')->name('marketcart.clear');
-    });
-    Route::resource('/review', ReviewController::class);
-}
-);
+// Route::get('/cities', [MarketplaceController::class, 'cities']);
+// Route::middleware(['role:customer'])->group(function () {
+//     Route::post('/marketcoupon', [MarketplaceController::class, 'coupon'])->name('market.coupon');
+//     Route::match(['get', 'post'], '/marketcheckout', [MarketplaceController::class, 'checkout'])->name('market.checkout');
+//     Route::resource('/wishlist', WishlistController::class);
+//     Route::get('/wishlist-move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+//     Route::post('/wishlist-remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
+//     Route::controller(CartUserController::class)->group(function () {
+//         Route::get('marketcart', 'index')->name('marketcart.index');
+//         Route::post('marketcart', 'addToCart')->name('marketcart.store');
+//         Route::post('market-update-cart', 'updateCart')->name('marketcart.update');
+//         Route::post('market-remove', 'removeCart')->name('marketcart.remove');
+//         Route::post('market-clear', 'clearAllCart')->name('marketcart.clear');
+//     });
+//     Route::resource('/review', ReviewController::class);
+// });
 
 require __DIR__.'/auth.php';
 
