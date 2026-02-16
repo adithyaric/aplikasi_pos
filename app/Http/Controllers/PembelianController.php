@@ -120,6 +120,7 @@ class PembelianController extends Controller
 
                     foreach ($serialNumbers as $serial) {
                         $serial = trim($serial);
+                        $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
                         if (! empty($serial)) {
                             // Create market stock
                             $stock = Stock::create([

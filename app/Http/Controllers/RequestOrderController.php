@@ -25,7 +25,13 @@ class RequestOrderController extends Controller
     {
         return view('request-orders.create', [
             'outlets' => Outlet::get(),
-            'products' => Product::where('is_serialized', false)->get(),
+            'products' => Product::whereHas('stocks', function ($q) {
+                $q->where('qty_available', '>', 0)
+                    ->where('status', 'available');
+            })
+                // ->where('is_serialized', false)
+                ->get(),
+
         ]);
     }
 
@@ -41,7 +47,7 @@ class RequestOrderController extends Controller
 
         DB::beginTransaction();
         try {
-            $lastRequest = RequestOrder::latest('id')->first();
+            $lastRequest = RequestOrder::withTrashed()->latest('id')->first();
             $nextNumber = $lastRequest ? ((int) substr($lastRequest->code, 3) + 1) : 1;
             $code = 'REQ'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
@@ -65,7 +71,8 @@ class RequestOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('request-orders.index')->with('toast_success', 'Request created successfully');
+            return redirect()->route('request-orders.verify', $requestOrder)
+                ->with('toast_success', 'Request created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -77,14 +84,14 @@ class RequestOrderController extends Controller
     {
         $requestOrder->load(['items.product.stocks']);
 
-        dd($requestOrder?->toArray());
+        // dd($requestOrder?->toArray());
 
         return view('request-orders.verify', compact('requestOrder'));
     }
 
     public function processVerification(Request $request, RequestOrder $requestOrder)
     {
-        dd($requestOrder?->toArray(), $request->all());
+        // dd($requestOrder?->toArray(), $request->all());
         $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:request_order_items,id',
@@ -118,7 +125,9 @@ class RequestOrderController extends Controller
                         ->get();
 
                     foreach ($stocks as $stock) {
-                        if ($remainingQty <= 0) { break; }
+                        if ($remainingQty <= 0) {
+                            break;
+                        }
 
                         $qtyToReserve = min($remainingQty, $stock->qty_available);
                         $stock->reserve($qtyToReserve);
@@ -131,12 +140,16 @@ class RequestOrderController extends Controller
                 }
 
                 // Determine overall status
-                if ($itemData['item_status'] === 'approved') { $hasApproved = true; }
+                if ($itemData['item_status'] === 'approved') {
+                    $hasApproved = true;
+                }
                 if ($itemData['item_status'] === 'partial') {
                     $hasPartial = true;
                     $hasApproved = true;
                 }
-                if ($itemData['item_status'] !== 'rejected') { $allRejected = false; }
+                if ($itemData['item_status'] !== 'rejected') {
+                    $allRejected = false;
+                }
             }
 
             // Update request order status
@@ -157,7 +170,7 @@ class RequestOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('request-orders.show', $requestOrder)
+            return redirect()->route('request-orders.verify', $requestOrder)
                 ->with('toast_success', 'Request verified successfully');
         } catch (\Exception $e) {
             DB::rollBack();

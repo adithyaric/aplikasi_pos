@@ -29,14 +29,14 @@
 - [x] Status: `pending`
 
 ### B. Warehouse Verifies
-- **Admin Gudang** opens verification
-- Checks `qty_available` for each product
-- Decides:
+- [x] **Admin Gudang** opens verification
+- [x] Checks `qty_available` for each product
+- [x] Decides:
   - **Approved** - full qty given
   - **Partial** - only some qty given
   - **Rejected** - no stock
-- System **RESERVES** stock (`qty_reserved` increases)
-- Status: `approved`/`partial`/`rejected`
+- [x] System **RESERVES** stock (`qty_reserved` increases)
+- [x] Status: `approved`/`partial`/`rejected`
 
 ---
 

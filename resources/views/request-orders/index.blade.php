@@ -63,22 +63,18 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        @if ($value->status == 'pending')
-                                            <a class="btn-sm btn btn-warning"
-                                                href="{{ route('request-orders.edit', $value->id) }}">Edit</a>
-                                            <a class="btn-sm btn btn-info"
-                                                href="{{ route('request-orders.verify', $value->id) }}">Detail</a>
-                                            <form action="{{ route('request-orders.destroy', $value->id) }}" method="post"
-                                                style="display: inline;">
-                                                @method('delete')
-                                                @csrf
-                                                <button class="border-0 btn-sm btn btn-danger"
-                                                    onclick="return confirm('Are you sure?')">Hapus</button>
-                                            </form>
-                                        @else
+                                        <a class="btn-sm btn btn-info" href="{{ route('request-orders.verify', $value->id) }}">Detail</a>
+                                        {{-- @if ($value->status == 'pending') --}}
+                                            {{-- <a class="btn-sm btn btn-warning" href="{{ route('request-orders.edit', $value->id) }}">Edit</a> --}}
+                                            {{-- <form action="{{ route('request-orders.destroy', $value->id) }}" method="post" style="display: inline;"> --}}
+                                                {{-- @method('delete') --}}
+                                                {{-- @csrf --}}
+                                                {{-- <button class="border-0 btn-sm btn btn-danger" onclick="return confirm('Are you sure?')">Hapus</button> --}}
+                                            {{-- </form> --}}
+                                        {{-- @else --}}
                                             <!-- optional print if needed -->
                                             {{-- <a class="btn-sm btn btn-primary" href="{{ route('request-orders.print', $value->id) }}">Print</a> --}}
-                                        @endif
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                             @endforeach

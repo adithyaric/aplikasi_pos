@@ -16,6 +16,7 @@ class Stock extends Model
         'harga_beli',
         'qty',
         'qty_reserved',
+        // 'qty_available',
         'expired_at',
         'location',
         'batch_number',
