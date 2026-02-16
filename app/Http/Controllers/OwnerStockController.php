@@ -21,6 +21,12 @@ class OwnerStockController extends Controller
                 ->get()
             : collect();
 
+        dd([
+            'owners' => $owners?->toArray(),
+            'stocks' => $stocks?->toArray(),
+            'selectedOwner' => $selectedOwner,
+        ]);
+
         return view('owner-stocks.index', compact('owners', 'selectedOwner', 'stocks'));
     }
 
@@ -29,6 +35,11 @@ class OwnerStockController extends Controller
         $stocks = OwnerStock::with('product')
             ->where('owner_id', $owner->id)
             ->get();
+
+        dd([
+            'owners' => $owner?->toArray(),
+            'stocks' => $stocks?->toArray(),
+        ]);
 
         return view('owner-stocks.show', compact('owner', 'stocks'));
     }

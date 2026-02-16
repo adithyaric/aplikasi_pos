@@ -97,15 +97,23 @@
                                 <label for="verification_notes">Catatan Verifikasi (opsional)</label>
                                 <textarea class="form-control" name="verification_notes" rows="3" placeholder="Catatan verifikasi...">{{ old('verification_notes', $requestOrder?->verification_notes) }}</textarea>
                             </div>
-                        </div>
-
-                        <div class="box-footer">
-                            <a href="{{ route('request-orders.index') }}" class="btn btn-default">Kembali</a>
                             @if ($requestOrder->status == 'pending')
                                 <button type="submit" class="btn btn-primary">Proses Verifikasi</button>
                             @endif
                         </div>
                     </form>
+                    <div class="box-footer">
+                        @if (($requestOrder->status == 'approved' || $requestOrder->status == 'partial') && !isset($requestOrder->pickingList))
+                            <form action="{{ route('picking-lists.generate', $requestOrder->id) }}" method="post">
+                                @csrf
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-list"></i> Generate Picking List
+                                </button>
+                            </form>
+                        <hr>
+                        @endif
+                        <a href="{{ route('request-orders.index') }}" class="btn btn-default">Kembali</a>
+                    </div>
                 </div>
             </div>
         </div>

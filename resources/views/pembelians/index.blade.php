@@ -6,7 +6,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            Data Pembelian
+            INBOUND PROCESS (Stock Masuk Gudang)
         </h1>
     </section>
 

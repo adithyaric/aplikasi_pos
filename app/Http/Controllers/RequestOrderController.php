@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class RequestOrderController extends Controller
 {
+    public function show($id)
+    {
+        $ro = RequestOrder::with(['items.product.stocks', 'pickingList', 'deliveryOrder'])->findOrFail($id);
+        dd($ro?->toArray());
+    }
+
     public function index()
     {
         $requests = RequestOrder::with(['owner', 'requestedBy'])

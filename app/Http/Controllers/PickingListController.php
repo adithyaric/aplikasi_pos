@@ -11,6 +11,29 @@ use Illuminate\Support\Facades\DB;
 
 class PickingListController extends Controller
 {
+    public function index()
+    {
+        $pickingLists = PickingList::with(['requestOrder.owner', 'picker'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('picking-lists.index', compact('pickingLists'));
+    }
+
+    public function show(PickingList $pickingList)
+    {
+        $pickingList->load(['requestOrder.owner', 'picker', 'items.product']);
+
+        return view('picking-lists.show', compact('pickingList'));
+    }
+
+    public function pick(PickingList $pickingList)
+    {
+        $pickingList->load(['items.product', 'items.stock']);
+
+        return view('picking-lists.pick', compact('pickingList'));
+    }
+
     public function generate(RequestOrder $requestOrder)
     {
         if ($requestOrder->status !== 'approved' && $requestOrder->status !== 'partial') {
@@ -89,7 +112,8 @@ class PickingListController extends Controller
             'is_picked' => $request->qty_picked == $item->qty_to_pick,
         ]);
 
-        return response()->json(['success' => true]);
+        // return response()->json(['success' => true]);
+        return redirect()->back();
     }
 
     public function complete(PickingList $pickingList)

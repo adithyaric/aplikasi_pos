@@ -6,7 +6,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            Data Request Order
+            OUTLET REQUESTS STOCK
         </h1>
     </section>
 

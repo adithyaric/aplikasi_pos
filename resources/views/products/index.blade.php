@@ -20,7 +20,7 @@
                     <div class="box-header">
                         <a href="{{ route('product.create') }}" class="btn btn-md bg-green">Tambah</a>
                     </div><!-- /.box-header -->
-                    <div class="box-body table-responsive">
+                    <div class="box-body table-responsive text-nowrap">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -28,6 +28,7 @@
                                     <td>Nama Outlet</td>
                                     <td>Nama</td>
                                     <td>Kategori</td>
+                                    <td>Stock Owner</td>
                                     <td>Stock Reserverd</td>
                                     <td>Stock Market</td>
                                     <td>Stock Warehouse</td>
@@ -43,6 +44,7 @@
                                         <td>{{ $value->outlet?->name }}</td>
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->category->name }}</td>
+                                        <td>{{ $value->ownerStocks()->sum('qty') }}</td>
                                         <td>{{ $value->stocks()->sum('qty_reserved') }}</td>
                                         <td>{{ $value->stocks()->sum('qty_available') }}</td>
                                         <td>{{ $value->stockPembelians()->sum('qty') }}</td>

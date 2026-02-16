@@ -29,6 +29,11 @@ class PickingList extends Model
         return $this->belongsTo(RequestOrder::class);
     }
 
+    public function deliveryOrder()
+    {
+        return $this->hasOne(DeliveryOrder::class);
+    }
+
     public function picker()
     {
         return $this->belongsTo(User::class, 'picker_id');

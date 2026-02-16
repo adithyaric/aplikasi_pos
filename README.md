@@ -43,33 +43,33 @@
 ## 3. **PICKING & PACKING**
 
 ### A. Generate Picking List
-- System creates `PickingList` from approved `RequestOrder`
-- Shows which stock to take (by batch/expired/location)
+- [x] System creates `PickingList` from approved `RequestOrder`
+- [x] Shows which stock to take (by batch/expired/location)
 - Prioritizes: **FIFO** (oldest first)
 
 ### B. Picker Process
 - **Petugas Picking** scans items
-- Updates `qty_picked` per item
-- Status: `in_progress` → `completed`
+- [x] Updates `qty_picked` per item
+- [x] Status: `in_progress` → `completed`
 
 ---
 
 ## 4. **OUTBOUND (Kirim ke Outlet)**
 
 ### A. Generate Delivery Order
-- System creates `DeliveryOrder` from completed picking
-- Code: DO######
+- [x] System creates `DeliveryOrder` from completed picking
+- [x] Code: DO######
 
 ### B. Send to Outlet
-- Click **Send**
-- Triggers:
+- [x] Click **Send**
+- [x] Triggers:
   - `Stock.allocate()` - reduces global warehouse stock
   - Creates/updates `OwnerStock` - outlet now owns it
   - Create `StockMovement` (type: 'out')
   - Unreserves remaining
 
 ### C. Outlet Receives
-- **Owner** confirms received
+- [x] **Owner** confirms received
 - Upload photo proof (optional)
 - Status: `delivered`
 

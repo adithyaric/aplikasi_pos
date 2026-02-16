@@ -12,6 +12,22 @@ use Illuminate\Support\Facades\DB;
 
 class DeliveryOrderController extends Controller
 {
+    public function index()
+    {
+        $deliveryOrders = DeliveryOrder::with(['requestOrder', 'owner'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('delivery-orders.index', compact('deliveryOrders'));
+    }
+
+    public function show(DeliveryOrder $deliveryOrder)
+    {
+        $deliveryOrder->load(['requestOrder', 'owner', 'preparedBy', 'receivedBy', 'items.product']);
+
+        return view('delivery-orders.show', compact('deliveryOrder'));
+    }
+
     public function generate(PickingList $pickingList)
     {
         if ($pickingList->status !== 'completed') {
