@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'superadmin@mailinator.com',
             'alamat' => 'magelang',
             'no_telp' => '+62'.str_pad(3, 10, '0', STR_PAD_LEFT),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', //password
             'remember_token' => Str::random(10),
         ]);
         User::create([

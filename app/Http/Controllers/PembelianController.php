@@ -9,8 +9,10 @@ use App\Models\Pembelian;
 use App\Models\PembelianProduct;
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\StockMovement;
 use App\Models\StockPembelian;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\DB;
 use PDF;
 
 class PembelianController extends Controller
@@ -106,14 +108,102 @@ class PembelianController extends Controller
 
     public function publish(Pembelian $pembelian)
     {
-        $pembelian->is_published = $pembelian->is_published ? false : true;
-        $this->updateStock($pembelian->pembelianProducts, $pembelian);
-        $pembelian->save();
-        $kas = Kas::find($pembelian->kas_id);
-        $kas->nominal -= $pembelian->total;
-        $kas->save();
+        DB::beginTransaction();
+        try {
+            foreach ($pembelian->pembelianProducts as $productData) {
+                $product = Product::find($productData->product_id);
 
-        return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Memperbarui Data!');
+                if ($product->is_serialized && ! empty($productData->serial_numbers)) {
+                    $serialNumbers = is_array($productData->serial_numbers)
+                        ? $productData->serial_numbers
+                        : explode("\n", trim($productData->serial_numbers));
+
+                    foreach ($serialNumbers as $serial) {
+                        $serial = trim($serial);
+                        if (! empty($serial)) {
+                            // Create market stock
+                            $stock = Stock::create([
+                                'pembelian_id' => $pembelian->id,
+                                'product_id' => $productData->product_id,
+                                'serial_number' => $serial,
+                                'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
+                                'qty' => 1,
+                                'subtotal' => (int) str_replace(',', '', $productData->harga_beli),
+                                'expired_at' => $productData->expired_at ?? null,
+                                'condition' => 'new',
+                                'status' => 'available',
+                            ]);
+
+                            // Log movement
+                            StockMovement::create([
+                                'product_id' => $productData->product_id,
+                                'user_id' => auth()->id(),
+                                'type' => 'in',
+                                'reference_type' => Pembelian::class,
+                                'reference_id' => $pembelian->id,
+                                'qty_in' => 1,
+                                'balance' => $product->stocks()->sum('qty'),
+                                'notes' => "Goods receipt from {$pembelian->supplier->name}",
+                            ]);
+                        }
+                    }
+                } else {
+                    // For bulk items
+                    $qty = (int) $productData->qty;
+                    $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
+
+                    $stock = Stock::create([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $productData->product_id,
+                        'harga_beli' => $hargaBeli,
+                        'qty' => $qty,
+                        'subtotal' => (int) $productData->subtotal,
+                        'expired_at' => $productData->expired_at ?? null,
+                        'condition' => 'new',
+                        'status' => 'available',
+                    ]);
+
+                    // Log movement
+                    StockMovement::create([
+                        'product_id' => $productData->product_id,
+                        'user_id' => auth()->id(),
+                        'type' => 'in',
+                        'reference_type' => Pembelian::class,
+                        'reference_id' => $pembelian->id,
+                        'qty_in' => $qty,
+                        'balance' => $product->stocks()->sum('qty'),
+                        'notes' => "Goods receipt from {$pembelian->supplier->name}",
+                    ]);
+                }
+
+                // Update product HPP
+                $newHPP = $product->calculateHPP($productData->qty, $productData->harga_beli);
+                $product->update([
+                    'harga_beli' => $hargaBeli,
+                    'hpp' => $newHPP,
+                ]);
+                $product->updateStockValue();
+            }
+
+            // Delete warehouse stock (StockPembelian)
+            $pembelian->stockPembelians()->delete();
+
+            $pembelian->update(['is_published' => true]);
+
+            // Deduct from Kas
+            $kas = Kas::find($pembelian->kas_id);
+            $kas->nominal -= $pembelian->total;
+            $kas->save();
+
+            DB::commit();
+
+            return redirect()->route('pembelian.index')
+                ->with('toast_success', 'Pembelian published successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('toast_error', $e->getMessage());
+        }
     }
 
     private function updateStock($request, $pembelian)

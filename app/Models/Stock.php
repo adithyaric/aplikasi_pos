@@ -15,12 +15,54 @@ class Stock extends Model
         'subtotal',
         'harga_beli',
         'qty',
+        'qty_reserved',
         'expired_at',
+        'location',
+        'batch_number',
         'serial_number', // For individual items like laptops
         'imei', // For phones
         'condition', // new, used, refurbished
-        'status', // free, on-keep
+        'status',
     ];
+
+    public function scopeAvailable($query)
+    {
+        return $query->where('qty_available', '>', 0)
+            ->where('status', 'available');
+    }
+
+    public function scopeReservable($query)
+    {
+        return $query->where('status', 'available');
+    }
+
+    public function reserve($qty)
+    {
+        if ($this->qty_available < $qty) {
+            throw new \Exception('Insufficient available stock');
+        }
+        $this->qty_reserved += $qty;
+        $this->save();
+    }
+
+    public function unreserve($qty)
+    {
+        $this->qty_reserved -= $qty;
+        if ($this->qty_reserved < 0) {
+            $this->qty_reserved = 0;
+        }
+        $this->save();
+    }
+
+    public function allocate($qty)
+    {
+        if ($this->qty < $qty) {
+            throw new \Exception('Insufficient stock');
+        }
+        $this->qty -= $qty;
+        $this->qty_reserved = max(0, $this->qty_reserved - $qty);
+        $this->save();
+    }
 
     public function pembelian()
     {
@@ -32,10 +74,10 @@ class Stock extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function scopeAvailable($query)
-    {
-        return $query->where('qty', '>', 0);
-    }
+    // public function scopeAvailable($query)
+    // {
+    //     return $query->where('qty', '>', 0);
+    // }
 
     protected $casts = [
         'created_at' => 'datetime',

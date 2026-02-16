@@ -90,18 +90,18 @@ class DashboardController extends Controller
 
     public function setting()
     {
-        $apiKey = env('APP_KEY_RAJAONGKIR');
-        $headers = ['key' => $apiKey];
-        $response = Http::withoutVerifying()->withHeaders($headers)->get('https://api.rajaongkir.com/starter/province');
-        $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
-        $origin = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
-        $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$origin");
-        $CityName = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
+        // $apiKey = env('APP_KEY_RAJAONGKIR');
+        // $headers = ['key' => $apiKey];
+        // $response = Http::withoutVerifying()->withHeaders($headers)->get('https://api.rajaongkir.com/starter/province');
+        // $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
+        // $origin = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
+        // $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$origin");
+        // $CityName = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
 
         return view('dashboard.setting', [
-            'provinces' => $provinces,
-            'origin' => $origin,
-            'CityName' => $CityName,
+            'provinces' => [],
+            'origin' => 'lorem',
+            'CityName' => 'lorem',
             'email' => json_decode(Storage::disk('public')->get('settings.json'), true)['email'],
             'telp' => json_decode(Storage::disk('public')->get('settings.json'), true)['telp'],
             'address' => json_decode(Storage::disk('public')->get('settings.json'), true)['address'],

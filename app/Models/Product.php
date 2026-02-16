@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Product extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
-        'pic',
+        'pic', //sku
         'code',
         'name',
         'category_id',
@@ -78,5 +81,61 @@ class Product extends Model
     public function getTotalStockAttribute()
     {
         return $this->stocks()->sum('qty');
+    }
+
+    public function calculateHPP($newQty, $newPrice)
+    {
+        if ($this->hpp_method === 'average') {
+            $currentValue = $this->total_stock * $this->hpp;
+            $newValue = $newQty * $newPrice;
+            $totalQty = $this->total_stock + $newQty;
+
+            return $totalQty > 0 ? ($currentValue + $newValue) / $totalQty : 0;
+        }
+        // FIFO handled differently in stock allocation
+        return $this->hpp;
+    }
+
+    public function updateStockValue()
+    {
+        $this->stock_value = $this->total_stock * $this->hpp;
+        $this->save();
+    }
+
+    public function getTotalAvailableStockAttribute()
+    {
+        return $this->stocks()->sum('qty_available');
+    }
+
+    public function getTotalReservedStockAttribute()
+    {
+        return $this->stocks()->sum('qty_reserved');
+    }
+
+    public function ownerStocks()
+    {
+        return $this->hasMany(OwnerStock::class);
+    }
+
+    public function movements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    public function isLowStock()
+    {
+        return $this->total_available_stock <= $this->min_stock;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['*'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['created_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->setDescriptionForEvent(fn (string $eventName) => "Data Product has been {$eventName}")
+            ->useLogName('Product');
     }
 }

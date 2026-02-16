@@ -95,6 +95,33 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/laporan/stock', [LaporanController::class, 'exportStock'])->name('laporan.stock');
     Route::get('/laporan/pengeluaran', [LaporanController::class, 'exportPengeluaran'])->name('laporan.pengeluaran');
     Route::get('/laporan/labarugi', [LaporanController::class, 'exportLabaRugi'])->name('laporan.labarugi');
+
+    // Request Orders
+    Route::resource('request-orders', App\Http\Controllers\RequestOrderController::class);
+    Route::get('request-orders/{requestOrder}/verify', [App\Http\Controllers\RequestOrderController::class, 'verify'])->name('request-orders.verify');
+    Route::post('request-orders/{requestOrder}/verify', [App\Http\Controllers\RequestOrderController::class, 'processVerification'])->name('request-orders.process-verification');
+
+    // Picking Lists
+    Route::resource('picking-lists', App\Http\Controllers\PickingListController::class);
+    Route::post('request-orders/{requestOrder}/generate-picking', [App\Http\Controllers\PickingListController::class, 'generate'])->name('picking-lists.generate');
+    Route::post('picking-lists/{pickingList}/start', [App\Http\Controllers\PickingListController::class, 'startPicking'])->name('picking-lists.start');
+    Route::get('picking-lists/{pickingList}/pick', [App\Http\Controllers\PickingListController::class, 'pick'])->name('picking-lists.pick');
+    Route::patch('picking-list-items/{item}', [App\Http\Controllers\PickingListController::class, 'updateItem'])->name('picking-list-items.update');
+    Route::post('picking-lists/{pickingList}/complete', [App\Http\Controllers\PickingListController::class, 'complete'])->name('picking-lists.complete');
+
+    // Delivery Orders
+    Route::resource('delivery-orders', App\Http\Controllers\DeliveryOrderController::class);
+    Route::post('picking-lists/{pickingList}/generate-do', [App\Http\Controllers\DeliveryOrderController::class, 'generate'])->name('delivery-orders.generate');
+    Route::post('delivery-orders/{deliveryOrder}/send', [App\Http\Controllers\DeliveryOrderController::class, 'send'])->name('delivery-orders.send');
+    Route::post('delivery-orders/{deliveryOrder}/receive', [App\Http\Controllers\DeliveryOrderController::class, 'receive'])->name('delivery-orders.receive');
+
+    // Owner Stocks
+    Route::get('owner-stocks', [App\Http\Controllers\OwnerStockController::class, 'index'])->name('owner-stocks.index');
+    Route::get('owner-stocks/{owner}', [App\Http\Controllers\OwnerStockController::class, 'show'])->name('owner-stocks.show');
+
+    // Stock Movements
+    Route::get('stock-movements', [App\Http\Controllers\StockMovementController::class, 'index'])->name('stock-movements.index');
+    Route::get('stock-movements/product/{product}', [App\Http\Controllers\StockMovementController::class, 'byProduct'])->name('stock-movements.by-product');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

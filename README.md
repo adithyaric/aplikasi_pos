@@ -1,38 +1,120 @@
-## APP INTERNAL DECAA STORE
+# Warehouse System Flow
 
-**User**
-- [x] Superadmin
-- [ ] Admin Warehouse
-- [ ] Admin Outlet
-- [x] Kasir Outlet (sales)
+## 1. **INBOUND PROCESS (Stock Masuk Gudang)**
 
-**⁠WAREHOUSE**
+### A. Purchase Order to Supplier
+- [x] **Admin Gudang** creates `Pembelian` (PO) to `Supplier`
+- [x] Status: `is_published = false` (draft)
+- [x] Stock goes to `StockPembelian` (warehouse staging)
 
-- [x] Product
-- [x] Category
-- [x] Stock -> Purchase Order -> Penerimaan Barang (Baru Masuk Stock)
-- [x] Order Outlet
-    - [x] List Pesan Order Dari Outlet
-    - [x] Acc -> Pilih Product & QTY -> `Send Stock (Auto stock berkurang / pindah)`
-- Return Outlet
-    - [ ] List Return Outlet (Refund)
-    - [ ] Acc -> Check Product & QTY -> `Submit (Auto Stock Bertambah)`
+### B. Receiving Goods
+- Verify physical goods vs PO
+- [x] Click **Publish** on `Pembelian`
+- [x] Triggers:
+  - Move from `StockPembelian` → `Stock` (global pool)
+  - Calculate HPP (Average/FIFO)
+  - Update `stock_value`
+  - Create `StockMovement` (type: 'in')
+  - Deduct from `Kas`
 
-**⁠POS**
+**Result:** Stock now in **Global Warehouse Pool** (no owner yet)
 
-- Adopsi POS yang sudah ada (newpos.demoo.net)
-    Hal Yang Berbeda dengan newpo.demoo.net
-    - [x] POS Multi Outlet **Tapi Penjualan Hanya 1 Outlet**
-    - [x] Stock Barang Sendiri - Sendiri
-    - [x] Stock Barang Request Ke Warehouse (Acc Warehouse)
-        - Contoh : Kak aku minta diisi stock Laptop Asus
-    - [ ] Return Ke Warehouse (Acc Warehouse)
-        - Contoh : Pilih Barang & QTY -> Send Stock (Waiting Acc Warehouse) -> Setelah Acc Stock Berkurang
-    - [x] Saat POS pilih `SALES` yang menjualkan (Berfungsi untuk poin)
-    - [x] Voucher (Diskon Tambahan)
-      - kasir bisa kasih max diskon jika di set oleh admin
-      - contoh : kasir 1 bisa memasukkan nominal diskon sebesar 50k, jika ingin kasih potogan tambahan maka pakai voucher
-    - [x] Search Stock
-        - Group By Name (Biar Tugas Admin Menyamakan Namanya)
-            - Stock Harus Kelihatan Dari All Outlet - Warehouse & Statusnya
-    - [x] Outlet Bisa Memberi Status Pada Product (Free & On Keep) -> wishlist (hanya sebagai status saja)
+---
+
+## 2. **OUTLET REQUESTS STOCK**
+
+### A. Create Request Order
+- [x] **Owner/Outlet** creates `RequestOrder`
+- [x] Select products + qty needed
+- [x] Status: `pending`
+
+### B. Warehouse Verifies
+- **Admin Gudang** opens verification
+- Checks `qty_available` for each product
+- Decides:
+  - **Approved** - full qty given
+  - **Partial** - only some qty given
+  - **Rejected** - no stock
+- System **RESERVES** stock (`qty_reserved` increases)
+- Status: `approved`/`partial`/`rejected`
+
+---
+
+## 3. **PICKING & PACKING**
+
+### A. Generate Picking List
+- System creates `PickingList` from approved `RequestOrder`
+- Shows which stock to take (by batch/expired/location)
+- Prioritizes: **FIFO** (oldest first)
+
+### B. Picker Process
+- **Petugas Picking** scans items
+- Updates `qty_picked` per item
+- Status: `in_progress` → `completed`
+
+---
+
+## 4. **OUTBOUND (Kirim ke Outlet)**
+
+### A. Generate Delivery Order
+- System creates `DeliveryOrder` from completed picking
+- Code: DO######
+
+### B. Send to Outlet
+- Click **Send**
+- Triggers:
+  - `Stock.allocate()` - reduces global warehouse stock
+  - Creates/updates `OwnerStock` - outlet now owns it
+  - Create `StockMovement` (type: 'out')
+  - Unreserves remaining
+
+### C. Outlet Receives
+- **Owner** confirms received
+- Upload photo proof (optional)
+- Status: `delivered`
+
+**Result:** Stock transferred from **Global Pool** → **Owner's Stock**
+
+---
+
+## 5. **STOCK VISIBILITY**
+
+### Global Warehouse (`Stock` table)
+```
+Total Stock = qty (physical)
+Available = qty - qty_reserved
+Reserved = booked for approved requests
+```
+
+### Owner Stock (`OwnerStock` table)
+- Per outlet
+- Used for POS transactions
+- Can integrate with existing `Penjualan` system
+
+---
+
+## KEY DIFFERENCES FROM OLD SYSTEM
+
+| Old (POS) | New (Warehouse) |
+|-----------|-----------------|
+| Cart-based | Request-based |
+| Direct stock deduction | Reserve → Pick → Allocate |
+| Stock per outlet from start | Global pool → allocate when needed |
+| `Stock` has `outlet_id` | `Stock` is global, `OwnerStock` is per outlet |
+
+---
+
+## YOUR QUESTION CLARIFIED
+
+> "outlet create po asking gudang and then goes to supplier if run out of stock right?"
+
+**Not quite. Correct flow:**
+
+1. **Warehouse** creates PO → **Supplier** (when warehouse needs stock)
+2. **Outlet** creates `RequestOrder` → **Warehouse** (when outlet needs stock)
+3. **Warehouse** verifies:
+   - If stock available → approve & send
+   - If stock low → partial approval OR reject
+4. **Warehouse** (separately) monitors `min_stock` → create new PO to supplier
+
+**Outlets don't directly create PO to suppliers.** They only request from warehouse.
