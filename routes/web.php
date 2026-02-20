@@ -69,7 +69,10 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
 
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::resource('/pembelian', PembelianController::class);
-    Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
+    // Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
+    Route::get('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
+    Route::get('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'penerimaan'])->name('pembelian.penerimaan');
+    Route::post('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'storePenerimaan'])->name('pembelian.store-penerimaan');
     Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
     Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
     Route::resource('/refund', RefundController::class);
@@ -120,8 +123,8 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('owner-stocks/{owner}', [App\Http\Controllers\OwnerStockController::class, 'show'])->name('owner-stocks.show');
 
     // Stock Movements
-    Route::get('stock-movements', [App\Http\Controllers\StockMovementController::class, 'index'])->name('stock-movements.index');
-    Route::get('stock-movements/product/{product}', [App\Http\Controllers\StockMovementController::class, 'byProduct'])->name('stock-movements.by-product');
+    // Route::get('stock-movements', [App\Http\Controllers\StockMovementController::class, 'index'])->name('stock-movements.index');
+    // Route::get('stock-movements/product/{product}', [App\Http\Controllers\StockMovementController::class, 'byProduct'])->name('stock-movements.by-product');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

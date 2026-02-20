@@ -12,6 +12,7 @@ use App\Models\Stock;
 use App\Models\StockMovement;
 use App\Models\StockPembelian;
 use App\Models\Supplier;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PDF;
 
@@ -59,9 +60,9 @@ class PembelianController extends Controller
 
         $pembelian = Pembelian::create([
             'code' => $request->code,
-            'outlet_id' => $request->outlet_id,
+            // 'outlet_id' => $request->outlet_id,
             'supplier_id' => $request->supplier_id,
-            'kas_id' => $request->kas_id,
+            // 'kas_id' => $request->kas_id,
             'total' => $request->total,
             'is_published' => false,
         ]);
@@ -108,98 +109,319 @@ class PembelianController extends Controller
 
     public function publish(Pembelian $pembelian)
     {
+        // Prevent double publishing
+        if ($pembelian->is_published) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'Pembelian already published');
+        }
+
+        return redirect()->route('pembelian.penerimaan', $pembelian);
+    }
+
+    // public function publish(Pembelian $pembelian)
+    // {
+    //     //TODO fix masalah di $qty = (int) $productData->qty;
+    //     // saat click publish, data kadang double
+    //     DB::beginTransaction();
+    //     try {
+    //         foreach ($pembelian->pembelianProducts as $productData) {
+    //             $product = Product::find($productData->product_id);
+
+    //             if ($product->is_serialized && ! empty($productData->serial_numbers)) {
+    //                 $serialNumbers = is_array($productData->serial_numbers)
+    //                     ? $productData->serial_numbers
+    //                     : explode("\n", trim($productData->serial_numbers));
+
+    //                 foreach ($serialNumbers as $serial) {
+    //                     $serial = trim($serial);
+    //                     $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
+    //                     if (! empty($serial)) {
+    //                         // Create market stock
+    //                         $stock = Stock::create([
+    //                             'pembelian_id' => $pembelian->id,
+    //                             'product_id' => $productData->product_id,
+    //                             'serial_number' => $serial,
+    //                             'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
+    //                             'qty' => 1,
+    //                             'subtotal' => (int) str_replace(',', '', $productData->harga_beli),
+    //                             'expired_at' => $productData->expired_at ?? null,
+    //                             'condition' => 'new',
+    //                             'status' => 'available',
+    //                         ]);
+
+    //                         // Log movement
+    //                         StockMovement::create([
+    //                             'product_id' => $productData->product_id,
+    //                             'user_id' => auth()->id(),
+    //                             'type' => 'in',
+    //                             'reference_type' => Pembelian::class,
+    //                             'reference_id' => $pembelian->id,
+    //                             'qty_in' => 1,
+    //                             'balance' => $product->stocks()->sum('qty'),
+    //                             'notes' => "Goods receipt from {$pembelian->supplier->name}",
+    //                         ]);
+    //                     }
+    //                 }
+    //             } else {
+    //                 // For bulk items
+    //                 $qty = (int) $productData->qty;
+    //                 $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
+
+    //                 $stock = Stock::create([
+    //                     'pembelian_id' => $pembelian->id,
+    //                     'product_id' => $productData->product_id,
+    //                     'harga_beli' => $hargaBeli,
+    //                     'qty' => $qty,
+    //                     'subtotal' => (int) $productData->subtotal,
+    //                     'expired_at' => $productData->expired_at ?? null,
+    //                     'condition' => 'new',
+    //                     'status' => 'available',
+    //                 ]);
+
+    //                 // Log movement
+    //                 StockMovement::create([
+    //                     'product_id' => $productData->product_id,
+    //                     'user_id' => auth()->id(),
+    //                     'type' => 'in',
+    //                     'reference_type' => Pembelian::class,
+    //                     'reference_id' => $pembelian->id,
+    //                     'qty_in' => $qty,
+    //                     'balance' => $product->stocks()->sum('qty'),
+    //                     'notes' => "Goods receipt from {$pembelian->supplier->name}",
+    //                 ]);
+    //             }
+
+    //             // Update product HPP
+    //             $newHPP = $product->calculateHPP($productData->qty, $productData->harga_beli);
+    //             $product->update([
+    //                 'harga_beli' => $hargaBeli,
+    //                 'hpp' => $newHPP,
+    //             ]);
+    //             $product->updateStockValue();
+    //         }
+
+    //         // Delete warehouse stock (StockPembelian)
+    //         // dd($stock?->toArray());
+    //         $pembelian->stockPembelians()->delete();
+
+    //         $pembelian->update(['is_published' => true]);
+
+    //         // // Deduct from Kas
+    //         // $kas = Kas::find($pembelian->kas_id);
+    //         // $kas->nominal -= $pembelian->total;
+    //         // $kas->save();
+
+    //         DB::commit();
+
+    //         return redirect()->route('pembelian.index')
+    //             ->with('toast_success', 'Pembelian published successfully');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+
+    //         return back()->with('toast_error', $e->getMessage());
+    //     }
+    // }
+
+    public function penerimaan(Pembelian $pembelian)
+    {
+        if ($pembelian->is_published) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'Pembelian already published');
+        }
+
+        $pembelian->load(['pembelianProducts.product', 'stockPembelians.product', 'supplier']);
+
+        // dd($pembelian?->toArray());
+        return view('pembelians.penerimaan', compact('pembelian'));
+    }
+
+    public function storePenerimaan(Request $request, Pembelian $pembelian)
+    {
+        if ($pembelian->is_published) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'Pembelian already published');
+        }
+
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.qty_diterima' => 'required|integer|min:0',
+        ]);
+
         DB::beginTransaction();
         try {
-            foreach ($pembelian->pembelianProducts as $productData) {
-                $product = Product::find($productData->product_id);
+            $hasReceived = false;
 
-                if ($product->is_serialized && ! empty($productData->serial_numbers)) {
-                    $serialNumbers = is_array($productData->serial_numbers)
-                        ? $productData->serial_numbers
-                        : explode("\n", trim($productData->serial_numbers));
+            foreach ($request->items as $itemData) {
+                $qtyDiterima = (int) $itemData['qty_diterima'];
 
+                if ($qtyDiterima <= 0) { continue; }
+
+                $hasReceived = true;
+                $product = Product::find($itemData['product_id']);
+                $pembelianProduct = $pembelian->pembelianProducts()
+                    ->where('product_id', $itemData['product_id'])
+                    ->first();
+
+                if (! $pembelianProduct) { continue; }
+
+                if ($product->is_serialized) {
+                    // For serialized items
+                    $serialNumbers = is_array($pembelianProduct->serial_numbers)
+                        ? $pembelianProduct->serial_numbers
+                        : explode("\n", trim($pembelianProduct->serial_numbers ?? ''));
+
+                    $receivedCount = 0;
                     foreach ($serialNumbers as $serial) {
-                        $serial = trim($serial);
-                        $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
-                        if (! empty($serial)) {
-                            // Create market stock
-                            $stock = Stock::create([
-                                'pembelian_id' => $pembelian->id,
-                                'product_id' => $productData->product_id,
-                                'serial_number' => $serial,
-                                'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
-                                'qty' => 1,
-                                'subtotal' => (int) str_replace(',', '', $productData->harga_beli),
-                                'expired_at' => $productData->expired_at ?? null,
-                                'condition' => 'new',
-                                'status' => 'available',
-                            ]);
+                        if ($receivedCount >= $qtyDiterima) { break; }
 
-                            // Log movement
-                            StockMovement::create([
-                                'product_id' => $productData->product_id,
-                                'user_id' => auth()->id(),
-                                'type' => 'in',
-                                'reference_type' => Pembelian::class,
-                                'reference_id' => $pembelian->id,
-                                'qty_in' => 1,
-                                'balance' => $product->stocks()->sum('qty'),
-                                'notes' => "Goods receipt from {$pembelian->supplier->name}",
-                            ]);
+                        $serial = trim($serial);
+                        if (empty($serial)) { continue; }
+
+                        // Check if already in Stock (prevent duplicate)
+                        $existingStock = Stock::where([
+                            'pembelian_id' => $pembelian->id,
+                            'product_id' => $itemData['product_id'],
+                            'serial_number' => $serial
+                        ])->exists();
+
+                        if ($existingStock) { continue; }
+
+                        // Create market stock
+                        Stock::create([
+                            'pembelian_id' => $pembelian->id,
+                            'product_id' => $itemData['product_id'],
+                            'serial_number' => $serial,
+                            'harga_beli' => $pembelianProduct->harga_beli,
+                            'qty' => 1,
+                            'subtotal' => $pembelianProduct->harga_beli,
+                            'expired_at' => $pembelianProduct->expired_at ?? null,
+                            'condition' => 'new',
+                            'status' => 'available',
+                        ]);
+
+                        // Decrease StockPembelian
+                        $stockPembelian = StockPembelian::where([
+                            'pembelian_id' => $pembelian->id,
+                            'product_id' => $itemData['product_id'],
+                            'serial_number' => $serial
+                        ])->first();
+
+                        if ($stockPembelian && $stockPembelian->qty > 0) {
+                            $stockPembelian->decrement('qty', 1);
+                            if ($stockPembelian->qty <= 0) {
+                                $stockPembelian->delete();
+                            }
                         }
+
+                        $receivedCount++;
+                    }
+
+                    // Log movement
+                    if ($receivedCount > 0) {
+                        StockMovement::create([
+                            'product_id' => $itemData['product_id'],
+                            'user_id' => auth()->id(),
+                            'type' => 'in',
+                            'reference_type' => Pembelian::class,
+                            'reference_id' => $pembelian->id,
+                            'qty_in' => $receivedCount,
+                            'balance' => $product->stocks()->sum('qty'),
+                            'notes' => "Goods receipt from {$pembelian->supplier->name}",
+                        ]);
                     }
                 } else {
                     // For bulk items
-                    $qty = (int) $productData->qty;
-                    $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
+                    $hargaBeli = $pembelianProduct->harga_beli;
 
-                    $stock = Stock::create([
+                    // Check existing stock for this pembelian+product
+                    $existingStock = Stock::where([
                         'pembelian_id' => $pembelian->id,
-                        'product_id' => $productData->product_id,
-                        'harga_beli' => $hargaBeli,
-                        'qty' => $qty,
-                        'subtotal' => (int) $productData->subtotal,
-                        'expired_at' => $productData->expired_at ?? null,
-                        'condition' => 'new',
-                        'status' => 'available',
-                    ]);
+                        'product_id' => $itemData['product_id']
+                    ])->first();
+
+                    if ($existingStock) {
+                        // Update existing
+                        $existingStock->increment('qty', $qtyDiterima);
+                        $existingStock->update([
+                            'subtotal' => DB::raw('qty * harga_beli')
+                        ]);
+                    } else {
+                        // Create new stock
+                        Stock::create([
+                            'pembelian_id' => $pembelian->id,
+                            'product_id' => $itemData['product_id'],
+                            'harga_beli' => $hargaBeli,
+                            'qty' => $qtyDiterima,
+                            'subtotal' => $qtyDiterima * $hargaBeli,
+                            'expired_at' => $pembelianProduct->expired_at ?? null,
+                            'condition' => 'new',
+                            'status' => 'available',
+                        ]);
+                    }
+
+                    // Decrease StockPembelian
+                    $stockPembelian = StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $itemData['product_id']
+                    ])->first();
+
+                    if ($stockPembelian) {
+                        $stockPembelian->decrement('qty', $qtyDiterima);
+                        if ($stockPembelian->qty <= 0) {
+                            $stockPembelian->delete();
+                        }
+                    }
 
                     // Log movement
                     StockMovement::create([
-                        'product_id' => $productData->product_id,
+                        'product_id' => $itemData['product_id'],
                         'user_id' => auth()->id(),
                         'type' => 'in',
                         'reference_type' => Pembelian::class,
                         'reference_id' => $pembelian->id,
-                        'qty_in' => $qty,
+                        'qty_in' => $qtyDiterima,
                         'balance' => $product->stocks()->sum('qty'),
                         'notes' => "Goods receipt from {$pembelian->supplier->name}",
                     ]);
                 }
 
                 // Update product HPP
-                $newHPP = $product->calculateHPP($productData->qty, $productData->harga_beli);
+                $newHPP = $product->calculateHPP($qtyDiterima, $pembelianProduct->harga_beli);
                 $product->update([
-                    'harga_beli' => $hargaBeli,
+                    'harga_beli' => $pembelianProduct->harga_beli,
                     'hpp' => $newHPP,
                 ]);
                 $product->updateStockValue();
             }
 
-            // Delete warehouse stock (StockPembelian)
-            $pembelian->stockPembelians()->delete();
+            if (! $hasReceived) {
+                throw new \Exception('No items received');
+            }
 
-            $pembelian->update(['is_published' => true]);
+            // Check if all items fully received
+            $remainingStock = $pembelian->stockPembelians()->sum('qty');
 
-            // Deduct from Kas
-            $kas = Kas::find($pembelian->kas_id);
-            $kas->nominal -= $pembelian->total;
-            $kas->save();
+            if ($remainingStock == 0) {
+                // All received, mark as published
+                $pembelian->update(['is_published' => true]);
+
+                // Deduct from Kas
+                $kas = Kas::find($pembelian->kas_id);
+                if ($kas) {
+                    $kas->nominal -= $pembelian->total;
+                    $kas->save();
+                }
+            }
 
             DB::commit();
 
+            $message = $remainingStock > 0
+                ? 'Partial receipt recorded. Remaining stock in warehouse.'
+                : 'All items received and published successfully';
+
             return redirect()->route('pembelian.index')
-                ->with('toast_success', 'Pembelian published successfully');
+                ->with('toast_success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
 

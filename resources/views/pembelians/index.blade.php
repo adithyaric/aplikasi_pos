@@ -23,7 +23,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
-                                    <td>Outlet</td>
+                                    {{-- <td>Outlet</td> --}}
                                     <td>Nama</td>
                                     <td>items</td>
                                     <td>Total</td>
@@ -34,7 +34,7 @@
                             @foreach ($pembelians as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->outlet->name }}</td>
+                                    {{-- <td>{{ $value->outlet?->name }}</td> --}}
                                     <td>{{ $value->code }}</td>
                                     <td>
                                         <ul>
@@ -64,12 +64,21 @@
                                         <a class=" btn-sm btn btn-info" href="{{ route('pembelian.print', $value->id) }}">Print</a>
                                         @endif
                                     </td>
-                                    <td>
-                                        <form action="{{ route('pembelian.publish', $value) }}" method="POST">
-                                            @csrf
-                                            <button class="btn btn-sm btn-primary" type="submit" @disabled($value->is_published)>Publish</button>
-                                        </form>
-                                    </td>
+                                    {{-- <td> --}}
+                                        {{-- <form action="{{ route('pembelian.publish', $value) }}" method="POST"> --}}
+                                            {{-- @csrf --}}
+                                            {{-- <button class="btn btn-sm btn-primary" type="submit" @disabled($value->is_published)>Publish</button> --}}
+                                        {{-- </form> --}}
+                                    {{-- </td> --}}
+<td>
+    @if (!$value->is_published)
+        <a href="{{ route('pembelian.penerimaan', $value) }}" class="btn btn-sm btn-primary">
+            Penerimaan Barang
+        </a>
+    @else
+        <span class="label label-success">Published</span>
+    @endif
+</td>
                                 </tr>
                             @endforeach
                         </table>

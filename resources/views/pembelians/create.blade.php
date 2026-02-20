@@ -26,22 +26,22 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;" id="outlet">
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}" {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('outlet_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label>Outlet</label> --}}
+                                {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;" id="outlet"> --}}
+                                    {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
+                                    {{-- @foreach ($outlets as $outlet) --}}
+                                        {{-- <option value="{{ $outlet->id }}" {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}> --}}
+                                            {{-- {{ $outlet->name }} --}}
+                                        {{-- </option> --}}
+                                    {{-- @endforeach --}}
+                                {{-- </select> --}}
+                                {{-- @error('outlet_id') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Supplier</label>
                                 <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier"
@@ -60,17 +60,17 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Kas</label>
-                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" style="width: 100%;" id="kas">
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label>Kas</label> --}}
+                                {{-- <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" style="width: 100%;" id="kas"> --}}
                                     {{-- @foreach ($kas as $kas)<option value="{{ $kas->id }}" {{ old('kas_id') == $kas->id ? 'selected' : '' }}>{{ $kas->name }}</option>@endforeach --}}
-                                </select>
-                                @error('kas_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                                {{-- </select> --}}
+                                {{-- @error('kas_id') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <hr>
                             <table class="table table-bordered table-striped" id="example">
                                 <thead>

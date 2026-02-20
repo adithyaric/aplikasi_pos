@@ -54,7 +54,7 @@
                                         <ul>
                                             @foreach ($value->items as $item)
                                                 <li>
-                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty }} pcs
+                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_approved }} pcs
                                                     @if (!empty($item->notes))
                                                         <small>({{ $item->notes }})</small>
                                                     @endif
