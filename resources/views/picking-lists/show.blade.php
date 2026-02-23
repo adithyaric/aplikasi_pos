@@ -93,6 +93,26 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="box-footer">
+                        @if (!isset($pickingList->deliveryOrder))
+                            @if ($pickingList->status == 'draft')
+                                <form action="{{ route('picking-lists.start', $pickingList->id) }}" method="post"
+                                    style="display: inline;">
+                                    @csrf
+                                    <button class="btn-sm btn btn-success">Start Picking</button>
+                                </form>
+                            @elseif ($pickingList->status == 'in_progress')
+                                <a class="btn-sm btn btn-warning"
+                                    href="{{ route('picking-lists.pick', $pickingList->id) }}">Continue</a>
+                            @elseif ($pickingList->status == 'completed')
+                                <form action="{{ route('delivery-orders.generate', $pickingList->id) }}"
+                                    method="post" style="display: inline;">
+                                    @csrf
+                                    <button class="btn-sm btn btn-primary">Generate DO</button>
+                                </form>
+                            @endif
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

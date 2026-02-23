@@ -31,8 +31,8 @@
                                     <td>Kategori</td>
                                     <td>Stock Owner</td>
                                     <td>Stock Reserverd</td>
-                                    <td>Stock Market</td>
                                     <td>Stock Warehouse</td>
+                                    <td>Stock INBOUND</td>
                                     <td>Harga Beli</td>
                                     <td>Serialized</td>
                                     <td>Aksi</td>

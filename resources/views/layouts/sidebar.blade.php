@@ -15,12 +15,13 @@
         <li class="{{ request()->is('dashboard*') ? 'active' : '' }}"><a href="/dashboard"><i class="fa fa-tachometer"></i><span>Dashboard</span></a></li>
         @if (auth()->user()->role != 'kasir')
             <li class="{{ request()->is('setting*') ? 'active' : '' }}"><a href="/setting"><i class="fa fa-gear"></i><span>Setting</span></a></li>
-            <li class="treeview {{ request()->is('admin*') || request()->is('customer*') || request()->is('salesman*') ? 'active' : '' }}">
+            <li class="treeview {{ request()->is('admin*') || request()->is('customer*') || request()->is('supplier*') ? 'active' : '' }}">
                 <a href="#"><i class="fa fa-users"></i><span>Users</span><i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     <li class="{{ request()->is('admin*') ? 'active' : '' }}"><a href="/admin"><i class="fa fa-users"></i><span>Admins</span></a></li>
-                    <li class="{{ request()->is('customer*') ? 'active' : '' }}"><a href="/customer"><i class="fa fa-users"></i><span>Customers</span></a></li>
-                    <li class="{{ request()->is('salesman*') ? 'active' : '' }}"><a href="/salesman"><i class="fa fa-user-secret"></i><span>Salesmans</span></a></li>
+                    {{-- <li class="{{ request()->is('customer*') ? 'active' : '' }}"><a href="/customer"><i class="fa fa-users"></i><span>Customers</span></a></li> --}}
+                    {{-- <li class="{{ request()->is('salesman*') ? 'active' : '' }}"><a href="/salesman"><i class="fa fa-user-secret"></i><span>Salesmans</span></a></li> --}}
+                    <li class="{{ request()->is('supplier*') ? 'active' : '' }}"><a href="/supplier"><i class="fa fa-archive"></i><span>Suppliers</span></a></li>
                 </ul>
             </li>
             <li class="treeview {{ request()->is('category-product*') || request()->is('product*') || request()->is('stock*') ? 'active' : '' }}">
@@ -40,7 +41,7 @@
                 <ul class="treeview-menu">
                     {{-- <li class="{{ request()->is('category-pengeluaran*') ? 'active' : '' }}"><a href="/category-pengeluaran"><i class="fa fa-tags"></i><span>Category Pengeluaran</span></a></li> --}}
                     {{-- <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}"><a href="/pengeluaran"><i class="fa fa-folder-open"></i><span>Pengeluaran</span></a></li> --}}
-                    <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>Gudang Minta Supplier</span></a></li>
+                    <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>INBOUND (Gudang Minta Supplier)</span></a></li>
                     <li class="{{ request()->is('request-orders*') ? 'active' : '' }}"><a href="/request-orders"><i class="fa fa-cube"></i><span>Outlet Minta Gudang</span></a></li>
                     <li class="{{ request()->is('picking-lists*') ? 'active' : '' }}"><a href="/picking-lists"><i class="fa fa-cube"></i><span>PICKING & PACKING</span></a></li>
                     <li class="{{ request()->is('delivery-orders*') ? 'active' : '' }}"><a href="/delivery-orders"><i class="fa fa-cube"></i><span>OUTBOUND (Kirim ke Outlet)</span></a></li>

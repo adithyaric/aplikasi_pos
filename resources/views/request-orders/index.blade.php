@@ -75,6 +75,14 @@
                                             <!-- optional print if needed -->
                                             {{-- <a class="btn-sm btn btn-primary" href="{{ route('request-orders.print', $value->id) }}">Print</a> --}}
                                         {{-- @endif --}}
+                                        @if (($value->status == 'approved' || $value->status == 'partial') && !isset($value->pickingList))
+                                            <form action="{{ route('picking-lists.generate', $value->id) }}" method="post">
+                                                @csrf
+                                                <button class="btn btn-primary">
+                                                    <i class="fa fa-list"></i> Generate Picking List
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

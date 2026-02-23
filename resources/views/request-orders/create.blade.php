@@ -70,7 +70,9 @@
                                                 data-placeholder="Pilih Produk" style="width:100%" required>
                                                 <option value="" disabled selected>Pilih Produk</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                                    <option value="{{ $product->id }}">
+                                                        {{ $product->name }} : [{{ $product->stocks()->sum('qty_available') }}]
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </td>

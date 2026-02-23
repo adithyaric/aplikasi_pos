@@ -46,11 +46,16 @@ class PembelianController extends Controller
 
     public function create()
     {
+        $lastPembelian = Pembelian::latest('id')->first();
+        $nextNumber = $lastPembelian ? ((int) substr($lastPembelian->code, 4) + 1) : 1;
+        $code = 'PO' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
         return view('pembelians.create', [
-            'kas' => Kas::get(),
-            'outlets' => Outlet::get(),
+            // 'kas' => Kas::get(),
+            // 'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'products' => Product::get(),
+            'code' => $code
         ]);
     }
 
