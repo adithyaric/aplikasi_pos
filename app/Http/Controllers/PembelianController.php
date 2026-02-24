@@ -40,7 +40,7 @@ class PembelianController extends Controller
     public function index()
     {
         return view('pembelians.index', [
-            'pembelians' => Pembelian::get(),
+            'pembelians' => Pembelian::latest()->get(),
         ]);
     }
 
@@ -48,7 +48,7 @@ class PembelianController extends Controller
     {
         $lastPembelian = Pembelian::latest('id')->first();
         $nextNumber = $lastPembelian ? ((int) substr($lastPembelian->code, 4) + 1) : 1;
-        $code = 'PO' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        $code = 'PO'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         return view('pembelians.create', [
             // 'kas' => Kas::get(),
@@ -123,116 +123,12 @@ class PembelianController extends Controller
         return redirect()->route('pembelian.penerimaan', $pembelian);
     }
 
-    // public function publish(Pembelian $pembelian)
-    // {
-    //     //TODO fix masalah di $qty = (int) $productData->qty;
-    //     // saat click publish, data kadang double
-    //     DB::beginTransaction();
-    //     try {
-    //         foreach ($pembelian->pembelianProducts as $productData) {
-    //             $product = Product::find($productData->product_id);
-
-    //             if ($product->is_serialized && ! empty($productData->serial_numbers)) {
-    //                 $serialNumbers = is_array($productData->serial_numbers)
-    //                     ? $productData->serial_numbers
-    //                     : explode("\n", trim($productData->serial_numbers));
-
-    //                 foreach ($serialNumbers as $serial) {
-    //                     $serial = trim($serial);
-    //                     $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
-    //                     if (! empty($serial)) {
-    //                         // Create market stock
-    //                         $stock = Stock::create([
-    //                             'pembelian_id' => $pembelian->id,
-    //                             'product_id' => $productData->product_id,
-    //                             'serial_number' => $serial,
-    //                             'harga_beli' => (int) str_replace(',', '', $productData->harga_beli),
-    //                             'qty' => 1,
-    //                             'subtotal' => (int) str_replace(',', '', $productData->harga_beli),
-    //                             'expired_at' => $productData->expired_at ?? null,
-    //                             'condition' => 'new',
-    //                             'status' => 'available',
-    //                         ]);
-
-    //                         // Log movement
-    //                         StockMovement::create([
-    //                             'product_id' => $productData->product_id,
-    //                             'user_id' => auth()->id(),
-    //                             'type' => 'in',
-    //                             'reference_type' => Pembelian::class,
-    //                             'reference_id' => $pembelian->id,
-    //                             'qty_in' => 1,
-    //                             'balance' => $product->stocks()->sum('qty'),
-    //                             'notes' => "Goods receipt from {$pembelian->supplier->name}",
-    //                         ]);
-    //                     }
-    //                 }
-    //             } else {
-    //                 // For bulk items
-    //                 $qty = (int) $productData->qty;
-    //                 $hargaBeli = (int) str_replace(',', '', $productData->harga_beli);
-
-    //                 $stock = Stock::create([
-    //                     'pembelian_id' => $pembelian->id,
-    //                     'product_id' => $productData->product_id,
-    //                     'harga_beli' => $hargaBeli,
-    //                     'qty' => $qty,
-    //                     'subtotal' => (int) $productData->subtotal,
-    //                     'expired_at' => $productData->expired_at ?? null,
-    //                     'condition' => 'new',
-    //                     'status' => 'available',
-    //                 ]);
-
-    //                 // Log movement
-    //                 StockMovement::create([
-    //                     'product_id' => $productData->product_id,
-    //                     'user_id' => auth()->id(),
-    //                     'type' => 'in',
-    //                     'reference_type' => Pembelian::class,
-    //                     'reference_id' => $pembelian->id,
-    //                     'qty_in' => $qty,
-    //                     'balance' => $product->stocks()->sum('qty'),
-    //                     'notes' => "Goods receipt from {$pembelian->supplier->name}",
-    //                 ]);
-    //             }
-
-    //             // Update product HPP
-    //             $newHPP = $product->calculateHPP($productData->qty, $productData->harga_beli);
-    //             $product->update([
-    //                 'harga_beli' => $hargaBeli,
-    //                 'hpp' => $newHPP,
-    //             ]);
-    //             $product->updateStockValue();
-    //         }
-
-    //         // Delete warehouse stock (StockPembelian)
-    //         // dd($stock?->toArray());
-    //         $pembelian->stockPembelians()->delete();
-
-    //         $pembelian->update(['is_published' => true]);
-
-    //         // // Deduct from Kas
-    //         // $kas = Kas::find($pembelian->kas_id);
-    //         // $kas->nominal -= $pembelian->total;
-    //         // $kas->save();
-
-    //         DB::commit();
-
-    //         return redirect()->route('pembelian.index')
-    //             ->with('toast_success', 'Pembelian published successfully');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-
-    //         return back()->with('toast_error', $e->getMessage());
-    //     }
-    // }
-
     public function penerimaan(Pembelian $pembelian)
     {
-        if ($pembelian->is_published) {
-            return redirect()->route('pembelian.index')
-                ->with('toast_error', 'Pembelian already published');
-        }
+        // if ($pembelian->is_published) {
+        //     return redirect()->route('pembelian.index')
+        //         ->with('toast_error', 'Pembelian already published');
+        // }
 
         $pembelian->load(['pembelianProducts.product', 'stockPembelians.product', 'supplier']);
 
@@ -248,13 +144,33 @@ class PembelianController extends Controller
         }
 
         $request->validate([
+            'receipt_date' => 'required|date',
+            'receipt_pic' => 'required|string',
+            'receipt_status' => 'required|in:draft,validated,completed',
+            'receipt_photo' => 'nullable|image|max:2048',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.qty_diterima' => 'required|integer|min:0',
+            'items.*.expired_at' => 'nullable|date',
+            'items.*.serial_numbers' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
         try {
+            // Handle photo upload
+            $photoPath = null;
+            if ($request->hasFile('receipt_photo')) {
+                $photoPath = $request->file('receipt_photo')->store('receipt-photos', 'public');
+            }
+
+            // Update pembelian receipt info
+            $pembelian->update([
+                'receipt_date' => $request->receipt_date,
+                'receipt_pic' => $request->receipt_pic,
+                'receipt_status' => $request->receipt_status,
+                'receipt_photo' => $photoPath,
+            ]);
+
             $hasReceived = false;
 
             foreach ($request->items as $itemData) {
@@ -270,29 +186,44 @@ class PembelianController extends Controller
 
                 if (! $pembelianProduct) { continue; }
 
+                $expiredAt = ! empty($itemData['expired_at']) ? $itemData['expired_at'] : null;
+
                 if ($product->is_serialized) {
-                    // For serialized items
-                    $serialNumbers = is_array($pembelianProduct->serial_numbers)
-                        ? $pembelianProduct->serial_numbers
-                        : explode("\n", trim($pembelianProduct->serial_numbers ?? ''));
+                    // For serialized items - USE ACTUAL RECEIVED SERIAL NUMBERS
+                    $receivedSerials = ! empty($itemData['serial_numbers'])
+                        ? array_filter(array_map('trim', explode("\n", $itemData['serial_numbers'])))
+                        : [];
+
+                    if (count($receivedSerials) !== $qtyDiterima) {
+                        throw new \Exception("Product {$product->name}: Serial numbers count (".count($receivedSerials).") must match qty received ({$qtyDiterima})");
+                    }
+
+                    // Check available qty in warehouse
+                    $availableQty = StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $itemData['product_id']
+                    ])->sum('qty');
+
+                    if ($qtyDiterima > $availableQty) {
+                        throw new \Exception("Product {$product->name}: Cannot receive {$qtyDiterima} items, only {$availableQty} available in warehouse");
+                    }
 
                     $receivedCount = 0;
-                    foreach ($serialNumbers as $serial) {
-                        if ($receivedCount >= $qtyDiterima) { break; }
-
-                        $serial = trim($serial);
+                    foreach ($receivedSerials as $serial) {
                         if (empty($serial)) { continue; }
 
-                        // Check if already in Stock (prevent duplicate)
+                        // Check if this serial already exists in Stock (prevent duplicate)
                         $existingStock = Stock::where([
                             'pembelian_id' => $pembelian->id,
                             'product_id' => $itemData['product_id'],
                             'serial_number' => $serial
                         ])->exists();
 
-                        if ($existingStock) { continue; }
+                        if ($existingStock) {
+                            throw new \Exception("Serial number '{$serial}' already received for product {$product->name}");
+                        }
 
-                        // Create market stock
+                        // Create market stock with RECEIVED serial number
                         Stock::create([
                             'pembelian_id' => $pembelian->id,
                             'product_id' => $itemData['product_id'],
@@ -300,26 +231,34 @@ class PembelianController extends Controller
                             'harga_beli' => $pembelianProduct->harga_beli,
                             'qty' => 1,
                             'subtotal' => $pembelianProduct->harga_beli,
-                            'expired_at' => $pembelianProduct->expired_at ?? null,
+                            'expired_at' => $expiredAt,
                             'condition' => 'new',
                             'status' => 'available',
                         ]);
 
-                        // Decrease StockPembelian
-                        $stockPembelian = StockPembelian::where([
-                            'pembelian_id' => $pembelian->id,
-                            'product_id' => $itemData['product_id'],
-                            'serial_number' => $serial
-                        ])->first();
+                        $receivedCount++;
+                    }
 
-                        if ($stockPembelian && $stockPembelian->qty > 0) {
-                            $stockPembelian->decrement('qty', 1);
-                            if ($stockPembelian->qty <= 0) {
-                                $stockPembelian->delete();
-                            }
+                    // Decrease StockPembelian (any records, FIFO)
+                    $remainingToDeduct = $receivedCount;
+                    $stockPembelians = StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $itemData['product_id']
+                    ])->where('qty', '>', 0)
+                        ->orderBy('id', 'asc')
+                        ->get();
+
+                    foreach ($stockPembelians as $stockPembelian) {
+                        if ($remainingToDeduct <= 0) { break; }
+
+                        $deductQty = min($remainingToDeduct, $stockPembelian->qty);
+                        $stockPembelian->decrement('qty', $deductQty);
+
+                        if ($stockPembelian->qty <= 0) {
+                            $stockPembelian->delete();
                         }
 
-                        $receivedCount++;
+                        $remainingToDeduct -= $deductQty;
                     }
 
                     // Log movement
@@ -332,24 +271,35 @@ class PembelianController extends Controller
                             'reference_id' => $pembelian->id,
                             'qty_in' => $receivedCount,
                             'balance' => $product->stocks()->sum('qty'),
-                            'notes' => "Goods receipt from {$pembelian->supplier->name}",
+                            'notes' => "Goods receipt from {$pembelian->supplier->name} - Serials: ".implode(', ', $receivedSerials),
                         ]);
                     }
                 } else {
                     // For bulk items
                     $hargaBeli = $pembelianProduct->harga_beli;
 
+                    // Check available qty in warehouse
+                    $availableQty = StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $itemData['product_id']
+                    ])->whereNull('serial_number')->sum('qty');
+
+                    if ($qtyDiterima > $availableQty) {
+                        throw new \Exception("Product {$product->name}: Cannot receive {$qtyDiterima} items, only {$availableQty} available in warehouse");
+                    }
+
                     // Check existing stock for this pembelian+product
                     $existingStock = Stock::where([
                         'pembelian_id' => $pembelian->id,
                         'product_id' => $itemData['product_id']
-                    ])->first();
+                    ])->whereNull('serial_number')->first();
 
                     if ($existingStock) {
                         // Update existing
                         $existingStock->increment('qty', $qtyDiterima);
                         $existingStock->update([
-                            'subtotal' => DB::raw('qty * harga_beli')
+                            'subtotal' => DB::raw('qty * harga_beli'),
+                            'expired_at' => $expiredAt ?? $existingStock->expired_at,
                         ]);
                     } else {
                         // Create new stock
@@ -359,7 +309,7 @@ class PembelianController extends Controller
                             'harga_beli' => $hargaBeli,
                             'qty' => $qtyDiterima,
                             'subtotal' => $qtyDiterima * $hargaBeli,
-                            'expired_at' => $pembelianProduct->expired_at ?? null,
+                            'expired_at' => $expiredAt,
                             'condition' => 'new',
                             'status' => 'available',
                         ]);
@@ -369,7 +319,7 @@ class PembelianController extends Controller
                     $stockPembelian = StockPembelian::where([
                         'pembelian_id' => $pembelian->id,
                         'product_id' => $itemData['product_id']
-                    ])->first();
+                    ])->whereNull('serial_number')->first();
 
                     if ($stockPembelian) {
                         $stockPembelian->decrement('qty', $qtyDiterima);
@@ -422,7 +372,7 @@ class PembelianController extends Controller
             DB::commit();
 
             $message = $remainingStock > 0
-                ? 'Partial receipt recorded. Remaining stock in warehouse.'
+                ? 'Partial receipt recorded. Remaining stock in warehouse: '.$remainingStock.' items'
                 : 'All items received and published successfully';
 
             return redirect()->route('pembelian.index')
@@ -430,7 +380,7 @@ class PembelianController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('toast_error', $e->getMessage());
+            return back()->with('toast_error', $e->getMessage())->withInput();
         }
     }
 
@@ -513,7 +463,7 @@ class PembelianController extends Controller
                             'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
                             'qty' => (int) $productData['qty'],
                             'subtotal' => (int) $productData['subtotal'],
-                            'expired_at' => $productData['expired'] ?? null,
+                            // 'expired_at' => $productData['expired'] ?? null,
                             'serial_numbers' => $serialNumbers,
                         ]
                     );
@@ -531,7 +481,7 @@ class PembelianController extends Controller
                                     'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
                                     'qty' => 1,
                                     'subtotal' => (int) str_replace(',', '', $productData['harga_beli']),
-                                    'expired_at' => $productData['expired'] ?? null,
+                                    // 'expired_at' => $productData['expired'] ?? null,
                                     'condition' => 'new',
                                     'status' => 'available',
                                 ]
@@ -544,7 +494,7 @@ class PembelianController extends Controller
                                 'harga_beli' => (int) str_replace(',', '', $productData['harga_beli']),
                                 'qty' => (int) $productData['qty'],
                                 'subtotal' => (int) $productData['subtotal'],
-                                'expired_at' => $productData['expired'] ?? null,
+                                // 'expired_at' => $productData['expired'] ?? null,
                                 'condition' => 'new',
                                 'status' => 'available',
                             ]

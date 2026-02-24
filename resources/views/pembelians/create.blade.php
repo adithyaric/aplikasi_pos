@@ -159,15 +159,6 @@
                 </select>
             </td>
             <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td>
-                <div class="serial-container" style="display: none;">
-                    <textarea class="form-control serial-numbers" name="product[${productIndex}][serial_numbers]" placeholder="Enter serial numbers (one per line)" rows="3"></textarea>
-                    <small class="text-muted">Enter one serial number per line</small>
-                </div>
-                <div class="no-serial-message" style="display: block;">
-                    <small class="text-muted">No serial numbers needed</small>
-                </div>
-            </td>
             <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
             <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>

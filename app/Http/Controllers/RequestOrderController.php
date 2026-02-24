@@ -61,7 +61,7 @@ class RequestOrderController extends Controller
 
         foreach ($request->items as $index => $item) {
             $product = $productStocks->get($item['product_id']);
-            if (!$product) continue;
+            if (! $product) { continue; }
 
             $available = $product->available_qty ?? 0;
             if ($item['qty_requested'] > $available) {
@@ -75,7 +75,7 @@ class RequestOrderController extends Controller
         try {
             $lastRequest = RequestOrder::withTrashed()->latest('id')->first();
             $nextNumber = $lastRequest ? ((int) substr($lastRequest->code, 3) + 1) : 1;
-            $code = 'REQ' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $code = 'REQ'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             $requestOrder = RequestOrder::create([
                 'code' => $code,
@@ -132,16 +132,14 @@ class RequestOrderController extends Controller
 
             if ($itemData['qty_approved'] > $availableStock) {
                 return back()->withErrors([
-                    'items.' . array_search($itemData, $request->items) . '.qty_approved' =>
-                    "Product {$item->product->name}: Approved qty ({$itemData['qty_approved']}) exceeds available stock ({$availableStock})"
+                    'items.'.array_search($itemData, $request->items).'.qty_approved' => "Product {$item->product->name}: Approved qty ({$itemData['qty_approved']}) exceeds available stock ({$availableStock})"
                 ])->withInput();
             }
 
             // Validate against requested qty
             if ($itemData['qty_approved'] > $item->qty_requested) {
                 return back()->withErrors([
-                    'items.' . array_search($itemData, $request->items) . '.qty_approved' =>
-                    "Product {$item->product->name}: Approved qty cannot exceed requested qty ({$item->qty_requested})"
+                    'items.'.array_search($itemData, $request->items).'.qty_approved' => "Product {$item->product->name}: Approved qty cannot exceed requested qty ({$item->qty_requested})"
                 ])->withInput();
             }
         }
@@ -162,6 +160,7 @@ class RequestOrderController extends Controller
                         'item_status' => 'rejected',
                         'notes' => $itemData['notes'] ?? null,
                     ]);
+
                     continue;
                 }
 
@@ -183,7 +182,7 @@ class RequestOrderController extends Controller
                         ->get();
 
                     foreach ($stocks as $stock) {
-                        if ($remainingQty <= 0) break;
+                        if ($remainingQty <= 0) { break; }
 
                         $qtyToReserve = min($remainingQty, $stock->qty_available);
                         $stock->reserve($qtyToReserve);

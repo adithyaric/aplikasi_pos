@@ -76,7 +76,9 @@
             Penerimaan Barang
         </a>
     @else
-        <span class="label label-success">Published</span>
+        <a href="{{ route('pembelian.penerimaan', $value) }}" class="btn btn-sm btn-info">
+            Detail
+        </a>
     @endif
 </td>
                                 </tr>
