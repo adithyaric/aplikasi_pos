@@ -12,6 +12,7 @@ class Outlet extends Model
     protected $fillable = [
         'logo',
         'name',
+        'jenis_outlet',
         'alamat',
         'npwp',
         'slogan',

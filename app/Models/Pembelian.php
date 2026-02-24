@@ -16,6 +16,14 @@ class Pembelian extends Model
         'kas_id',
         'total',
         'is_published',
+        'receipt_date',
+        'receipt_pic',
+        'receipt_status',
+        'receipt_photo',
+    ];
+
+    protected $casts = [
+        'receipt_date' => 'date',
     ];
 
     public function outlet()

@@ -18,7 +18,7 @@
                         <div class="box-body">
                             <div class="form-group">
                                 <label for="">Kode Pembelian</label>
-                                <input type="text" class="form-control" name="code" value="{{ old('code') }}"
+                                <input type="text" class="form-control" name="code" value="{{ old('code', $code) }}"
                                     placeholder="Masukkan Kode Pembelian">
                                 @error('code')
                                     <div class="invalid-feedback text-danger">
@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        <td>Serial Numbers</td>
+                                        {{-- <td>Serial Numbers</td> --}}
                                         {{-- <td>Expired</td> --}}
                                         <td>Harga Beli</td>
                                         <td>Sub Total</td>
@@ -90,22 +90,22 @@
                                             <select class="form-control select2 product" data-placeholder="Pilih Product" name="product[0][product_id]" required style="width:100%">
                                                 <option value="" disabled selected>Pilih Produk</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }}</option>
+                                                    <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }} [{{ $product->stocks()->sum('qty_available') }}]</option>
                                                 @endforeach
                                             </select>
                                         </td>
                                         <td>
                                             <input type="number" class="form-control qty" name="product[0][qty]" required value="1" min="1">
                                         </td>
-                                        <td>
-                                            <div class="serial-container" style="display: none;">
-                                                <textarea class="form-control serial-numbers" name="product[0][serial_numbers]" placeholder="Enter serial numbers (one per line)" rows="3"></textarea>
-                                                <small class="text-muted">Enter one serial number per line</small>
-                                            </div>
-                                            <div class="no-serial-message" style="display: block;">
-                                                <small class="text-muted">No serial numbers needed</small>
-                                            </div>
-                                        </td>
+                                        {{-- <td> --}}
+                                            {{-- <div class="serial-container" style="display: none;"> --}}
+                                                {{-- <textarea class="form-control serial-numbers" name="product[0][serial_numbers]" placeholder="Enter serial numbers (one per line)" rows="3"></textarea> --}}
+                                                {{-- <small class="text-muted">Enter one serial number per line</small> --}}
+                                            {{-- </div> --}}
+                                            {{-- <div class="no-serial-message" style="display: block;"> --}}
+                                                {{-- <small class="text-muted">No serial numbers needed</small> --}}
+                                            {{-- </div> --}}
+                                        {{-- </td> --}}
                                         {{-- <td> --}}
                                             {{-- <input class="form-control" name="product[0][expired]" required type="date"> --}}
                                         {{-- </td> --}}
@@ -145,6 +145,7 @@
     <script>
         let productIndex = 0;
 
+        //TODO harga beli titik koma
         function addBahanBaku() {
             productIndex++;
             let productTemplate = `
@@ -153,7 +154,7 @@
                 <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
                     <option value="" disabled selected>Pilih Produk</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }}</option>
+                        <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }} [{{ $product->stocks()->sum('qty_available') }}]</option>
                     @endforeach
                 </select>
             </td>

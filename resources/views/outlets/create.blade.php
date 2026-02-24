@@ -27,6 +27,16 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label for="">Jenis Outlet</label>
+                                <input type="text" class="form-control" name="jenis_outlet" value="{{ old('jenis_outlet') }}"
+                                    placeholder="Masukkan Jenis Outlet (Toko / Beauty)">
+                                @error('jenis_outlet')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="">Alamat</label>
                                 <input type="text" class="form-control" name="alamat" value="{{ old('alamat') }}"
                                     placeholder="Masukkan Alamat">
@@ -36,51 +46,61 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">NPWP</label>
-                                <input type="text" class="form-control" name="npwp" value="{{ old('npwp') }}"
-                                    placeholder="Masukkan NPWP">
-                                @error('npwp')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Slogan</label>
-                                <input type="text" class="form-control" name="slogan" value="{{ old('slogan') }}"
-                                    placeholder="Masukkan Slogan">
-                                @error('slogan')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">NPWP</label> --}}
+                                {{-- <input type="text" class="form-control" name="npwp" value="{{ old('npwp') }}" --}}
+                                    {{-- placeholder="Masukkan NPWP"> --}}
+                                {{-- @error('npwp') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Slogan</label> --}}
+                                {{-- <input type="text" class="form-control" name="slogan" value="{{ old('slogan') }}" --}}
+                                    {{-- placeholder="Masukkan Slogan"> --}}
+                                {{-- @error('slogan') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Deskripsi</label> --}}
+                                {{-- <input type="text" class="form-control" name="desc" value="{{ old('desc') }}" --}}
+                                    {{-- placeholder="Masukkan Deskripsi"> --}}
+                                {{-- @error('desc') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Footer</label> --}}
+                                {{-- <input type="text" class="form-control" name="footer" value="{{ old('footer') }}" --}}
+                                    {{-- placeholder="Masukkan Footer"> --}}
+                                {{-- @error('footer') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Logo</label> --}}
+                                {{-- <input type="file" class="form-control" name="logo" value="{{ old('logo') }}" --}}
+                                    {{-- placeholder="Masukkan logo"> --}}
+                                {{-- @error('logo') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Deskripsi</label>
-                                <input type="text" class="form-control" name="desc" value="{{ old('desc') }}"
-                                    placeholder="Masukkan Deskripsi">
+                                <input type="text" class="form-control" name="desc"
+                                    value="{{ old('desc') }}" placeholder="Masukkan Deskripsi">
                                 @error('desc')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Footer</label>
-                                <input type="text" class="form-control" name="footer" value="{{ old('footer') }}"
-                                    placeholder="Masukkan Footer">
-                                @error('footer')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Logo</label>
-                                <input type="file" class="form-control" name="logo" value="{{ old('logo') }}"
-                                    placeholder="Masukkan logo">
-                                @error('logo')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
                                     </div>

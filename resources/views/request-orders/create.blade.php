@@ -70,8 +70,10 @@
                                                 data-placeholder="Pilih Produk" style="width:100%" required>
                                                 <option value="" disabled selected>Pilih Produk</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}">
-                                                        {{ $product->name }} : [{{ $product->stocks()->sum('qty_available') }}]
+                                                    <option value="{{ $product->id }}"
+                                                        data-stock="{{ $product->stocks()->sum('qty_available') }}">
+                                                        {{ $product->name }} :
+                                                        [{{ $product->stocks()->sum('qty_available') }}]
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -117,7 +119,9 @@
                 <select class="form-control select2 product" name="items[${itemIndex}][product_id]" data-placeholder="Pilih Produk" style="width:100%" required>
                     <option value="" disabled selected>Pilih Produk</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        <option value="{{ $product->id }}" data-stock="{{ $product->stocks()->sum('qty_available') }}">
+                            {{ $product->name }} : [{{ $product->stocks()->sum('qty_available') }}]
+                        </option>
                     @endforeach
                 </select>
             </td>
@@ -132,7 +136,9 @@
             </td>
         </tr>`;
             $('#item-repeater').append(template);
-            $('#item-repeater .select2').last().select2();
+            var $newSelect = $('#item-repeater .select2').last();
+            $newSelect.select2();
+            setMaxQty($newSelect); // set max if option is pre-selected (none by default)
             itemIndex++;
         }
 
@@ -147,6 +153,30 @@
         // Initialize select2 for existing rows
         $(document).ready(function() {
             $('.select2').select2();
+            $('.product').each(function() {
+                setMaxQty(this);
+            });
+        });
+
+        function setMaxQty(selectElement) {
+            var $select = $(selectElement);
+            var $row = $select.closest('tr');
+            var stock = $select.find(':selected').data('stock');
+            var $qty = $row.find('.qty');
+            if (stock !== undefined) {
+                $qty.attr('max', stock);
+                // Optional: if current value > stock, adjust it
+                if (parseInt($qty.val()) > stock) {
+                    $qty.val(stock);
+                }
+            } else {
+                $qty.removeAttr('max');
+            }
+        }
+
+        // On product change
+        $(document).on('change', '.product', function() {
+            setMaxQty(this);
         });
     </script>
 @endsection

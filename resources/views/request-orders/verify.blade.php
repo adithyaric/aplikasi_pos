@@ -46,6 +46,7 @@
                                 <thead>
                                     <tr>
                                         <td>Produk</td>
+                                        <td>Qty Warehouse</td>
                                         <td>Qty Request</td>
                                         <td>Qty Approved</td>
                                         <td>Status</td>
@@ -54,23 +55,39 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($requestOrder->items as $index => $item)
+                                        @php
+                                            $availableStock = $item->product->stocks()->sum('qty_available');
+                                            $maxQty = min($item->qty_requested, $availableStock);
+                                        @endphp
                                         <tr>
                                             <td>
                                                 {{ $item->product->name }}
                                                 <input type="hidden" name="items[{{ $index }}][id]"
                                                     value="{{ $item->id }}">
                                             </td>
+                                            <td>
+                                                <span
+                                                    class="label {{ $availableStock >= $item->qty_requested ? 'label-success' : 'label-warning' }}">
+                                                    {{ $availableStock }}
+                                                </span>
+                                            </td>
                                             <td>{{ $item->qty_requested }}</td>
                                             <td>
                                                 <input type="number" class="form-control qty-approved"
                                                     name="items[{{ $index }}][qty_approved]"
-                                                    value="{{ old('items.' . $index . '.qty_approved', $item->qty_approved ?? $item->qty_requested) }}"
-                                                    min="0" max="{{ $item->qty_requested }}" step="1"
-                                                    required>
+                                                    value="{{ old('items.' . $index . '.qty_approved', $item->qty_approved ?? $maxQty) }}"
+                                                    min="0" max="{{ $maxQty }}"
+                                                    data-max="{{ $maxQty }}" data-available="{{ $availableStock }}"
+                                                    step="1" required>
+                                                <small class="text-muted">Max: {{ $maxQty }}</small>
+                                                @error('items.' . $index . '.qty_approved')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </td>
                                             <td>
                                                 <select class="form-control item-status"
-                                                    name="items[{{ $index }}][item_status]" required>
+                                                    name="items[{{ $index }}][item_status]"
+                                                    data-index="{{ $index }}" required>
                                                     <option value="approved"
                                                         {{ old('items.' . $index . '.item_status', $item->item_status) == 'approved' ? 'selected' : '' }}>
                                                         Approved</option>
@@ -110,7 +127,7 @@
                                     <i class="fa fa-list"></i> Generate Picking List
                                 </button>
                             </form>
-                        <hr>
+                            <hr>
                         @endif
                         <a href="{{ route('request-orders.index') }}" class="btn btn-default">Kembali</a>
                     </div>
@@ -121,4 +138,69 @@
 @endsection
 
 @section('page-script')
+    <script>
+        $(document).ready(function() {
+            // Auto-adjust status based on qty_approved
+            $('.qty-approved').on('input', function() {
+                var $row = $(this).closest('tr');
+                var qtyApproved = parseInt($(this).val()) || 0;
+                var maxQty = parseInt($(this).attr('max')) || 0;
+                var availableStock = parseInt($(this).data('available')) || 0;
+                var qtyRequested = parseInt($row.find('td:eq(2)').text()) || 0;
+                var $status = $row.find('.item-status');
+
+                // Validate against max
+                if (qtyApproved > maxQty) {
+                    $(this).val(maxQty);
+                    qtyApproved = maxQty;
+                    alert('Qty approved cannot exceed available stock (' + availableStock +
+                        ') or requested qty (' + qtyRequested + ')');
+                }
+
+                // Auto-set status
+                if (qtyApproved === 0) {
+                    $status.val('rejected');
+                } else if (qtyApproved < qtyRequested) {
+                    $status.val('partial');
+                } else {
+                    $status.val('approved');
+                }
+            });
+
+            // When status changes to rejected, set qty to 0
+            $('.item-status').on('change', function() {
+                var $row = $(this).closest('tr');
+                var $qtyInput = $row.find('.qty-approved');
+
+                if ($(this).val() === 'rejected') {
+                    $qtyInput.val(0);
+                } else if ($qtyInput.val() == 0) {
+                    var maxQty = parseInt($qtyInput.attr('max')) || 0;
+                    $qtyInput.val(maxQty);
+                }
+            });
+
+            // Form validation before submit
+            $('form').on('submit', function(e) {
+                var hasError = false;
+
+                $('.qty-approved').each(function() {
+                    var qtyApproved = parseInt($(this).val()) || 0;
+                    var maxQty = parseInt($(this).attr('max')) || 0;
+                    var availableStock = parseInt($(this).data('available')) || 0;
+
+                    if (qtyApproved > maxQty) {
+                        hasError = true;
+                        alert('Error: Approved quantity exceeds available stock for some products');
+                        return false;
+                    }
+                });
+
+                if (hasError) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 @endsection

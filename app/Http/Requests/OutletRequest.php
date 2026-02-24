@@ -16,11 +16,12 @@ class OutletRequest extends FormRequest
         return [
             'logo' => 'nullable',
             'name' => 'required',
+            'jenis_outlet' => 'required',
             'alamat' => 'required',
-            'npwp' => 'required',
-            'slogan' => 'required',
-            'desc' => 'required',
-            'footer' => 'required',
+            // 'npwp' => 'required',
+            // 'slogan' => 'required',
+            'desc' => 'nullable',
+            // 'footer' => 'required',
         ];
     }
 }

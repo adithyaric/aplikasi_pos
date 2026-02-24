@@ -24,8 +24,9 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
+                                    <td>Jenis</td>
                                     <td>Alamat</td>
-                                    <td>Slogan</td>
+                                    <td>Deskripsi</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -33,8 +34,9 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->name }}</td>
+                                    <td>{{ $value->jenis_outlet }}</td>
                                     <td>{{ $value->alamat }}</td>
-                                    <td>{{ $value->slogan }}</td>
+                                    <td>{{ $value->desc }}</td>
                                     <td>
                                         <a class="btn btn-warning" href="{{ route('outlet.edit', $value->id) }}">Edit</a>
                                         <form action="{{ route('outlet.destroy', $value->id) }}" method="post"

@@ -63,7 +63,6 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        <a class="btn-sm btn btn-info" href="{{ route('request-orders.verify', $value->id) }}">Detail</a>
                                         {{-- @if ($value->status == 'pending') --}}
                                             {{-- <a class="btn-sm btn btn-warning" href="{{ route('request-orders.edit', $value->id) }}">Edit</a> --}}
                                             {{-- <form action="{{ route('request-orders.destroy', $value->id) }}" method="post" style="display: inline;"> --}}
@@ -78,11 +77,13 @@
                                         @if (($value->status == 'approved' || $value->status == 'partial') && !isset($value->pickingList))
                                             <form action="{{ route('picking-lists.generate', $value->id) }}" method="post">
                                                 @csrf
-                                                <button class="btn btn-primary">
+                                                <button class="btn btn-sm btn-primary">
                                                     <i class="fa fa-list"></i> Generate Picking List
                                                 </button>
                                             </form>
+                                            <br>
                                         @endif
+                                        <a class="btn-sm btn btn-info" href="{{ route('request-orders.verify', $value->id) }}">Detail</a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -16,16 +16,16 @@
                     <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="box-body">
-                            <div class="form-group">
-                                <label for="">Gambar</label>
-                                <input type="file" class="form-control" name="pic" value="{{ old('pic') }}"
-                                    placeholder="Masukkan Gambar">
-                                @error('pic')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Gambar</label> --}}
+                                {{-- <input type="file" class="form-control" name="pic" value="{{ old('pic') }}" --}}
+                                    {{-- placeholder="Masukkan Gambar"> --}}
+                                {{-- @error('pic') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Nama</label>
                                 <input type="text" class="form-control" name="name" value="{{ old('name') }}"
@@ -46,58 +46,58 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Brand</label>
-                                <input type="text" class="form-control" name="brand" value="{{ old('brand') }}"
-                                    placeholder="Masukkan brand">
-                                @error('brand')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Model</label>
-                                <input type="text" class="form-control" name="model" value="{{ old('model') }}"
-                                    placeholder="Masukkan model">
-                                @error('model')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Serialized</label>
-                                <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="is_serialized"
-                                            id="serialized_yes" value="1"
-                                            {{ old('is_serialized') == '1' ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="serialized_yes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="is_serialized"
-                                            id="serialized_no" value="0"
-                                            {{ old('is_serialized') == '0' ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="serialized_no">No</label>
-                                    </div>
-                                </div>
-                                @error('is_serialized')
-                                    <div class="invalid-feedback text-danger d-block">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Deskripsi</label>
-                                <input type="text" class="form-control" name="desc" value="{{ old('desc') }}"
-                                    placeholder="Masukkan Deskripsi">
-                                @error('desc')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Brand</label> --}}
+                                {{-- <input type="text" class="form-control" name="brand" value="{{ old('brand') }}" --}}
+                                    {{-- placeholder="Masukkan brand"> --}}
+                                {{-- @error('brand') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Model</label> --}}
+                                {{-- <input type="text" class="form-control" name="model" value="{{ old('model') }}" --}}
+                                    {{-- placeholder="Masukkan model"> --}}
+                                {{-- @error('model') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Serialized</label> --}}
+                                {{-- <div> --}}
+                                    {{-- <div class="form-check form-check-inline"> --}}
+                                        {{-- <input class="form-check-input" type="radio" name="is_serialized" --}}
+                                            {{-- id="serialized_yes" value="1" --}}
+                                            {{-- {{ old('is_serialized') == '1' ? 'checked' : '' }}> --}}
+                                        {{-- <label class="form-check-label" for="serialized_yes">Yes</label> --}}
+                                    {{-- </div> --}}
+                                    {{-- <div class="form-check form-check-inline"> --}}
+                                        {{-- <input class="form-check-input" type="radio" name="is_serialized" --}}
+                                            {{-- id="serialized_no" value="0" --}}
+                                            {{-- {{ old('is_serialized') == '0' ? 'checked' : '' }}> --}}
+                                        {{-- <label class="form-check-label" for="serialized_no">No</label> --}}
+                                    {{-- </div> --}}
+                                {{-- </div> --}}
+                                {{-- @error('is_serialized') --}}
+                                    {{-- <div class="invalid-feedback text-danger d-block"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Deskripsi</label> --}}
+                                {{-- <input type="text" class="form-control" name="desc" value="{{ old('desc') }}" --}}
+                                    {{-- placeholder="Masukkan Deskripsi"> --}}
+                                {{-- @error('desc') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Warna</label>
                                 <input type="text" class="form-control" name="warna" value="{{ old('warna') }}"
@@ -118,16 +118,16 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Berat (gram)</label>
-                                <input type="text" class="form-control" name="berat" value="{{ old('berat') }}"
-                                    placeholder="Masukkan Berat">
-                                @error('berat')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Berat (gram)</label> --}}
+                                {{-- <input type="text" class="form-control" name="berat" value="{{ old('berat') }}" --}}
+                                    {{-- placeholder="Masukkan Berat"> --}}
+                                {{-- @error('berat') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Harga Beli</label>
                                 <input type="text" class="form-control" name="harga_beli"
@@ -138,16 +138,16 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Diskon</label>
-                                <input type="text" class="form-control" name="diskon" value="{{ old('diskon') }}"
-                                    placeholder="Masukkan Diskon">
-                                @error('diskon')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Diskon</label> --}}
+                                {{-- <input type="text" class="form-control" name="diskon" value="{{ old('diskon') }}" --}}
+                                    {{-- placeholder="Masukkan Diskon"> --}}
+                                {{-- @error('diskon') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label for="">Harga Jual</label>
                                 <input type="text" class="form-control" name="harga_jual"
@@ -158,24 +158,24 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('outlet_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label>Outlet</label> --}}
+                                {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" --}}
+                                    {{-- style="width: 100%;"> --}}
+                                    {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
+                                    {{-- @foreach ($outlets as $outlet) --}}
+                                        {{-- <option value="{{ $outlet->id }}" --}}
+                                            {{-- {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}> --}}
+                                            {{-- {{ $outlet->name }} --}}
+                                        {{-- </option> --}}
+                                    {{-- @endforeach --}}
+                                {{-- </select> --}}
+                                {{-- @error('outlet_id') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             {{-- <div class="form-group"> --}}
                             {{-- <label>Supplier</label> --}}
                             {{-- <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier" --}}
@@ -212,6 +212,7 @@
                                     </div>
                                 @enderror
                             </div>
+                            {{-- //TODO multiple select supplier --}}
                         </div><!-- /.box-body -->
 
                         <div class="box-footer">

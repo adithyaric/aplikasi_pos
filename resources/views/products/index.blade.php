@@ -34,7 +34,8 @@
                                     <td>Stock Warehouse</td>
                                     <td>Stock INBOUND</td>
                                     <td>Harga Beli</td>
-                                    <td>Serialized</td>
+                                    <td>Harga Jual</td>
+                                    {{-- <td>Serialized</td> --}}
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -51,7 +52,8 @@
                                         <td>{{ $value->stocks()->sum('qty_available') }}</td>
                                         <td>{{ $value->stockPembelians()->sum('qty') }}</td>
                                         <td>@currency($value->harga_beli)</td>
-                                        <td>{{ $value->is_serialized ? 'Yes' : 'No' }}</td>
+                                        <td>@currency($value->harga_jual)</td>
+                                        {{-- <td>{{ $value->is_serialized ? 'Yes' : 'No' }}</td> --}}
                                         <td>
                                             <a class="btn btn-warning" href="{{ route('product.edit', $value->id) }}">Edit</a>
                                             <form action="{{ route('product.destroy', $value->id) }}" method="post" style="display: inline;">

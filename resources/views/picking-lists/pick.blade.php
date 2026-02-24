@@ -45,7 +45,7 @@
                                                     <input type="number" name="qty_picked" class="form-control"
                                                         value="{{ $item->qty_picked }}" min="0"
                                                         max="{{ $item->qty_to_pick }}" style="width: 80px;">
-                                                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                                    <button type="submit" class="btn btn-primary">Update</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -57,7 +57,7 @@
                         <div class="text-center" style="margin-top: 20px;">
                             <form action="{{ route('picking-lists.complete', $pickingList->id) }}" method="post">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-lg">
+                                <button type="submit" class="btn btn-success">
                                     <i class="fa fa-check"></i> Complete Picking
                                 </button>
                             </form>

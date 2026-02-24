@@ -9,6 +9,7 @@ use App\Models\RequestOrderItem;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RequestOrderController extends Controller
 {
@@ -51,11 +52,30 @@ class RequestOrderController extends Controller
             'items.*.qty_requested' => 'required|integer|min:1',
         ]);
 
+        // Validate stock availability
+        $productIds = collect($request->items)->pluck('product_id')->unique();
+        $productStocks = Product::whereIn('id', $productIds)
+            ->withSum('stocks as available_qty', 'qty_available')
+            ->get()
+            ->keyBy('id');
+
+        foreach ($request->items as $index => $item) {
+            $product = $productStocks->get($item['product_id']);
+            if (!$product) continue;
+
+            $available = $product->available_qty ?? 0;
+            if ($item['qty_requested'] > $available) {
+                throw ValidationException::withMessages([
+                    "items.{$index}.qty_requested" => "Quantity requested exceeds available stock ({$available}) for product {$product->name}."
+                ]);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $lastRequest = RequestOrder::withTrashed()->latest('id')->first();
             $nextNumber = $lastRequest ? ((int) substr($lastRequest->code, 3) + 1) : 1;
-            $code = 'REQ'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $code = 'REQ' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             $requestOrder = RequestOrder::create([
                 'code' => $code,
@@ -105,6 +125,27 @@ class RequestOrderController extends Controller
             'items.*.item_status' => 'required|in:approved,partial,rejected',
         ]);
 
+        // ADD: Validate qty_approved against warehouse stock
+        foreach ($request->items as $itemData) {
+            $item = RequestOrderItem::find($itemData['id']);
+            $availableStock = $item->product->stocks()->sum('qty_available');
+
+            if ($itemData['qty_approved'] > $availableStock) {
+                return back()->withErrors([
+                    'items.' . array_search($itemData, $request->items) . '.qty_approved' =>
+                    "Product {$item->product->name}: Approved qty ({$itemData['qty_approved']}) exceeds available stock ({$availableStock})"
+                ])->withInput();
+            }
+
+            // Validate against requested qty
+            if ($itemData['qty_approved'] > $item->qty_requested) {
+                return back()->withErrors([
+                    'items.' . array_search($itemData, $request->items) . '.qty_approved' =>
+                    "Product {$item->product->name}: Approved qty cannot exceed requested qty ({$item->qty_requested})"
+                ])->withInput();
+            }
+        }
+
         DB::beginTransaction();
         try {
             $hasApproved = false;
@@ -113,13 +154,24 @@ class RequestOrderController extends Controller
 
             foreach ($request->items as $itemData) {
                 $item = RequestOrderItem::find($itemData['id']);
+
+                // Skip reservation if rejected
+                if ($itemData['item_status'] === 'rejected') {
+                    $item->update([
+                        'qty_approved' => 0,
+                        'item_status' => 'rejected',
+                        'notes' => $itemData['notes'] ?? null,
+                    ]);
+                    continue;
+                }
+
                 $item->update([
                     'qty_approved' => $itemData['qty_approved'],
                     'item_status' => $itemData['item_status'],
                     'notes' => $itemData['notes'] ?? null,
                 ]);
 
-                // Reserve stock for approved items
+                // Reserve stock for approved/partial items
                 if ($itemData['qty_approved'] > 0) {
                     $product = $item->product;
                     $remainingQty = $itemData['qty_approved'];
@@ -131,9 +183,7 @@ class RequestOrderController extends Controller
                         ->get();
 
                     foreach ($stocks as $stock) {
-                        if ($remainingQty <= 0) {
-                            break;
-                        }
+                        if ($remainingQty <= 0) break;
 
                         $qtyToReserve = min($remainingQty, $stock->qty_available);
                         $stock->reserve($qtyToReserve);
