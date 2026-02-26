@@ -16,7 +16,7 @@ class PembelianRequest extends FormRequest
         return [
             'code' => 'required',
             // 'outlet_id' => 'required',
-            'supplier_id' => 'required',
+            'supplier_id' => 'required|exists:suppliers,id',
             // 'kas_id' => 'required',
             // 'qty' => 'required',
             // 'expired' => 'required',

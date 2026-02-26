@@ -53,15 +53,9 @@
                             <div class="form-group">
                                 <label>Status Penerimaan <span class="text-danger">*</span></label>
                                 <select name="receipt_status" class="form-control" required>
-                                    <option value="draft"
-                                        {{ old('receipt_status', $pembelian->receipt_status) == 'draft' ? 'selected' : '' }}>
-                                        Draft</option>
-                                    <option value="validated"
-                                        {{ old('receipt_status', $pembelian->receipt_status) == 'validated' ? 'selected' : '' }}>
-                                        Validated</option>
-                                    <option value="completed"
-                                        {{ old('receipt_status', $pembelian->receipt_status) == 'completed' ? 'selected' : '' }}>
-                                        Completed</option>
+                                    <option value="draft" {{ old('receipt_status', $pembelian->receipt_status) == 'draft' ? 'selected' : '' }}>Draft</option>
+                                    {{-- <option value="validated"{{ old('receipt_status', $pembelian->receipt_status) == 'validated' ? 'selected' : '' }}>Validated</option> --}}
+                                    <option value="completed" {{ old('receipt_status', $pembelian->receipt_status) == 'completed' ? 'selected' : '' }}>Completed</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -167,6 +161,7 @@
                                                     value="{{ old('items.' . $loop->index . '.expired_at') }}"
                                                     {{ $maxDiterima == 0 ? 'disabled' : '' }}>
                                             </td>
+                                            //TODO input sku (tidak ganti walaupun input partial)
                                             {{-- <td> --}}
                                                 {{-- @if ($isSerialized) --}}
                                                     {{-- <textarea name="items[{{ $loop->index }}][serial_numbers]" class="form-control input-sm serial-input" --}}

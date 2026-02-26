@@ -55,7 +55,7 @@
                                                 <form action="{{ route('delivery-orders.generate', $value->id) }}"
                                                     method="post" style="display: inline;">
                                                     @csrf
-                                                    <button class="btn-sm btn btn-primary">Generate DO</button>
+                                                    <button class="btn-sm btn btn-primary">Generate DO & Send to outlet</button>
                                                 </form>
                                             @endif
                                         @endif

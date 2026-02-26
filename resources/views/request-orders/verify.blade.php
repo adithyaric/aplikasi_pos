@@ -47,7 +47,10 @@
                                     <tr>
                                         <td>Produk</td>
                                         <td>Qty Warehouse</td>
-                                        <td>Qty Request</td>
+                                        <td>
+                                            Qty Request
+                                            //TODO nanti input centang by sku (bukan akumulasi seluruh stock)
+                                        </td>
                                         <td>Qty Approved</td>
                                         <td>Status</td>
                                         <td>Catatan Item</td>

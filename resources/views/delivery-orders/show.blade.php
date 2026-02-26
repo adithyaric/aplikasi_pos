@@ -84,10 +84,10 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Product</th>
-                                    <th>Batch</th>
+                                    <th>SKU</th>
                                     <th>Expired</th>
                                     <th>Qty</th>
-                                    <th>HPP</th>
+                                    <th>Harga Beli</th>
                                     <th>Subtotal</th>
                                 </tr>
                             </thead>
@@ -124,8 +124,9 @@
                                 style="display: inline;">
                                 @csrf
                                 <button class="btn btn-success" onclick="return confirm('Send this delivery order?')">
-                                    <i class="fa fa-truck"></i> Send to Outlet
+                                    <i class="fa fa-truck"></i> Delivery Completed
                                 </button>
+                                //TODO muncul popup bukti pengiriman (#receiveModal)
                             </form>
                         @endif
                     </div>

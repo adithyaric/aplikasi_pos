@@ -66,7 +66,7 @@
                                     <th>No</th>
                                     <th>Product</th>
                                     <th>Location</th>
-                                    <th>Batch</th>
+                                    <th>Batch (//TODO input sku-sku)</th>
                                     <th>Qty to Pick</th>
                                     <th>Qty Picked</th>
                                     <th>Status</th>
@@ -108,7 +108,7 @@
                                 <form action="{{ route('delivery-orders.generate', $pickingList->id) }}"
                                     method="post" style="display: inline;">
                                     @csrf
-                                    <button class="btn-sm btn btn-primary">Generate DO</button>
+                                    <button class="btn-sm btn btn-primary">Generate DO& Send to outlet</button>
                                 </form>
                             @endif
                         @endif

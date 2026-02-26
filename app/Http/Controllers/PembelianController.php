@@ -7,6 +7,7 @@ use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\PembelianProduct;
+use App\Models\PembelianTransaction;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockMovement;
@@ -73,6 +74,18 @@ class PembelianController extends Controller
         ]);
 
         $this->updateStock($request, $pembelian);
+
+        $supplier = Supplier::find($request->supplier_id);
+        PembelianTransaction::create([
+            'pembelian_id' => $pembelian->id,
+            'payment_date' => null,
+            'payment_method' => 'bank_transfer',
+            'payment_reference' => $supplier->bank_no_rek.'-'.$supplier->bank_nama ?? 'TRX-'.now(),
+            // 'amount' => $grandTotal,
+            'amount' => 0,
+            'status' => 'unpaid',
+            'notes' => null,
+        ]);
 
         return redirect(route('pembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
@@ -176,7 +189,9 @@ class PembelianController extends Controller
             foreach ($request->items as $itemData) {
                 $qtyDiterima = (int) $itemData['qty_diterima'];
 
-                if ($qtyDiterima <= 0) { continue; }
+                if ($qtyDiterima <= 0) {
+                    continue;
+                }
 
                 $hasReceived = true;
                 $product = Product::find($itemData['product_id']);
@@ -184,7 +199,9 @@ class PembelianController extends Controller
                     ->where('product_id', $itemData['product_id'])
                     ->first();
 
-                if (! $pembelianProduct) { continue; }
+                if (! $pembelianProduct) {
+                    continue;
+                }
 
                 $expiredAt = ! empty($itemData['expired_at']) ? $itemData['expired_at'] : null;
 
@@ -210,7 +227,9 @@ class PembelianController extends Controller
 
                     $receivedCount = 0;
                     foreach ($receivedSerials as $serial) {
-                        if (empty($serial)) { continue; }
+                        if (empty($serial)) {
+                            continue;
+                        }
 
                         // Check if this serial already exists in Stock (prevent duplicate)
                         $existingStock = Stock::where([
@@ -249,7 +268,9 @@ class PembelianController extends Controller
                         ->get();
 
                     foreach ($stockPembelians as $stockPembelian) {
-                        if ($remainingToDeduct <= 0) { break; }
+                        if ($remainingToDeduct <= 0) {
+                            break;
+                        }
 
                         $deductQty = min($remainingToDeduct, $stockPembelian->qty);
                         $stockPembelian->decrement('qty', $deductQty);
@@ -524,5 +545,118 @@ class PembelianController extends Controller
         );
 
         return redirect()->back()->with('toast_success', 'Berhasil Menghapus Data!');
+    }
+
+    public function editPembayaran(Pembelian $pembelian)
+    {
+        $pembelian->load(['supplier', 'pembelianProducts.product', 'pembelianTransaction']);
+        $title = 'Edit Pembayaran Pembelian';
+        $paymentHistory = $pembelian->pembelianTransaction?->payment_history ?? [];
+
+        return view('pembelians.pembayaran-edit', compact('pembelian', 'title', 'paymentHistory'));
+    }
+
+    public function updatePembayaran(Request $request, Pembelian $pembelian)
+    {
+        $currentAmount = $pembelian->pembelianTransaction?->amount ?? 0;
+        $maxAmount = $pembelian->total - $currentAmount;
+
+        $request->validate([
+            'payment_date'      => 'required|date',
+            'payment_method'    => 'required|in:cash,bank_transfer,giro_cek,lainnya',
+            'payment_reference' => 'nullable|string',
+            'amount'            => 'required|numeric|min:0|max:'.$maxAmount,
+            'notes'             => 'nullable|string',
+            'status'            => 'required|in:unpaid,paid,partial',
+            'bukti_transfer'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $previousAmount = $pembelian->pembelianTransaction?->amount ?? 0;
+            $newTotalAmount = $previousAmount + $request->amount;
+
+            // Handle file upload
+            $buktiPath = null;
+            if ($request->hasFile('bukti_transfer')) {
+                $file = $request->file('bukti_transfer');
+                $filename = 'bukti_'.time().'_'.$pembelian->id.'.'.$file->getClientOriginalExtension();
+                $buktiPath = $file->storeAs('bukti_transfer', $filename, 'public');
+            }
+
+            if ($pembelian->pembelianTransaction) {
+                // Update existing transaction
+                $paymentHistory = $pembelian->pembelianTransaction->payment_history ?? [];
+
+                if ($request->amount > 0) {
+                    $paymentHistory[] = [
+                        'payment_date'      => $request->payment_date,
+                        'amount'            => $request->amount,
+                        'payment_method'    => $request->payment_method,
+                        'payment_reference' => $request->payment_reference,
+                        'bukti_transfer'    => $buktiPath ?? null,
+                        'notes'             => $request->notes,
+                        'created_at'        => now()->toDateTimeString(),
+                    ];
+                }
+
+                $transactionData = [
+                    'payment_date'      => $request->payment_date,
+                    'payment_method'    => $request->payment_method,
+                    'payment_reference' => $request->payment_reference,
+                    'amount'            => $newTotalAmount,
+                    'payment_history'   => $paymentHistory,
+                    'notes'             => $request->notes,
+                    'status'            => $request->status,
+                ];
+
+                if ($buktiPath) {
+                    $transactionData['bukti_transfer'] = $buktiPath;
+                }
+
+                $pembelian->pembelianTransaction->update($transactionData);
+            } else {
+                // Create new transaction
+                $paymentHistory = [];
+                if ($request->amount > 0) {
+                    $paymentHistory[] = [
+                        'payment_date'      => $request->payment_date,
+                        'amount'            => $request->amount,
+                        'payment_method'    => $request->payment_method,
+                        'payment_reference' => $request->payment_reference,
+                        'bukti_transfer'    => $buktiPath,
+                        'notes'             => $request->notes,
+                        'created_at'        => now()->toDateTimeString(),
+                    ];
+                }
+
+                $transactionData = [
+                    'payment_date'      => $request->payment_date,
+                    'payment_method'    => $request->payment_method,
+                    'payment_reference' => $request->payment_reference,
+                    'amount'            => $request->amount,
+                    'payment_history'   => $paymentHistory,
+                    'notes'             => $request->notes,
+                    'status'            => $request->status,
+                    'bukti_transfer'    => $buktiPath,
+                ];
+
+                $pembelian->pembelianTransaction()->create($transactionData);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil disimpan'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: '.$e->getMessage()
+            ], 500);
+        }
     }
 }

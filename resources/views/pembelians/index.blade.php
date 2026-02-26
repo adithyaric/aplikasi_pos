@@ -50,6 +50,7 @@
                                     </td>
                                     <td>@currency($value->total)</td>
                                     <td>
+                                        <a class=" btn-sm btn btn-success" href="{{ route('pembelian.pembayaran.edit', $value->id) }}">Bayar</a>
                                         @if (!$value->is_published)
                                             <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
                                             <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"

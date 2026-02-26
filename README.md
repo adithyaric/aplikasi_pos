@@ -118,3 +118,5 @@ Reserved = booked for approved requests
 4. **Warehouse** (separately) monitors `min_stock` → create new PO to supplier
 
 **Outlets don't directly create PO to suppliers.** They only request from warehouse.
+
+---
