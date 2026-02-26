@@ -77,7 +77,12 @@ class ProductController extends Controller
             $data['pic'] = 'storage/pics/'.$fileName;
         }
 
-        Product::create($data);
+        $product = Product::create($data);
+
+        // Sync suppliers (multiple select)
+        if ($request->has('supplier_ids')) {
+            $product->suppliers()->sync($request->supplier_ids);
+        }
 
         return redirect(route('product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }
@@ -100,10 +105,12 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         return view('products.edit', [
-            'product' => $product,
+            'product' => $product->load('suppliers'),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'categories' => Category::where('type', 'product')->get(),
+            // optional: selected supplier IDs for form
+            'selectedSuppliers' => $product->suppliers->pluck('id')->toArray(),
         ]);
     }
 
@@ -122,6 +129,14 @@ class ProductController extends Controller
             $data['pic'] = 'storage/pics/'.$fileName;
         }
         $product->update($data);
+
+        // Sync suppliers (multiple select)
+        if ($request->has('supplier_ids')) {
+            $product->suppliers()->sync($request->supplier_ids);
+        } else {
+            // If no supplier selected, detach all
+            $product->suppliers()->detach();
+        }
 
         return redirect(route('product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }

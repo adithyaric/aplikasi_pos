@@ -31,6 +31,11 @@ class ProductRequest extends FormRequest
             'harga_jual' => 'required',
             'diskon' => 'nullable',
             'berat' => 'nullable',
+            'satuan' => 'nullable|string',
+            'min_stock' => 'nullable|integer|min:0',
+            'lokasi' => 'nullable|string',
+            'supplier_ids' => 'nullable|array',
+            'supplier_ids.*' => 'exists:suppliers,id',
         ];
     }
 }

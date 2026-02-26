@@ -13,18 +13,21 @@ class Product extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'pic', //sku
+        'pic', //picture
         'code',
         'name',
         'category_id',
         'desc',
         'warna',
         'ukuran',
-        'outlet_id', //unsued, currently just for experiment
-        'supplier_id', //unsued, currently just for experiment
+        // 'outlet_id', //unsued, currently just for experiment
+        // 'supplier_id', //unsued, currently just for experiment
         'brand', // Add for Lenovo, Samsung, etc.
+        'satuan',
+        'min_stock',
+        'lokasi',
         'model', // Add for specific model info
-        'is_serialized', // Boolean: true for unique items, false for bulk
+        'is_serialized', // Boolean: true for unique items, false for bulk => now always false
         'harga_beli',
         'harga_jual',
         'diskon',
@@ -43,6 +46,11 @@ class Product extends Model
     public function outlet()
     {
         return $this->belongsTo(Outlet::class);
+    }
+
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'product_supplier');
     }
 
     // public function supplier()

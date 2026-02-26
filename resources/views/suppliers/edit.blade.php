@@ -18,6 +18,27 @@
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
+                                <label for="">Kode</label>
+                                <input type="text" class="form-control" name="kode_supplier"
+                                    value="{{ old('kode_supplier', $supplier->kode_supplier) }}"
+                                    placeholder="Masukkan Kode Supplier">
+                                @error('kode_supplier')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="">PIC</label>
+                                <input type="text" class="form-control" name="pic_supplier"
+                                    value="{{ old('pic_supplier', $supplier->pic_supplier) }}" placeholder="Masukkan PIC Supplier">
+                                @error('pic_supplier')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="">Nama Supplier</label>
                                 <input type="text" class="form-control" name="name"
                                     value="{{ old('name', $supplier->name) }}" placeholder="Masukkan Nama Supplier">

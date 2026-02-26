@@ -23,6 +23,8 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
+                                    <td>Kode</td>
+                                    <td>PIC</td>
                                     <td>Nama</td>
                                     <td>Alamat</td>
                                     <td>Nomor Telp</td>
@@ -32,6 +34,8 @@
                             @foreach ($suppliers as $value)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $value->kode_supplier }}</td>
+                                    <td>{{ $value->pic_supplier }}</td>
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->alamat }}</td>
                                     <td>{{ $value->no_telp }}</td>
