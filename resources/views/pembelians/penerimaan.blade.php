@@ -48,7 +48,7 @@
                             <div class="form-group">
                                 <label>Tanggal Penerimaan <span class="text-danger">*</span></label>
                                 <input type="datetime-local" name="receipt_date" class="form-control"
-                                    value="{{ old('receipt_date', $pembelian->receipt_date->format('Y-m-d\TH:i')) }}" required>
+                                    value="{{ old('receipt_date', $pembelian->receipt_date?->format('Y-m-d\TH:i')) }}" required>
                             </div>
                             <div class="form-group">
                                 <label>PIC Penerima <span class="text-danger">*</span></label>
