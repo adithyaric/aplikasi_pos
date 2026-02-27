@@ -16,4 +16,9 @@ class Supplier extends Model
         'alamat',
         'no_telp',
     ];
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_supplier');
+    }
 }

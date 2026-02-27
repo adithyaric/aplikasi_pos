@@ -78,6 +78,8 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::post('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'storePenerimaan'])->name('pembelian.store-penerimaan');
     Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
     Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
+    Route::get('/supplier/{supplier}/products', [App\Http\Controllers\PembelianController::class, 'getProductsBySupplier'])->name('supplier.products');
+
     Route::resource('/refund', RefundController::class);
     Route::resource('/refundPembelian', RefundPembelianController::class);
     Route::resource('/penjualan', PenjualanController::class);

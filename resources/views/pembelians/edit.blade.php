@@ -28,24 +28,24 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Outlet</label>
-                                <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id', $pembelian->outlet_id) == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('outlet_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label>Outlet</label> --}}
+                                {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" --}}
+                                    {{-- style="width: 100%;"> --}}
+                                    {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
+                                    {{-- @foreach ($outlets as $outlet) --}}
+                                        {{-- <option value="{{ $outlet->id }}" --}}
+                                            {{-- {{ old('outlet_id', $pembelian->outlet_id) == $outlet->id ? 'selected' : '' }}> --}}
+                                            {{-- {{ $outlet->name }} --}}
+                                        {{-- </option> --}}
+                                    {{-- @endforeach --}}
+                                {{-- </select> --}}
+                                {{-- @error('outlet_id') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Supplier</label>
                                 <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier"
@@ -64,31 +64,31 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label>Kas</label>
-                                <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas"
-                                    style="width: 100%;">
-                                    <option value="" selected disabled>Pilih Supplier</option>
-                                    @foreach ($kas as $kas)
-                                        <option value="{{ $kas->id }}"
-                                            {{ old('kas_id', $pembelian->kas_id) == $kas->id ? 'selected' : '' }}>
-                                            {{ $kas->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('kas_id')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label>Kas</label> --}}
+                                {{-- <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" --}}
+                                    {{-- style="width: 100%;"> --}}
+                                    {{-- <option value="" selected disabled>Pilih Supplier</option> --}}
+                                    {{-- @foreach ($kas as $kas) --}}
+                                        {{-- <option value="{{ $kas->id }}" --}}
+                                            {{-- {{ old('kas_id', $pembelian->kas_id) == $kas->id ? 'selected' : '' }}> --}}
+                                            {{-- {{ $kas->name }} --}}
+                                        {{-- </option> --}}
+                                    {{-- @endforeach --}}
+                                {{-- </select> --}}
+                                {{-- @error('kas_id') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <hr>
                             <table class="table table-bordered table-striped" id="example">
                                 <thead>
                                     <tr>
                                         <td>Nama Product</td>
                                         <td>Qty</td>
-                                        <td>Serial Numbers</td>
+                                        {{-- <td>Serial Numbers</td> --}}
                                         <td>Harga Beli</td>
                                         <td>Sub Total</td>
                                         <td>Aksi</td>
@@ -116,18 +116,18 @@
                                                     value="{{ $stock->product->is_serialized ? ($stock->serial_numbers ? count($stock->serial_numbers) : 1) : $stock->qty }}"
                                                     min="1" {{ $stock->product->is_serialized ? 'readonly' : '' }}>
                                             </td>
-                                            <td>
-                                                <div class="serial-container"
-                                                    style="display: {{ $stock->product->is_serialized ? 'block' : 'none' }};">
-                                                    <textarea class="form-control serial-numbers" name="product[{{ $key }}][serial_numbers]"
-                                                        placeholder="Enter serial numbers (one per line)" rows="3">{{ $stock->serial_numbers ? implode("\n", $stock->serial_numbers) : '' }}</textarea>
-                                                    <small class="text-muted">Enter one serial number per line</small>
-                                                </div>
-                                                <div class="no-serial-message"
-                                                    style="display: {{ $stock->product->is_serialized ? 'none' : 'block' }};">
-                                                    <small class="text-muted">No serial numbers needed</small>
-                                                </div>
-                                            </td>
+                                            {{-- <td> --}}
+                                                {{-- <div class="serial-container" --}}
+                                                    {{-- style="display: {{ $stock->product->is_serialized ? 'block' : 'none' }};"> --}}
+                                                    {{-- <textarea class="form-control serial-numbers" name="product[{{ $key }}][serial_numbers]" --}}
+                                                        {{-- placeholder="Enter serial numbers (one per line)" rows="3">{{ $stock->serial_numbers ? implode("\n", $stock->serial_numbers) : '' }}</textarea> --}}
+                                                    {{-- <small class="text-muted">Enter one serial number per line</small> --}}
+                                                {{-- </div> --}}
+                                                {{-- <div class="no-serial-message" --}}
+                                                    {{-- style="display: {{ $stock->product->is_serialized ? 'none' : 'block' }};"> --}}
+                                                    {{-- <small class="text-muted">No serial numbers needed</small> --}}
+                                                {{-- </div> --}}
+                                            {{-- </td> --}}
                                             <td>
                                                 <input type="text" class="form-control harga_beli numeral-mask"
                                                     name="product[{{ $key }}][harga_beli]" required

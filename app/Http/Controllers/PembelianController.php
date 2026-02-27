@@ -38,6 +38,12 @@ class PembelianController extends Controller
         }
     }
 
+    public function getProductsBySupplier(Supplier $supplier)
+    {
+        $products = $supplier->products()->select('id', 'name', 'is_serialized', 'harga_beli')->get();
+        return response()->json($products);
+    }
+
     public function index()
     {
         return view('pembelians.index', [
@@ -49,13 +55,10 @@ class PembelianController extends Controller
     {
         $lastPembelian = Pembelian::latest('id')->first();
         $nextNumber = $lastPembelian ? ((int) substr($lastPembelian->code, 4) + 1) : 1;
-        $code = 'PO'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        $code = 'PO' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         return view('pembelians.create', [
-            // 'kas' => Kas::get(),
-            // 'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'products' => Product::get(),
             'code' => $code
         ]);
     }
