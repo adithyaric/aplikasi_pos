@@ -66,7 +66,7 @@
                                     <th>No</th>
                                     <th>Product</th>
                                     <th>Location</th>
-                                    <th>Batch (//TODO input sku-sku)</th>
+                                    <th>SKU</th>
                                     <th>Qty to Pick</th>
                                     <th>Qty Picked</th>
                                     <th>Status</th>
@@ -78,7 +78,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->product->name }}</td>
                                         <td>{{ $item->location ?? '-' }}</td>
-                                        <td>{{ $item->batch_number ?? '-' }}</td>
+                                        <td>{{ $item->sku ?? '-' }}</td>
                                         <td>{{ $item->qty_to_pick }}</td>
                                         <td>{{ $item->qty_picked }}</td>
                                         <td>

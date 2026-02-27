@@ -24,11 +24,12 @@
                                     {{-- <td>Nama Outlet</td> --}}
                                     <td>Nama Product</td>
                                     <td>Harga Beli</td>
-                                    <td>Qty</td>
+                                    <td>Qty Reserved</td>
+                                    <td>Qty Warehouse</td>
                                     <td>Created</td>
                                     <td>Expired</td>
                                     <td>Status</td>
-                                    <td>serial_number</td>
+                                    <td>Sku</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,11 +40,12 @@
                                         {{-- <td>{{ $stock->pembelian->outlet?->name }}</td> --}}
                                         <td>{{ $stock->product->name }}</td>
                                         <td>@currency($stock->harga_beli)</td>
-                                        <td>{{ $stock->qty }}</td>
+                                        <td>{{ $stock->qty_reserved }}</td>
+                                        <td>{{ $stock->qty_available }}</td>
                                         <td>{{ $stock->created_at?->format('h:i a / d-M-Y') }}</td>
                                         <td>{{ $stock->expired_at?->format('h:i a / d-M-Y') }}</td>
                                         <td>{{ $stock->status }}</td>
-                                        <td>{{ $stock->serial_number }}</td>
+                                        <td>{{ $stock->sku }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

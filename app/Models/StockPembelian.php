@@ -12,6 +12,7 @@ class StockPembelian extends Model
     protected $fillable = [
         'pembelian_id',
         'product_id',
+        'sku',
         'subtotal',
         'harga_beli',
         'qty',

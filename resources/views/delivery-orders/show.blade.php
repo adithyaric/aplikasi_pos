@@ -95,16 +95,16 @@
                                 @php $total = 0; @endphp
                                 @foreach ($deliveryOrder->items as $item)
                                     @php
-                                        $subtotal = $item->qty * $item->hpp;
+                                        $subtotal = $item->qty * $item->harga_beli;
                                         $total += $subtotal;
                                     @endphp
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->product->name }}</td>
-                                        <td>{{ $item->batch_number ?? '-' }}</td>
+                                        <td>{{ $item->sku ?? '-' }}</td>
                                         <td>{{ $item->expired_at ? $item->expired_at->format('d-m-Y') : '-' }}</td>
                                         <td>{{ $item->qty }}</td>
-                                        <td>Rp {{ number_format($item->hpp, 0, ',', '.') }}</td>
+                                        <td>Rp {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                                         <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
@@ -119,15 +119,40 @@
                     </div>
                     <div class="box-footer">
                         <a href="{{ route('delivery-orders.index') }}" class="btn btn-default">Back</a>
-                        @if ($deliveryOrder->status == 'draft')
-                            <form action="{{ route('delivery-orders.send', $deliveryOrder->id) }}" method="post"
-                                style="display: inline;">
-                                @csrf
-                                <button class="btn btn-success" onclick="return confirm('Send this delivery order?')">
-                                    <i class="fa fa-truck"></i> Delivery Completed
-                                </button>
-                                //TODO muncul popup bukti pengiriman (#receiveModal)
-                            </form>
+                        @if ($deliveryOrder->status == 'draft' || $deliveryOrder->status == 'sent')
+                            <button class="btn btn-success" data-toggle="modal"
+                                data-target="#sendModal{{ $deliveryOrder->id }}">
+                                <i class="fa fa-truck"></i> Delivery Completed
+                            </button>
+
+                            <!-- Send Modal -->
+                            <div class="modal fade" id="sendModal{{ $deliveryOrder->id }}" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <form action="{{ route('delivery-orders.send', $deliveryOrder->id) }}"
+                                            method="post" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Send Delivery Order</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label>Upload Dispatch Photo (Optional)</label>
+                                                    <input type="file" name="photo" class="form-control"
+                                                        accept="image/*">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default"
+                                                    data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-success"
+                                                    onclick="return confirm('Send this delivery order?')">Confirm Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </div>

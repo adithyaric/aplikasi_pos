@@ -12,6 +12,7 @@ class RequestOrderItem extends Model
     protected $fillable = [
         'request_order_id',
         'product_id',
+        'stock_id',
         'qty_requested',
         'qty_approved',
         'item_status',
@@ -26,5 +27,10 @@ class RequestOrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class);
     }
 }

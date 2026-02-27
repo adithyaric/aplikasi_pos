@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('qty_to_pick')->nullable();
             $table->integer('qty_picked')->nullable()->default(0);
             $table->string('location')->nullable();
-            $table->string('batch_number')->nullable();
+            $table->string('sku')->nullable();
             $table->boolean('is_picked')->default(false);
             $table->timestamps();
         });

@@ -19,9 +19,9 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained();
             $table->foreignId('stock_id')->nullable()->constrained();
             $table->integer('qty')->nullable();
-            $table->string('batch_number')->nullable();
+            $table->string('sku')->nullable();
             $table->date('expired_at')->nullable();
-            $table->decimal('hpp', 15, 2)->nullable();
+            $table->decimal('harga_beli', 15, 2)->nullable();
             $table->timestamps();
         });
     }

@@ -13,7 +13,7 @@ class PickingListItem extends Model
         'qty_to_pick',
         'qty_picked',
         'location',
-        'batch_number',
+        'sku',
         'is_picked',
     ];
 

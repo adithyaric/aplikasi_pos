@@ -11,9 +11,9 @@ class DeliveryOrderItem extends Model
         'product_id',
         'stock_id',
         'qty',
-        'batch_number',
+        'sku',
         'expired_at',
-        'hpp',
+        'harga_beli',
     ];
 
     protected $casts = [

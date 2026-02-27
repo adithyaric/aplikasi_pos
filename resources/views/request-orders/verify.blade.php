@@ -47,10 +47,7 @@
                                     <tr>
                                         <td>Produk</td>
                                         <td>Qty Warehouse</td>
-                                        <td>
-                                            Qty Request
-                                            //TODO nanti input centang by sku (bukan akumulasi seluruh stock)
-                                        </td>
+                                        <td>Qty Request</td>
                                         <td>Qty Approved</td>
                                         <td>Status</td>
                                         <td>Catatan Item</td>
@@ -59,12 +56,14 @@
                                 <tbody>
                                     @foreach ($requestOrder->items as $index => $item)
                                         @php
-                                            $availableStock = $item->product->stocks()->sum('qty_available');
+                                            $stock = $item->stock;
+                                            $availableStock = $stock ? $stock->qty_available : 0;
                                             $maxQty = min($item->qty_requested, $availableStock);
                                         @endphp
                                         <tr>
                                             <td>
                                                 {{ $item->product->name }}
+                                                <br><small class="text-muted">SKU: {{ $stock->sku ?? 'N/A' }}</small>
                                                 <input type="hidden" name="items[{{ $index }}][id]"
                                                     value="{{ $item->id }}">
                                             </td>
@@ -91,22 +90,16 @@
                                                 <select class="form-control item-status"
                                                     name="items[{{ $index }}][item_status]"
                                                     data-index="{{ $index }}" required>
-                                                    <option value="approved"
-                                                        {{ old('items.' . $index . '.item_status', $item->item_status) == 'approved' ? 'selected' : '' }}>
-                                                        Approved</option>
-                                                    <option value="partial"
-                                                        {{ old('items.' . $index . '.item_status', $item->item_status) == 'partial' ? 'selected' : '' }}>
-                                                        Partial</option>
-                                                    <option value="rejected"
-                                                        {{ old('items.' . $index . '.item_status', $item->item_status) == 'rejected' ? 'selected' : '' }}>
-                                                        Rejected</option>
+                                                    <option value="approved">Approved</option>
+                                                    <option value="partial">Partial</option>
+                                                    <option value="rejected">Rejected</option>
                                                 </select>
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control"
                                                     name="items[{{ $index }}][notes]"
                                                     value="{{ old('items.' . $index . '.notes', $item->notes) }}"
-                                                    placeholder="Catatan item (opsional)">
+                                                    placeholder="Notes">
                                             </td>
                                         </tr>
                                     @endforeach
@@ -184,26 +177,26 @@
             });
 
             // Form validation before submit
-            $('form').on('submit', function(e) {
-                var hasError = false;
+            // $('form').on('submit', function(e) {
+            //     var hasError = false;
 
-                $('.qty-approved').each(function() {
-                    var qtyApproved = parseInt($(this).val()) || 0;
-                    var maxQty = parseInt($(this).attr('max')) || 0;
-                    var availableStock = parseInt($(this).data('available')) || 0;
+            //     $('.qty-approved').each(function() {
+            //         var qtyApproved = parseInt($(this).val()) || 0;
+            //         var maxQty = parseInt($(this).attr('max')) || 0;
+            //         var availableStock = parseInt($(this).data('available')) || 0;
 
-                    if (qtyApproved > maxQty) {
-                        hasError = true;
-                        alert('Error: Approved quantity exceeds available stock for some products');
-                        return false;
-                    }
-                });
+            //         if (qtyApproved > maxQty) {
+            //             hasError = true;
+            //             alert('Error: Approved quantity exceeds available stock for some products');
+            //             return false;
+            //         }
+            //     });
 
-                if (hasError) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
+            //     if (hasError) {
+            //         e.preventDefault();
+            //         return false;
+            //     }
+            // });
         });
     </script>
 @endsection

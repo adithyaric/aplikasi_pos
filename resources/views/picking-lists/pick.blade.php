@@ -30,7 +30,7 @@
                                             <p><strong>Location:</strong> {{ $item->location ?? '-' }}</p>
                                         </div>
                                         <div class="col-md-3">
-                                            <p><strong>Batch:</strong> {{ $item->batch_number ?? '-' }}</p>
+                                            <p><strong>SKU:</strong> {{ $item->sku ?? '-' }}</p>
                                         </div>
                                         <div class="col-md-3">
                                             <p><strong>Qty to Pick:</strong> {{ $item->qty_to_pick }}</p>

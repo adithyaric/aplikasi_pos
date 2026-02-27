@@ -42,48 +42,44 @@
                                     <td>
                                         <a class="btn-sm btn btn-info"
                                             href="{{ route('delivery-orders.show', $value->id) }}">Detail</a>
-                                        @if ($value->status == 'draft')
-                                            <form action="{{ route('delivery-orders.send', $value->id) }}" method="post"
-                                                style="display: inline;">
-                                                @csrf
-                                                <button class="btn-sm btn btn-success"
-                                                    onclick="return confirm('Send this delivery order?')">Send</button>
-                                            </form>
-                                        @elseif ($value->status == 'sent')
-                                            <button class="btn-sm btn btn-warning" data-toggle="modal"
-                                                data-target="#receiveModal{{ $value->id }}">Receive</button>
+                                        @if ($value->status == 'draft' || $value->status == 'sent')
+                                            <button class="btn-sm btn btn-success" data-toggle="modal"
+                                                data-target="#sendModal{{ $value->id }}">Send</button>
+
+                                            <!-- Send Modal -->
+                                            <div class="modal fade" id="sendModal{{ $value->id }}" tabindex="-1"
+                                                role="dialog">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <form action="{{ route('delivery-orders.send', $value->id) }}"
+                                                            method="post" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close"
+                                                                    data-dismiss="modal">&times;</button>
+                                                                <h4 class="modal-title">Send Delivery Order</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <label>Upload Dispatch Photo (Optional)</label>
+                                                                    <input type="file" name="photo"
+                                                                        class="form-control" accept="image/*">
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-default"
+                                                                    data-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-success"
+                                                                    onclick="return confirm('Send this delivery order?')">Confirm
+                                                                    Send</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>
-
-                                <!-- Receive Modal -->
-                                <div class="modal fade" id="receiveModal{{ $value->id }}" tabindex="-1" role="dialog">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <form action="{{ route('delivery-orders.receive', $value->id) }}" method="post"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="modal-header">
-                                                    <button type="button" class="close"
-                                                        data-dismiss="modal">&times;</button>
-                                                    <h4 class="modal-title">Receive Delivery</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <label>Upload Photo Proof (Optional)</label>
-                                                        <input type="file" name="photo" class="form-control"
-                                                            accept="image/*">
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default"
-                                                        data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-success">Confirm Received</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             @endforeach
                         </table>
                     </div>

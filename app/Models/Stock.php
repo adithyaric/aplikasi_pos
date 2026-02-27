@@ -12,11 +12,12 @@ class Stock extends Model
     protected $fillable = [
         'pembelian_id',
         'product_id',
+        'sku',
         'subtotal',
         'harga_beli',
         'qty',
         'qty_reserved',
-        // 'qty_available',
+        'qty_available',
         'expired_at',
         'location',
         'batch_number',

@@ -104,7 +104,6 @@
     <script>
         let productIndex = 0;
 
-        //TODO harga beli titik koma
         function addBahanBaku() {
             productIndex++;
             let productTemplate = `

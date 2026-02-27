@@ -13,9 +13,9 @@ class OwnerStock extends Model
         'owner_id',
         'product_id',
         'qty',
-        'batch_number',
+        'sku',
         'expired_at',
-        'hpp',
+        'harga_beli',
     ];
 
     protected $casts = [

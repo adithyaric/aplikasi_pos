@@ -16,86 +16,71 @@
                     <form action="{{ route('request-orders.store') }}" method="POST">
                         @csrf
                         <div class="box-body">
-                            {{-- Code is auto-generated, not shown in form --}}
                             <div class="form-group">
-                                <label>Owner (Outlet)</label>
-                                <select class="form-control select2" name="owner_id" data-placeholder="Pilih Outlet"
-                                    style="width: 100%;" required>
-                                    <option value="" selected disabled>Pilih Outlet</option>
-                                    {{-- Make sure $outlets is passed from controller --}}
+                                <label>Owner/Outlet <span class="text-danger">*</span></label>
+                                <select name="owner_id" class="form-control select2" required>
+                                    <option value="">Select Outlet</option>
                                     @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('owner_id') || auth()->user()->outlet_id == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
+                                        <option value="{{ $outlet->id }}">{{ $outlet->name }}</option>
                                     @endforeach
                                 </select>
-                                @error('owner_id')
-                                    <div class="invalid-feedback text-danger">{{ $message }}</div>
-                                @enderror
                             </div>
 
                             <div class="form-group">
-                                <label>Tanggal Request</label>
-                                <input type="date" class="form-control" name="request_date"
-                                    value="{{ old('request_date', date('Y-m-d')) }}" required>
-                                @error('request_date')
-                                    <div class="invalid-feedback text-danger">{{ $message }}</div>
-                                @enderror
+                                <label>Request Date <span class="text-danger">*</span></label>
+                                <input type="date" name="request_date" class="form-control"
+                                    value="{{ now()->format('Y-m-d') }}" required>
                             </div>
 
                             <div class="form-group">
-                                <label>Catatan Umum</label>
-                                <textarea class="form-control" name="notes" rows="3" placeholder="Catatan tambahan (opsional)">{{ old('notes') }}</textarea>
-                                @error('notes')
-                                    <div class="invalid-feedback text-danger">{{ $message }}</div>
-                                @enderror
+                                <label>Notes</label>
+                                <textarea name="notes" class="form-control" rows="3"></textarea>
                             </div>
 
                             <hr>
-                            <h4>Item yang diminta</h4>
-                            <table class="table table-bordered table-striped" id="items-table">
+                            <h4>Select Products & SKU</h4>
+                            <table class="table table-bordered" id="items-table">
                                 <thead>
                                     <tr>
-                                        <td>Produk</td>
-                                        <td>Qty</td>
-                                        <td>Catatan Item</td>
-                                        <td>Aksi</td>
+                                        <th>Product</th>
+                                        <th>SKU</th>
+                                        <th width="150">Available Qty</th>
+                                        <th width="150">Qty Request</th>
+                                        <th width="100">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="item-repeater">
-                                    <tr>
+                                <tbody>
+                                    <tr class="item-row">
                                         <td>
-                                            <select class="form-control select2 product" name="items[0][product_id]"
-                                                data-placeholder="Pilih Produk" style="width:100%" required>
-                                                <option value="" disabled selected>Pilih Produk</option>
+                                            <select name="items[0][product_id]" class="form-control product-select"
+                                                required>
+                                                <option value="">Select Product</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}"
-                                                        data-stock="{{ $product->stocks()->sum('qty_available') }}">
-                                                        {{ $product->name }} :
-                                                        [{{ $product->stocks()->sum('qty_available') }}]
-                                                    </option>
+                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control qty" name="items[0][qty_requested]"
-                                                required value="1" min="1">
+                                            <select name="items[0][stock_id]" class="form-control sku-select" required
+                                                disabled>
+                                                <option value="">Select SKU</option>
+                                            </select>
+                                        </td>
+                                        <td class="available-qty">-</td>
+                                        <td>
+                                            <input type="number" name="items[0][qty_requested]" class="form-control"
+                                                min="1" required>
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control" name="items[0][notes]"
-                                                placeholder="Catatan item (opsional)">
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger" onclick="removeItem(this)"
-                                                type="button">Hapus</button>
+                                            <button type="button" class="btn btn-danger btn-sm remove-row"><i
+                                                    class="fa fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-
-                            <button class="btn btn-sm btn-primary" onclick="addItem()" type="button">Tambah Item</button>
-                        </div><!-- /.box-body -->
+                            <button type="button" class="btn btn-success" id="add-row"><i class="fa fa-plus"></i> Add
+                                Product</button>
+                        </div>
 
                         <div class="box-footer">
                             <a href="{{ route('request-orders.index') }}" class="btn btn-default">Kembali</a>
@@ -110,73 +95,80 @@
 
 @section('page-script')
     <script>
-        let itemIndex = 1; // start from 1 because first row is index 0
+        let rowIndex = 1;
 
-        function addItem() {
-            let template = `
-        <tr>
+        $(document).on('change', '.product-select', function() {
+            const row = $(this).closest('tr');
+            const productId = $(this).val();
+            const skuSelect = row.find('.sku-select');
+
+            skuSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
+            row.find('.available-qty').text('-');
+
+            if (!productId) return;
+
+            $.get(`/api/stocks/by-product/${productId}`, function(stocks) {
+                skuSelect.empty().append('<option value="">Select SKU</option>');
+
+                if (stocks.length === 0) {
+                    skuSelect.append('<option value="">No stock available</option>');
+                    return;
+                }
+
+                stocks.forEach(stock => {
+                    const label =
+                        `${stock.sku} (Qty: ${stock.qty_available}, Exp: ${stock.expired_at || 'N/A'})`;
+                    skuSelect.append(
+                        `<option value="${stock.id}" data-qty="${stock.qty_available}">${label}</option>`
+                        );
+                });
+
+                skuSelect.prop('disabled', false);
+            });
+        });
+
+        $(document).on('change', '.sku-select', function() {
+            const row = $(this).closest('tr');
+            const selectedOption = $(this).find(':selected');
+            const availableQty = selectedOption.data('qty') || 0;
+
+            row.find('.available-qty').text(availableQty);
+            row.find('input[name*="qty_requested"]').attr('max', availableQty);
+        });
+
+        $('#add-row').click(function() {
+            const newRow = `
+        <tr class="item-row">
             <td>
-                <select class="form-control select2 product" name="items[${itemIndex}][product_id]" data-placeholder="Pilih Produk" style="width:100%" required>
-                    <option value="" disabled selected>Pilih Produk</option>
+                <select name="items[${rowIndex}][product_id]" class="form-control product-select" required>
+                    <option value="">Select Product</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-stock="{{ $product->stocks()->sum('qty_available') }}">
-                            {{ $product->name }} : [{{ $product->stocks()->sum('qty_available') }}]
-                        </option>
+                        <option value="{{ $product->id }}">{{ $product->name }}</option>
                     @endforeach
                 </select>
             </td>
             <td>
-                <input type="number" class="form-control qty" name="items[${itemIndex}][qty_requested]" required value="1" min="1">
+                <select name="items[${rowIndex}][stock_id]" class="form-control sku-select" required disabled>
+                    <option value="">Select SKU</option>
+                </select>
+            </td>
+            <td class="available-qty">-</td>
+            <td>
+                <input type="number" name="items[${rowIndex}][qty_requested]" class="form-control" min="1" required>
             </td>
             <td>
-                <input type="text" class="form-control" name="items[${itemIndex}][notes]" placeholder="Catatan item (opsional)">
+                <button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button>
             </td>
-            <td>
-                <button class="btn btn-sm btn-danger" onclick="removeItem(this)" type="button">Hapus</button>
-            </td>
-        </tr>`;
-            $('#item-repeater').append(template);
-            var $newSelect = $('#item-repeater .select2').last();
-            $newSelect.select2();
-            setMaxQty($newSelect); // set max if option is pre-selected (none by default)
-            itemIndex++;
-        }
-
-        function removeItem(button) {
-            if ($('#item-repeater tr').length > 1) {
-                $(button).closest('tr').remove();
-            } else {
-                alert('Minimal satu item harus diisi');
-            }
-        }
-
-        // Initialize select2 for existing rows
-        $(document).ready(function() {
-            $('.select2').select2();
-            $('.product').each(function() {
-                setMaxQty(this);
-            });
+        </tr>
+    `;
+            $('#items-table tbody').append(newRow);
+            rowIndex++;
         });
 
-        function setMaxQty(selectElement) {
-            var $select = $(selectElement);
-            var $row = $select.closest('tr');
-            var stock = $select.find(':selected').data('stock');
-            var $qty = $row.find('.qty');
-            if (stock !== undefined) {
-                $qty.attr('max', stock);
-                // Optional: if current value > stock, adjust it
-                if (parseInt($qty.val()) > stock) {
-                    $qty.val(stock);
-                }
-            } else {
-                $qty.removeAttr('max');
+        $(document).on('click', '.remove-row', function() {
+            if ($('.item-row').length > 1) {
+                $(this).closest('tr').remove();
             }
-        }
-
-        // On product change
-        $(document).on('change', '.product', function() {
-            setMaxQty(this);
         });
     </script>
 @endsection

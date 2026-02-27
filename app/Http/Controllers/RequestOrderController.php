@@ -49,24 +49,17 @@ class RequestOrderController extends Controller
             'request_date' => 'required|date',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
+            'items.*.stock_id' => 'required|exists:stocks,id',
             'items.*.qty_requested' => 'required|integer|min:1',
         ]);
 
-        // Validate stock availability
-        $productIds = collect($request->items)->pluck('product_id')->unique();
-        $productStocks = Product::whereIn('id', $productIds)
-            ->withSum('stocks as available_qty', 'qty_available')
-            ->get()
-            ->keyBy('id');
-
+        // Validate stock availability per SKU
         foreach ($request->items as $index => $item) {
-            $product = $productStocks->get($item['product_id']);
-            if (! $product) { continue; }
+            $stock = Stock::find($item['stock_id']);
 
-            $available = $product->available_qty ?? 0;
-            if ($item['qty_requested'] > $available) {
+            if (! $stock || $stock->qty_available < $item['qty_requested']) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.qty_requested" => "Quantity requested exceeds available stock ({$available}) for product {$product->name}."
+                    "items.{$index}.qty_requested" => 'Quantity requested exceeds available stock for selected SKU.'
                 ]);
             }
         }
@@ -90,6 +83,7 @@ class RequestOrderController extends Controller
                 RequestOrderItem::create([
                     'request_order_id' => $requestOrder->id,
                     'product_id' => $item['product_id'],
+                    'stock_id' => $item['stock_id'],
                     'qty_requested' => $item['qty_requested'],
                     'notes' => $item['notes'] ?? null,
                 ]);
@@ -117,7 +111,6 @@ class RequestOrderController extends Controller
 
     public function processVerification(Request $request, RequestOrder $requestOrder)
     {
-        // dd($requestOrder?->toArray(), $request->all());
         $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:request_order_items,id',
@@ -125,14 +118,22 @@ class RequestOrderController extends Controller
             'items.*.item_status' => 'required|in:approved,partial,rejected',
         ]);
 
-        // ADD: Validate qty_approved against warehouse stock
+        // Validate qty_approved against specific SKU stock
         foreach ($request->items as $itemData) {
             $item = RequestOrderItem::find($itemData['id']);
-            $availableStock = $item->product->stocks()->sum('qty_available');
+            $stock = $item->stock;
+
+            if (! $stock) {
+                return back()->withErrors([
+                    'items.'.array_search($itemData, $request->items).'.qty_approved' => "Stock not found for product {$item->product->name}"
+                ])->withInput();
+            }
+
+            $availableStock = $stock->qty_available;
 
             if ($itemData['qty_approved'] > $availableStock) {
                 return back()->withErrors([
-                    'items.'.array_search($itemData, $request->items).'.qty_approved' => "Product {$item->product->name}: Approved qty ({$itemData['qty_approved']}) exceeds available stock ({$availableStock})"
+                    'items.'.array_search($itemData, $request->items).'.qty_approved' => "Product {$item->product->name} (SKU: {$stock->sku}): Approved qty ({$itemData['qty_approved']}) exceeds available stock ({$availableStock})"
                 ])->withInput();
             }
 
@@ -170,28 +171,20 @@ class RequestOrderController extends Controller
                     'notes' => $itemData['notes'] ?? null,
                 ]);
 
-                // Reserve stock for approved/partial items
+                // Reserve stock for approved/partial items from SPECIFIC SKU
                 if ($itemData['qty_approved'] > 0) {
-                    $product = $item->product;
-                    $remainingQty = $itemData['qty_approved'];
+                    $stock = $item->stock;
 
-                    $stocks = Stock::where('product_id', $product->id)
-                        ->available()
-                        ->orderBy('expired_at', 'asc')
-                        ->orderBy('created_at', 'asc')
-                        ->get();
-
-                    foreach ($stocks as $stock) {
-                        if ($remainingQty <= 0) { break; }
-
-                        $qtyToReserve = min($remainingQty, $stock->qty_available);
-                        $stock->reserve($qtyToReserve);
-                        $remainingQty -= $qtyToReserve;
+                    if (! $stock) {
+                        throw new \Exception("Stock not found for product: {$item->product->name}");
                     }
 
-                    if ($remainingQty > 0) {
-                        throw new \Exception("Insufficient stock for product: {$product->name}");
+                    if ($stock->qty_available < $itemData['qty_approved']) {
+                        throw new \Exception("Insufficient stock for product {$item->product->name} (SKU: {$stock->sku})");
                     }
+
+                    // Reserve from specific stock
+                    $stock->reserve($itemData['qty_approved']);
                 }
 
                 // Determine overall status

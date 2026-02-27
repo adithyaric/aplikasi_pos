@@ -72,7 +72,7 @@ class PickingListController extends Controller
                         'stock_id' => $stock->id,
                         'qty_to_pick' => $qtyToPick,
                         'location' => $stock->location,
-                        'batch_number' => $stock->batch_number,
+                        'sku' => $stock->sku,
                     ]);
 
                     $remainingQty -= $qtyToPick;

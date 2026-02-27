@@ -49,7 +49,7 @@ class DeliveryOrderController extends Controller
                 'owner_id' => $requestOrder->owner_id,
                 'prepared_by' => auth()->id(),
                 'delivery_date' => now(),
-                'status' => 'draft',
+                'status' => 'sent',
             ]);
 
             foreach ($pickingList->items as $pickItem) {
@@ -59,9 +59,9 @@ class DeliveryOrderController extends Controller
                         'product_id' => $pickItem->product_id,
                         'stock_id' => $pickItem->stock_id,
                         'qty' => $pickItem->qty_picked,
-                        'batch_number' => $pickItem->batch_number,
+                        'sku' => $pickItem->stock->sku,
                         'expired_at' => $pickItem->stock->expired_at,
-                        'hpp' => $pickItem->stock->harga_beli,
+                        'harga_beli' => $pickItem->stock->harga_beli,
                     ]);
                 }
             }
@@ -77,8 +77,12 @@ class DeliveryOrderController extends Controller
         }
     }
 
-    public function send(DeliveryOrder $deliveryOrder)
+    public function send(Request $request, DeliveryOrder $deliveryOrder)
     {
+        $request->validate([
+            'photo' => 'nullable|image|max:2048',
+        ]);
+
         DB::beginTransaction();
         try {
             foreach ($deliveryOrder->items as $item) {
@@ -87,17 +91,17 @@ class DeliveryOrderController extends Controller
                 // Allocate stock (reduces qty and qty_reserved)
                 $stock->allocate($item->qty);
 
-                // Create owner stock
+                // Create/update owner stock with SKU
                 OwnerStock::updateOrCreate(
                     [
                         'owner_id' => $deliveryOrder->owner_id,
                         'product_id' => $item->product_id,
-                        'batch_number' => $item->batch_number,
+                        'sku' => $stock->sku,
                     ],
                     [
                         'qty' => DB::raw('qty + '.$item->qty),
                         'expired_at' => $item->expired_at,
-                        'hpp' => $item->hpp,
+                        'harga_beli' => $item->harga_beli,
                     ]
                 );
 
@@ -110,11 +114,22 @@ class DeliveryOrderController extends Controller
                     'reference_id' => $deliveryOrder->id,
                     'qty_out' => $item->qty,
                     'balance' => $item->product->stocks()->sum('qty'),
-                    'notes' => "Delivery to {$deliveryOrder->owner->name}",
+                    'notes' => "Delivery to {$deliveryOrder->owner->name} - SKU: {$stock->sku}",
                 ]);
             }
 
-            $deliveryOrder->update(['status' => 'sent']);
+            $data = [
+                'status' => 'delivered',
+                'received_by' => auth()->id(),
+                'received_date' => now(),
+            ];
+
+            if ($request->hasFile('photo')) {
+                $path = $request->file('photo')->store('delivery-proofs', 'public');
+                $data['photo_path'] = $path;
+            }
+
+            $deliveryOrder->update($data);
 
             DB::commit();
 

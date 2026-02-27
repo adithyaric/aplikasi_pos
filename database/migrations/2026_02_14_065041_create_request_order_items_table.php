@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('request_order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained();
+            $table->foreignId('stock_id')->nullable()->constrained();
             $table->integer('qty_requested')->nullable();
             $table->integer('qty_approved')->nullable()->default(0);
             $table->integer('qty_difference')->nullable()->storedAs('qty_requested - qty_approved');
