@@ -71,7 +71,7 @@ class PickingListController extends Controller
                         'product_id' => $item->product_id,
                         'stock_id' => $stock->id,
                         'qty_to_pick' => $qtyToPick,
-                        'location' => $stock->location,
+                        'location' => $stock->product->lokasi,
                         'sku' => $stock->sku,
                     ]);
 

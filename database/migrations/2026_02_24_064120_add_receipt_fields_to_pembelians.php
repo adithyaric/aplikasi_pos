@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pembelians', function (Blueprint $table) {
-            $table->date('receipt_date')->nullable()->after('total');
+            $table->dateTime('receipt_date')->nullable()->after('total');
             $table->string('receipt_pic')->nullable()->after('receipt_date');
             $table->enum('receipt_status', ['draft', 'validated', 'completed'])->nullable()->default('draft')->after('receipt_pic');
             $table->string('receipt_photo')->nullable()->after('receipt_status');

@@ -11,6 +11,7 @@ class Pembelian extends Model
 
     protected $fillable = [
         'code',
+        'code_gr',
         'outlet_id',
         'supplier_id',
         'kas_id',
@@ -23,7 +24,7 @@ class Pembelian extends Model
     ];
 
     protected $casts = [
-        'receipt_date' => 'date',
+        'receipt_date' => 'datetime',
     ];
 
     public function outlet()

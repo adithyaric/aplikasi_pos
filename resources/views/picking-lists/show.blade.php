@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->product->name }}</td>
-                                        <td>{{ $item->location ?? '-' }}</td>
+                                        <td>{{ $item->location ?? $item->product?->lokasi }}</td>
                                         <td>{{ $item->sku ?? '-' }}</td>
                                         <td>{{ $item->qty_to_pick }}</td>
                                         <td>{{ $item->qty_picked }}</td>

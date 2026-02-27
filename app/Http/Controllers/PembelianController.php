@@ -173,6 +173,7 @@ class PembelianController extends Controller
 
             // Update pembelian receipt info
             $pembelian->update([
+                'code_gr' => $request->code_gr,
                 'receipt_date' => $request->receipt_date,
                 'receipt_pic' => $request->receipt_pic,
                 'receipt_status' => $request->receipt_status,

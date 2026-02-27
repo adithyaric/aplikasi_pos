@@ -41,9 +41,14 @@
                         </div>
                         <div class="box-body">
                             <div class="form-group">
+                                <label>Goods receipt <span class="text-danger">*</span></label>
+                                <input type="text" name="code_gr" class="form-control"
+                                    value="{{ old('code_gr', $pembelian->code_gr) }}" required>
+                            </div>
+                            <div class="form-group">
                                 <label>Tanggal Penerimaan <span class="text-danger">*</span></label>
-                                <input type="date" name="receipt_date" class="form-control"
-                                    value="{{ old('receipt_date', now()->format('Y-m-d')) }}" required>
+                                <input type="datetime-local" name="receipt_date" class="form-control"
+                                    value="{{ old('receipt_date', $pembelian->receipt_date->format('Y-m-d\TH:i')) }}" required>
                             </div>
                             <div class="form-group">
                                 <label>PIC Penerima <span class="text-danger">*</span></label>

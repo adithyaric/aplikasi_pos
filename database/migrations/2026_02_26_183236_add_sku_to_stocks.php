@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('sku')->nullable()->after('product_id');
         });
 
+        Schema::table('pembelians', function (Blueprint $table) {
+            $table->string('code_gr')->nullable()->after('code');
+        });
+
         Schema::table('owner_stocks', function (Blueprint $table) {
             $table->renameColumn('batch_number', 'sku');
             $table->renameColumn('hpp', 'harga_beli');
@@ -35,8 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('stocks', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

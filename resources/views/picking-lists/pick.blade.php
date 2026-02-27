@@ -27,7 +27,7 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <p><strong>Location:</strong> {{ $item->location ?? '-' }}</p>
+                                            <p><strong>Location:</strong> {{ $item->location ?? $item->product?->lokasi }}</p>
                                         </div>
                                         <div class="col-md-3">
                                             <p><strong>SKU:</strong> {{ $item->sku ?? '-' }}</p>
