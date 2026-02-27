@@ -43,10 +43,9 @@
                                 <thead>
                                     <tr>
                                         <th>Product</th>
-                                        <th>SKU</th>
-                                        <th width="150">Available Qty</th>
-                                        <th width="150">Qty Request</th>
-                                        <th width="100">Action</th>
+                                        <th>Available Qty</th>
+                                        <th>Qty Request</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,14 +55,11 @@
                                                 required>
                                                 <option value="">Select Product</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                                    <option value="{{ $product->id }}"
+                                                        data-available="{{ $product->stocks()->sum('qty_available') }}">
+                                                        {{ $product->name }}
+                                                    </option>
                                                 @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="items[0][stock_id]" class="form-control sku-select" required
-                                                disabled>
-                                                <option value="">Select SKU</option>
                                             </select>
                                         </td>
                                         <td class="available-qty">-</td>
@@ -99,41 +95,9 @@
 
         $(document).on('change', '.product-select', function() {
             const row = $(this).closest('tr');
-            const productId = $(this).val();
-            const skuSelect = row.find('.sku-select');
-
-            skuSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
-            row.find('.available-qty').text('-');
-
-            if (!productId) return;
-
-            $.get(`/api/stocks/by-product/${productId}`, function(stocks) {
-                skuSelect.empty().append('<option value="">Select SKU</option>');
-
-                if (stocks.length === 0) {
-                    skuSelect.append('<option value="">No stock available</option>');
-                    return;
-                }
-
-                stocks.forEach(stock => {
-                    const label =
-                        `${stock.sku} (Qty: ${stock.qty_available}, Exp: ${stock.expired_at || 'N/A'})`;
-                    skuSelect.append(
-                        `<option value="${stock.id}" data-qty="${stock.qty_available}">${label}</option>`
-                        );
-                });
-
-                skuSelect.prop('disabled', false);
-            });
-        });
-
-        $(document).on('change', '.sku-select', function() {
-            const row = $(this).closest('tr');
-            const selectedOption = $(this).find(':selected');
-            const availableQty = selectedOption.data('qty') || 0;
-
+            const availableQty = $(this).find(':selected').data('available') || 0;
             row.find('.available-qty').text(availableQty);
-            row.find('input[name*="qty_requested"]').attr('max', availableQty);
+            // row.find('input[name*="qty_requested"]').attr('max', availableQty);
         });
 
         $('#add-row').click(function() {
@@ -143,13 +107,10 @@
                 <select name="items[${rowIndex}][product_id]" class="form-control product-select" required>
                     <option value="">Select Product</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        <option value="{{ $product->id }}" data-available="{{ $product->stocks()->sum('qty_available') }}">
+                            {{ $product->name }}
+                        </option>
                     @endforeach
-                </select>
-            </td>
-            <td>
-                <select name="items[${rowIndex}][stock_id]" class="form-control sku-select" required disabled>
-                    <option value="">Select SKU</option>
                 </select>
             </td>
             <td class="available-qty">-</td>

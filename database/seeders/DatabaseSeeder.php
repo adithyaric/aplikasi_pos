@@ -88,26 +88,26 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // for ($i = 1; $i <= 5; $i++) {
-        //     Product::create([
-        //         'pic' => 'pic'.$i,
-        //         'code' => 'code'.$i,
-        //         'name' => 'Product '.$i,
-        //         'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
-        //         'desc' => 'Description '.$i,
-        //         'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
-        //         'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
-        //         // 'outlet_id' => Outlet::inRandomOrder()->first()->id,
-        //         // 'supplier_id' => Supplier::inRandomOrder()->first()->id,
-        //         'brand' => 'brand'.$i,
-        //         'model' => 'model'.$i,
-        //         // 'is_serialized' => rand(0, 1),
-        //         'is_serialized' => 0,
-        //         'harga_jual' => round(rand(10000, 100000), -4),
-        //         'diskon' => rand(0, 50),
-        //         'berat' => round(rand(1, 10)),
-        //     ]);
-        // }
+        for ($i = 1; $i <= 5; $i++) {
+            Product::create([
+                'pic' => 'pic'.$i,
+                'code' => 'code'.$i,
+                'name' => 'Product '.$i,
+                'category_id' => Category::where('type', 'product')->inRandomOrder()->first()->id,
+                'desc' => 'Description '.$i,
+                'warna' => ($i % 2 == 0) ? 'Red' : 'Blue',
+                'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
+                // 'outlet_id' => Outlet::inRandomOrder()->first()->id,
+                // 'supplier_id' => Supplier::inRandomOrder()->first()->id,
+                'brand' => 'brand'.$i,
+                'model' => 'model'.$i,
+                // 'is_serialized' => rand(0, 1),
+                'is_serialized' => 0,
+                'harga_jual' => round(rand(10000, 100000), -4),
+                'diskon' => rand(0, 50),
+                'berat' => round(rand(1, 10)),
+            ]);
+        }
 
         // for ($i = 1; $i <= 3; $i++) {
         //     Voucher::create([

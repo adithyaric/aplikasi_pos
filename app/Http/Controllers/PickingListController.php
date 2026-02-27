@@ -53,30 +53,40 @@ class PickingListController extends Controller
             ]);
 
             foreach ($requestOrder->items()->where('qty_approved', '>', 0)->get() as $item) {
-                $remainingQty = $item->qty_approved;
 
-                $stocks = Stock::where('product_id', $item->product_id)
-                    ->where('qty_reserved', '>', 0)
-                    ->orderBy('expired_at', 'asc')
-                    ->orderBy('created_at', 'asc')
-                    ->get();
+                PickingListItem::create([
+                    'picking_list_id' => $pickingList->id,
+                    'product_id' => $item->product_id,
+                    'stock_id' => $item->stock->id,
+                    'qty_to_pick' => min($item->qty_approved, $item->stock->qty_reserved),
+                    'location' => $item->stock->product->lokasi,
+                    'sku' => $item->stock->sku,
+                ]);
 
-                foreach ($stocks as $stock) {
-                    if ($remainingQty <= 0) { break; }
+                // $remainingQty = $item->qty_approved;
 
-                    $qtyToPick = min($remainingQty, $stock->qty_reserved);
+                // $stocks = Stock::where('product_id', $item->product_id)
+                //     ->where('qty_reserved', '>', 0)
+                //     ->orderBy('expired_at', 'asc')
+                //     ->orderBy('created_at', 'asc')
+                //     ->get();
 
-                    PickingListItem::create([
-                        'picking_list_id' => $pickingList->id,
-                        'product_id' => $item->product_id,
-                        'stock_id' => $stock->id,
-                        'qty_to_pick' => $qtyToPick,
-                        'location' => $stock->product->lokasi,
-                        'sku' => $stock->sku,
-                    ]);
+                // foreach ($stocks as $stock) {
+                //     if ($remainingQty <= 0) { break; }
 
-                    $remainingQty -= $qtyToPick;
-                }
+                //     $qtyToPick = min($remainingQty, $stock->qty_reserved);
+
+                //     PickingListItem::create([
+                //         'picking_list_id' => $pickingList->id,
+                //         'product_id' => $item->product_id,
+                //         'stock_id' => $stock->id,
+                //         'qty_to_pick' => $qtyToPick,
+                //         'location' => $stock->product->lokasi,
+                //         'sku' => $stock->sku,
+                //     ]);
+
+                //     $remainingQty -= $qtyToPick;
+                // }
             }
 
             DB::commit();

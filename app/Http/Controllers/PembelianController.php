@@ -238,6 +238,19 @@ class PembelianController extends Controller
                         'status' => 'available',
                     ]);
 
+                    // Decrease StockPembelian
+                    $stockPembelian = StockPembelian::where([
+                        'pembelian_id' => $pembelian->id,
+                        'product_id' => $itemData['product_id']
+                    ])->first();
+
+                    if ($stockPembelian) {
+                        $stockPembelian->decrement('qty', $qtyDiterima);
+                        if ($stockPembelian->qty <= 0) {
+                            $stockPembelian->delete();
+                        }
+                    }
+
                     // Log movement
                     StockMovement::create([
                         'product_id' => $itemData['product_id'],
@@ -254,7 +267,7 @@ class PembelianController extends Controller
                 // Update product HPP
                 $newHPP = $product->calculateHPP($qtyDiterima, $pembelianProduct->harga_beli);
                 $product->update([
-                    'hpp' => $newHPP,
+                    'harga_beli' => $newHPP,
                 ]);
                 $product->updateStockValue();
             }

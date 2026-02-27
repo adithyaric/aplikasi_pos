@@ -106,6 +106,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
 
     // Request Orders
     Route::resource('request-orders', App\Http\Controllers\RequestOrderController::class);
+    Route::post('request-orders/{requestOrder}/update-stocks', [App\Http\Controllers\RequestOrderController::class, 'updateStocks'])->name('request-orders.update-stocks');
     Route::get('request-orders/{requestOrder}/verify', [App\Http\Controllers\RequestOrderController::class, 'verify'])->name('request-orders.verify');
     Route::post('request-orders/{requestOrder}/verify', [App\Http\Controllers\RequestOrderController::class, 'processVerification'])->name('request-orders.process-verification');
 
