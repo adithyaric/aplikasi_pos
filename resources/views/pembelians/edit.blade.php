@@ -28,24 +28,6 @@
                                     </div>
                                 @enderror
                             </div>
-                            {{-- <div class="form-group"> --}}
-                                {{-- <label>Outlet</label> --}}
-                                {{-- <select class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" --}}
-                                    {{-- style="width: 100%;"> --}}
-                                    {{-- <option value="" selected disabled>Pilih Outlet</option> --}}
-                                    {{-- @foreach ($outlets as $outlet) --}}
-                                        {{-- <option value="{{ $outlet->id }}" --}}
-                                            {{-- {{ old('outlet_id', $pembelian->outlet_id) == $outlet->id ? 'selected' : '' }}> --}}
-                                            {{-- {{ $outlet->name }} --}}
-                                        {{-- </option> --}}
-                                    {{-- @endforeach --}}
-                                {{-- </select> --}}
-                                {{-- @error('outlet_id') --}}
-                                    {{-- <div class="invalid-feedback text-danger"> --}}
-                                        {{-- {{ $message }} --}}
-                                    {{-- </div> --}}
-                                {{-- @enderror --}}
-                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Supplier</label>
                                 <select class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier"
@@ -64,24 +46,6 @@
                                     </div>
                                 @enderror
                             </div>
-                            {{-- <div class="form-group"> --}}
-                                {{-- <label>Kas</label> --}}
-                                {{-- <select class="form-control select2" name="kas_id" data-placeholder="Pilih Kas" --}}
-                                    {{-- style="width: 100%;"> --}}
-                                    {{-- <option value="" selected disabled>Pilih Supplier</option> --}}
-                                    {{-- @foreach ($kas as $kas) --}}
-                                        {{-- <option value="{{ $kas->id }}" --}}
-                                            {{-- {{ old('kas_id', $pembelian->kas_id) == $kas->id ? 'selected' : '' }}> --}}
-                                            {{-- {{ $kas->name }} --}}
-                                        {{-- </option> --}}
-                                    {{-- @endforeach --}}
-                                {{-- </select> --}}
-                                {{-- @error('kas_id') --}}
-                                    {{-- <div class="invalid-feedback text-danger"> --}}
-                                        {{-- {{ $message }} --}}
-                                    {{-- </div> --}}
-                                {{-- @enderror --}}
-                            {{-- </div> --}}
                             <hr>
                             <table class="table table-bordered table-striped" id="example">
                                 <thead>
@@ -101,13 +65,7 @@
                                                 <select class="form-control select2 product"
                                                     data-placeholder="Pilih Product"
                                                     name="product[{{ $key }}][product_id]" required
-                                                    style="width:100%">
-                                                    @foreach ($products as $product)
-                                                        <option {{ $stock->product_id == $product->id ? 'selected' : '' }}
-                                                            value="{{ $product->id }}"
-                                                            data-serialized="{{ $product->is_serialized ? 1 : 0 }}">
-                                                            {{ $product->name }}</option>
-                                                    @endforeach
+                                                    style="width:100%" data-current-product="{{ $stock->product_id }}">
                                                 </select>
                                             </td>
                                             <td>
@@ -116,18 +74,6 @@
                                                     value="{{ $stock->product->is_serialized ? ($stock->serial_numbers ? count($stock->serial_numbers) : 1) : $stock->qty }}"
                                                     min="1" {{ $stock->product->is_serialized ? 'readonly' : '' }}>
                                             </td>
-                                            {{-- <td> --}}
-                                                {{-- <div class="serial-container" --}}
-                                                    {{-- style="display: {{ $stock->product->is_serialized ? 'block' : 'none' }};"> --}}
-                                                    {{-- <textarea class="form-control serial-numbers" name="product[{{ $key }}][serial_numbers]" --}}
-                                                        {{-- placeholder="Enter serial numbers (one per line)" rows="3">{{ $stock->serial_numbers ? implode("\n", $stock->serial_numbers) : '' }}</textarea> --}}
-                                                    {{-- <small class="text-muted">Enter one serial number per line</small> --}}
-                                                {{-- </div> --}}
-                                                {{-- <div class="no-serial-message" --}}
-                                                    {{-- style="display: {{ $stock->product->is_serialized ? 'none' : 'block' }};"> --}}
-                                                    {{-- <small class="text-muted">No serial numbers needed</small> --}}
-                                                {{-- </div> --}}
-                                            {{-- </td> --}}
                                             <td>
                                                 <input type="text" class="form-control harga_beli numeral-mask"
                                                     name="product[{{ $key }}][harga_beli]" required
@@ -169,7 +115,68 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
+        let currentProducts = null;
         let productIndex = {{ count($pembelian->pembelianProducts) }};
+
+        // Function to populate product selects with given products
+        function populateProductSelects(products, target = '.product') {
+            $(target).each(function() {
+                let $select = $(this);
+                let currentProductId = $select.data('current-product'); // from Blade attribute
+
+                $select.empty().append('<option value="" disabled selected>Pilih Produk</option>');
+                $.each(products, function(i, product) {
+                    let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
+                    $select.append($('<option>', {
+                        value: product.id,
+                        text: product.name + stockText,
+                        'data-serialized': product.is_serialized ? 1 : 0
+                    }));
+                });
+
+                // Set selected value if it exists
+                if (currentProductId && products.some(p => p.id == currentProductId)) {
+                    $select.val(currentProductId);
+                }
+
+                $select.trigger('change.select2');
+            });
+
+            updateSubtotalAndTotal();
+        }
+
+        // Listen for supplier change
+        $('select[name="supplier_id"]').on('change', function() {
+            let supplierId = $(this).val();
+            if (!supplierId) {
+                // Clear all product selects
+                $('.product').empty().append('<option value="" disabled selected>Pilih Produk</option>').trigger(
+                    'change.select2');
+                currentProducts = null;
+                return;
+            }
+
+            $.get('/supplier/' + supplierId + '/products', function(products) {
+                currentProducts = products;
+                populateProductSelects(products);
+            });
+        });
+
+        // On page load, trigger supplier change to load products for the pre-selected supplier
+        $(document).ready(function() {
+            let initialSupplierId = $('select[name="supplier_id"]').val();
+            if (initialSupplierId) {
+                $.get('/supplier/' + initialSupplierId + '/products', function(products) {
+                    currentProducts = products;
+                    populateProductSelects(products);
+                });
+            }
+
+            // Also trigger product change for existing rows to load harga_beli
+            $('.product').each(function() {
+                $(this).trigger('change');
+            });
+        });
 
         function addBahanBaku() {
             productIndex++;
@@ -178,27 +185,19 @@
             <td>
                 <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
                     <option value="" disabled selected>Pilih Produk</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }}</option>
-                    @endforeach
                 </select>
             </td>
             <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td>
-                <div class="serial-container" style="display: none;">
-                    <textarea class="form-control serial-numbers" name="product[${productIndex}][serial_numbers]" placeholder="Enter serial numbers (one per line)" rows="3"></textarea>
-                    <small class="text-muted">Enter one serial number per line</small>
-                </div>
-                <div class="no-serial-message" style="display: block;">
-                    <small class="text-muted">No serial numbers needed</small>
-                </div>
-            </td>
             <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
             <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
         </tr>`;
             $('#product-repeater').append(productTemplate);
-            $('#product-repeater .select2').last().select2();
+            let $newSelect = $('#product-repeater .select2').last();
+            $newSelect.select2();
+            if (currentProducts) {
+                populateProductSelects(currentProducts, $newSelect);
+            }
             updateSubtotalAndTotal();
         }
 

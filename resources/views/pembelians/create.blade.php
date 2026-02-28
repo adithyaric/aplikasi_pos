@@ -58,24 +58,26 @@
                                 <tbody id="product-repeater">
                                     <tr>
                                         <td>
-                                            <select class="form-control select2 product" data-placeholder="Pilih Product" name="product[0][product_id]" required style="width:100%">
+                                            <select class="form-control select2 product" data-placeholder="Pilih Product"
+                                                name="product[0][product_id]" required style="width:100%">
                                                 <option value="" disabled selected>Pilih Produk</option>
-                                                @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }} [{{ $product->stocks()->sum('qty_available') }}]</option>
-                                                @endforeach
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control qty" name="product[0][qty]" required value="1" min="1">
+                                            <input type="number" class="form-control qty" name="product[0][qty]" required
+                                                value="1" min="1">
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control harga_beli numeral-mask" name="product[0][harga_beli]" required>
+                                            <input type="text" class="form-control harga_beli numeral-mask"
+                                                name="product[0][harga_beli]" required>
                                         </td>
                                         <td>
-                                            <input class="form-control subtotal" name="product[0][subtotal]" required readonly>
+                                            <input class="form-control subtotal" name="product[0][subtotal]" required
+                                                readonly>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button>
+                                            <button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)"
+                                                type="button">Remove</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -102,7 +104,51 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
+        let currentProducts = null;
         let productIndex = 0;
+
+        $('select[name="supplier_id"]').on('change', function() {
+            let supplierId = $(this).val();
+            if (!supplierId) {
+                // If no supplier selected, clear all product selects
+                $('.product').empty().append('<option value="" disabled selected>Pilih Produk</option>').trigger(
+                    'change.select2');
+                currentProducts = null;
+                return;
+            }
+
+            // Fetch products for this supplier
+            $.get('/supplier/' + supplierId + '/products', function(products) {
+                currentProducts = products;
+                populateProductSelects(products);
+            });
+        });
+
+        function populateProductSelects(products, target = '.product') {
+            $(target).each(function() {
+                let $select = $(this);
+                let currentVal = $select.val(); // preserve selected value if still valid
+
+                $select.empty().append('<option value="" disabled selected>Pilih Produk</option>');
+                $.each(products, function(i, product) {
+                    // Include stock count if your API returns it; otherwise omit.
+                    let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
+                    $select.append($('<option>', {
+                        value: product.id,
+                        text: product.name + stockText,
+                        'data-serialized': product.is_serialized ? 1 : 0
+                    }));
+                });
+
+                // Try to reselect previous value if it exists in new options
+                if (currentVal && products.some(p => p.id == currentVal)) {
+                    $select.val(currentVal);
+                }
+
+                // Refresh Select2
+                $select.trigger('change.select2');
+            });
+        }
 
         function addBahanBaku() {
             productIndex++;
@@ -111,9 +157,6 @@
             <td>
                 <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
                     <option value="" disabled selected>Pilih Produk</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-serialized="{{ $product->is_serialized ? 1 : 0 }}">{{ $product->name }} [{{ $product->stocks()->sum('qty_available') }}]</option>
-                    @endforeach
                 </select>
             </td>
             <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
@@ -122,7 +165,15 @@
             <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
         </tr>`;
             $('#product-repeater').append(productTemplate);
-            $('#product-repeater .select2').last().select2();
+
+            let $newSelect = $('#product-repeater .select2').last();
+            $newSelect.select2(); // initialize Select2
+
+            // If we already have products from a selected supplier, populate this new select
+            if (currentProducts) {
+                populateProductSelects(currentProducts, $newSelect);
+            }
+
             updateSubtotalAndTotal();
         }
 
@@ -210,7 +261,8 @@
             let outlet_id = $(this).val();
             $.get('/outlet/' + outlet_id + '/kas', function(data) {
                 $('#kas').find('option').remove();
-                let defaultOption = $('<option>').val('').text('Pilih Kas').prop('disabled', true).prop('selected', true);
+                let defaultOption = $('<option>').val('').text('Pilih Kas').prop('disabled', true).prop(
+                    'selected', true);
                 $('#kas').append(defaultOption);
                 data.forEach(function(kas) {
                     let option = $('<option>').val(kas.id).text(kas.name);

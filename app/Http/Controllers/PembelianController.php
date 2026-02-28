@@ -40,7 +40,14 @@ class PembelianController extends Controller
 
     public function getProductsBySupplier(Supplier $supplier)
     {
-        $products = $supplier->products()->select('id', 'name', 'is_serialized', 'harga_beli')->get();
+        $products = $supplier->products()
+            ->select('products.id', 'name', 'is_serialized', 'harga_beli')
+            ->get()
+            ->map(function ($product) {
+                $product->stock_count = $product->stocks()->sum('qty_available');
+
+                return $product;
+            });
 
         return response()->json($products);
     }
