@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class OwnerStock extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'owner_id',
@@ -30,5 +33,17 @@ class OwnerStock extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['*'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['created_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->setDescriptionForEvent(fn (string $eventName) => "Data OwnerStock has been {$eventName}")
+            ->useLogName('OwnerStock');
     }
 }

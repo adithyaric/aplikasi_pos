@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class StockPembelian extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'pembelian_id',
@@ -47,5 +50,17 @@ class StockPembelian extends Model
     public function scopeForProduct($query, $productId)
     {
         return $query->where('product_id', $productId);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['*'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['created_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->setDescriptionForEvent(fn (string $eventName) => "Data StockPembelian has been {$eventName}")
+            ->useLogName('StockPembelian');
     }
 }

@@ -31,17 +31,17 @@ class DatabaseSeeder extends Seeder
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', //password
             'remember_token' => Str::random(10),
         ]);
-        User::create([
-            'name' => 'customer',
-            'username' => 'customer@mailinator.com',
-            'role' => 'customer',
-            'status' => 'active',
-            'email' => 'customer@mailinator.com',
-            'alamat' => 'magelang',
-            'no_telp' => '+62'.str_pad(5, 10, '0', STR_PAD_LEFT),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-            'remember_token' => Str::random(10),
-        ]);
+        // User::create([
+        //     'name' => 'customer',
+        //     'username' => 'customer@mailinator.com',
+        //     'role' => 'customer',
+        //     'status' => 'active',
+        //     'email' => 'customer@mailinator.com',
+        //     'alamat' => 'magelang',
+        //     'no_telp' => '+62'.str_pad(5, 10, '0', STR_PAD_LEFT),
+        //     'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        //     'remember_token' => Str::random(10),
+        // ]);
 
         // for ($i = 1; $i <= 3; $i++) {
         //     Slider::create([
@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             Product::create([
                 'pic' => 'pic'.$i,
                 'code' => 'code'.$i,
@@ -99,13 +99,14 @@ class DatabaseSeeder extends Seeder
                 'ukuran' => ($i % 2 == 0) ? 'Large' : 'Small',
                 // 'outlet_id' => Outlet::inRandomOrder()->first()->id,
                 // 'supplier_id' => Supplier::inRandomOrder()->first()->id,
-                'brand' => 'brand'.$i,
-                'model' => 'model'.$i,
+                // 'brand' => 'brand'.$i,
+                // 'model' => 'model'.$i,
                 // 'is_serialized' => rand(0, 1),
                 'is_serialized' => 0,
+                'harga_beli' => 0,
                 'harga_jual' => round(rand(10000, 100000), -4),
-                'diskon' => rand(0, 50),
-                'berat' => round(rand(1, 10)),
+                // 'diskon' => rand(0, 50),
+                // 'berat' => round(rand(1, 10)),
             ]);
         }
 

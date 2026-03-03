@@ -30,6 +30,13 @@ return new class extends Migration
             $table->renameColumn('batch_number', 'sku');
             $table->renameColumn('hpp', 'harga_beli');
         });
+
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('hpp');
+            $table->dropColumn('hpp_method');
+            $table->dropColumn('brand');
+            $table->dropColumn('berat');
+        });
     }
 
     /**

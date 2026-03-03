@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Stock extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'pembelian_id',
@@ -86,4 +89,16 @@ class Stock extends Model
         'updated_at' => 'datetime',
         'expired_at' => 'datetime',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['*'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['created_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->setDescriptionForEvent(fn (string $eventName) => "Data Stock has been {$eventName}")
+            ->useLogName('Stock');
+    }
 }
