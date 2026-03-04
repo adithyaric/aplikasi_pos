@@ -52,8 +52,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-xs btn-primary" data-toggle="modal"
-                                                data-target="#historyModal{{ $stock->id }}">
+                                            <button type="button" class="btn btn-xs btn-primary btn-stock-history"
+                                                data-toggle="modal" data-target="#stockHistoryModal"
+                                                data-id="{{ $stock->id }}">
                                                 <i class="fa fa-history"></i> History
                                             </button>
                                         </td>
@@ -89,7 +90,56 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Stock History Modal -->
+                        <div class="modal fade" id="stockHistoryModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Stock History</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h5><b>Activity Log</b></h5>
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>User</th>
+                                                    <th>Event</th>
+                                                    <th>Changes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="activityBody">
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Loading...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <h5><b>Stock Movements</b></h5>
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>User</th>
+                                                    <th>Type</th>
+                                                    <th>In</th>
+                                                    <th>Out</th>
+                                                    <th>Balance</th>
+                                                    <th>Notes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="movementBody">
+                                                <tr>
+                                                    <td colspan="7" class="text-center">Loading...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> {{-- box-body --}}
                 </div>
             </div>
         </div>
@@ -130,6 +180,63 @@
                             '<tr><td colspan="3" class="text-center text-danger">Error loading data.</td></tr>'
                         );
                     }
+                });
+            });
+
+            $(document).on('click', '.btn-stock-history', function() {
+                var id = $(this).data('id');
+                $('#activityBody').html('<tr><td colspan="4" class="text-center">Loading...</td></tr>');
+                $('#movementBody').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
+                $('#stockHistoryModal').modal('show');
+
+                $.get('/stock/' + id + '/history', function(res) {
+                    // Activities
+                    var aRows = '';
+                    if (res.activities.length) {
+                        res.activities.forEach(function(item) {
+                            var changes = '';
+                            if (item.event === 'created') {
+                                changes = 'Stock created';
+                            } else {
+                                var old = item.properties.old || {};
+                                var attr = item.properties.attributes || {};
+                                changes = Object.keys(attr).map(function(k) {
+                                    return k + ': ' + (old[k] ?? '?') + ' → ' +
+                                        attr[k];
+                                }).join('<br>');
+                            }
+                            aRows += '<tr><td>' + item.date + '</td><td>' + item.user +
+                                '</td><td>' + item.event + '</td><td>' + changes +
+                                '</td></tr>';
+                        });
+                    } else {
+                        aRows =
+                            '<tr><td colspan="4" class="text-center">No activity found.</td></tr>';
+                    }
+                    $('#activityBody').html(aRows);
+
+                    // Movements
+                    var mRows = '';
+                    if (res.movements.length) {
+                        res.movements.forEach(function(item) {
+                            mRows += '<tr><td>' + item.date + '</td><td>' + item.user +
+                                '</td><td>' + item.type + '</td><td>' + (item.qty_in ?? 0) +
+                                '</td><td>' + (item.qty_out ?? 0) + '</td><td>' + (item
+                                    .balance ?? 0) + '</td><td>' + (item.notes ?? '-') +
+                                '</td></tr>';
+                        });
+                    } else {
+                        mRows =
+                            '<tr><td colspan="7" class="text-center">No movements found.</td></tr>';
+                    }
+                    $('#movementBody').html(mRows);
+                }).fail(function() {
+                    $('#activityBody').html(
+                        '<tr><td colspan="4" class="text-center text-danger">Error loading data.</td></tr>'
+                    );
+                    $('#movementBody').html(
+                        '<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>'
+                    );
                 });
             });
         });

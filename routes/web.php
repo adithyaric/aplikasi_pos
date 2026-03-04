@@ -133,6 +133,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     // Route::get('stock-movements/product/{product}', [App\Http\Controllers\StockMovementController::class, 'byProduct'])->name('stock-movements.by-product');
 
     Route::get('/product/{product}/price-history', [App\Http\Controllers\ProductController::class, 'priceHistory'])->name('product.price-history');
+    Route::get('/stock/{stock}/history', [App\Http\Controllers\StockController::class, 'history'])->name('stock.history');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {
