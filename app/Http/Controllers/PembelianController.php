@@ -360,6 +360,7 @@ class PembelianController extends Controller
         } else {
             if (isset($request->product)) {
                 foreach ($request->product as $productData) {
+                    $product = Product::find($productData['product_id']);
                     // Process serial numbers for PembelianProduct
                     $serialNumbers = null;
                     if (isset($productData['serial_numbers']) && ! empty($productData['serial_numbers'])) {
@@ -411,6 +412,8 @@ class PembelianController extends Controller
                             ]
                         );
                     }
+
+                    $product->update(['harga_beli' => (int) str_replace(',', '', $productData['harga_beli'])]);
                 }
             }
         }
