@@ -63,7 +63,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/category-pengeluaran-create', [CategoryController::class, 'createPengeluaran'])->name('category.pengeluaran.create');
     Route::get('/category-pengeluaran/{category}/edit', [CategoryController::class, 'editPengeluaran'])->name('category.pengeluaran.edit');
     Route::resource('/product', ProductController::class);
-    //TODO tampil halaman stock dengan pop-up history harga fifo
+
     Route::resource('/stock', StockController::class);
     Route::resource('/voucher', VoucherController::class);
     Route::resource('/slider', SliderController::class);
@@ -131,6 +131,8 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     // Stock Movements
     // Route::get('stock-movements', [App\Http\Controllers\StockMovementController::class, 'index'])->name('stock-movements.index');
     // Route::get('stock-movements/product/{product}', [App\Http\Controllers\StockMovementController::class, 'byProduct'])->name('stock-movements.by-product');
+
+    Route::get('/product/{product}/price-history', [App\Http\Controllers\ProductController::class, 'priceHistory'])->name('product.price-history');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

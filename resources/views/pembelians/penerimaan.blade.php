@@ -43,7 +43,7 @@
                             <div class="form-group">
                                 <label>Goods receipt <span class="text-danger">*</span></label>
                                 <input type="text" name="code_gr" class="form-control"
-                                    value="{{ old('code_gr', $pembelian->code_gr) }}" required>
+                                    value="{{ str_replace('PO', 'GR', old('code_gr', $pembelian->code_gr ?? $pembelian->code)) }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Tanggal Penerimaan <span class="text-danger">*</span></label>

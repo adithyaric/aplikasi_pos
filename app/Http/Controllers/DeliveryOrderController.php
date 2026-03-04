@@ -96,6 +96,7 @@ class DeliveryOrderController extends Controller
                     [
                         'owner_id' => $deliveryOrder->owner_id,
                         'product_id' => $item->product_id,
+                        'stock_id' => $stock->id,
                         'sku' => $stock->sku,
                     ],
                     [

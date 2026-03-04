@@ -274,7 +274,7 @@ class PembelianController extends Controller
                 // Update product HPP
                 $newHPP = $product->calculateHPP($qtyDiterima, $pembelianProduct->harga_beli);
                 $product->update([
-                    'harga_beli' => $newHPP,
+                    'harga_beli' => (int) $newHPP,
                 ]);
                 $product->updateStockValue();
             }

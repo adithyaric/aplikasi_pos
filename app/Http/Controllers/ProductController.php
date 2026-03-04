@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Models\Activity;
 
 class ProductController extends Controller
 {
@@ -151,5 +152,31 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect(route('product.index'))->with('toast_success', 'Berhasil Menghapus Data!');
+    }
+
+    public function priceHistory(Product $product)
+    {
+        $activities = Activity::forSubject($product)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->filter(function ($activity) {
+                return isset($activity->properties['attributes']['harga_beli']);
+            })
+            ->map(function ($activity, $index) use (&$prev) {
+                $new = $activity->properties['attributes']['harga_beli'];
+                $old = $activity->event === 'created'
+                    ? null
+                    : ($activity->properties['old']['harga_beli'] ?? null);
+
+                return [
+                    'date'  => $activity->created_at->format('d M Y H:i'),
+                    'user'  => $activity->causer?->name ?? 'System',
+                    'old'   => (int) $old,
+                    'new'   => (int) $new,
+                    'event' => $activity->event,
+                ];
+            })->values();
+
+        return response()->json(['success' => true, 'data' => $activities]);
     }
 }

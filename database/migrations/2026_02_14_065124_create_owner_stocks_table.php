@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('owner_id')->nullable()->constrained('outlets');
             $table->foreignId('product_id')->nullable()->constrained();
+            $table->foreignId('stock_id')->nullable()->constrained('stocks');
             $table->integer('qty')->default(0);
             $table->string('batch_number')->nullable();
             $table->date('expired_at')->nullable();

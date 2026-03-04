@@ -15,6 +15,7 @@ class OwnerStock extends Model
     protected $fillable = [
         'owner_id',
         'product_id',
+        'stock_id',
         'qty',
         'sku',
         'expired_at',
@@ -33,6 +34,11 @@ class OwnerStock extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class);
     }
 
     public function getActivitylogOptions(): LogOptions

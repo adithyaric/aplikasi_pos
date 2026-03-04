@@ -22,8 +22,7 @@
                                             <strong>Tanggal Terima :
                                                 {{ $pembelian->receipt_date?->format('d/m/Y') ?? '-' }}</strong>
                                             <strong>Pemasok : {{ $pembelian->supplier?->name }}</strong>
-                                            <small>Bank & No Rek : {{ $pembelian->supplier?->bank_name }}
-                                                {{ $pembelian->supplier?->bank_account }}</small>
+                                            {{-- <small>Bank & No Rek : {{ $pembelian->supplier?->bank_name }} {{ $pembelian->supplier?->bank_account }}</small> --}}
                                         </div>
                                         <div class="ms-auto align-self-start">
                                             <h5>
@@ -41,7 +40,7 @@
                                     </div>
                                     <div class="p-3 border-bottom border-bottom-1">
                                         <div class="overflow-auto">
-                                            <table class="table">
+                                            <table id="example1" class="table table-bordered table-striped">
                                                 <thead>
                                                     <tr>
                                                         <th>Produk</th>
@@ -109,7 +108,7 @@
                                                         @foreach ($paymentHistory as $history)
                                                             <tr>
                                                                 <td>{{ \Carbon\Carbon::parse($history['payment_date'])->format('d/M/Y
-                                                                                                                                                                                                                                                                                                                        H:i T') }}
+                                                                                                                                                                                                                                                                                                                                                                                        H:i T') }}
                                                                 </td>
                                                                 <td>Rp {{ number_format($history['amount'], 0, ',', '.') }}
                                                                 </td>
@@ -148,7 +147,7 @@
                                 @endif
                             </div>
 
-                            <div class="col-md-4 col-sm-12">
+                            <div class="col-md-4 col-sm-12 bg-success">
                                 <div class="border border-2 d-flex flex-column gap-2 rounded-3 overflow-hidden">
                                     <h4 class="fw-bold p-3 border-bottom border-bottom-1">
                                         Pembayaran
@@ -187,10 +186,8 @@
                                         <div class="form-group">
                                             <label class="form-label">No. Bukti / Referensi</label>
                                             <input type="text" name="payment_reference" class="form-control"
-                                                id="paymentReference"
-                                                value="{{ $pembelian->pembelianTransaction?->payment_reference }}"
-                                                placeholder="Mis. TRF-0925-00123" required
-                                                @if ($pembelian->pembelianTransaction?->status === 'paid') disabled @endif />
+                                                id="paymentReference" value="" placeholder="Mis. TRF-0925-00123"
+                                                required @if ($pembelian->pembelianTransaction?->status === 'paid') disabled @endif />
                                             @if ($pembelian->supplier?->bank_name && $pembelian->supplier?->bank_account)
                                                 <small class="text-muted">
                                                     Rekening: {{ $pembelian->supplier->bank_name }} -
@@ -254,8 +251,11 @@
                                         </div>
 
                                         @if ($pembelian->pembelianTransaction?->status !== 'paid')
-                                            <div class="d-flex justify-content-end align-items-center">
-                                                <button type="submit" class="btn btn-success">Simpan Pembayaran</button>
+                                            <div class="form-group">
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <button type="submit" class="btn btn-success">Simpan
+                                                        Pembayaran</button>
+                                                </div>
                                             </div>
                                         @endif
                                     </form>

@@ -93,15 +93,15 @@ class Product extends Model
 
     public function calculateHPP($newQty, $newPrice)
     {
-        if ($this->hpp_method === 'average') {
-            $currentValue = $this->total_stock * $this->harga_beli;
-            $newValue = $newQty * $newPrice;
-            $totalQty = $this->total_stock + $newQty;
+        // if ($this->hpp_method === 'average') {
+        $currentValue = $this->total_stock * $this->harga_beli;
+        $newValue = $newQty * $newPrice;
+        $totalQty = $this->total_stock + $newQty;
 
-            return $totalQty > 0 ? ($currentValue + $newValue) / $totalQty : 0;
-        }
+        return $totalQty > 0 ? ($currentValue + $newValue) / $totalQty : 0;
+        // }
         // FIFO handled differently in stock allocation
-        return $this->harga_beli;
+        // return $this->harga_beli;
     }
 
     public function updateStockValue()

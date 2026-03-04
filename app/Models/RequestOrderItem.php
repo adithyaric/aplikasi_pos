@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class RequestOrderItem extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'request_order_id',
@@ -32,5 +35,17 @@ class RequestOrderItem extends Model
     public function stock()
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['*'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['created_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->setDescriptionForEvent(fn (string $eventName) => "Data RequestOrderItem has been {$eventName}")
+            ->useLogName('RequestOrderItem');
     }
 }

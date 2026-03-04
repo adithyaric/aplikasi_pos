@@ -9,9 +9,14 @@ class StockController extends Controller
     public function index()
     {
         return view('stocks.index', [
-            'stocks' => Stock::get()
-                ->sortBy('product_id')
-            // ->sortBy('expired_at')
+            'stocks' => Stock::with([
+                'product',
+                'pembelian.supplier',
+                'ownerStock.owner',
+            ])
+                ->orderBy('product_id')
+                ->orderBy('expired_at')
+                ->get()
         ]);
     }
 
