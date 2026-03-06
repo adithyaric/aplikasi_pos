@@ -30,6 +30,7 @@
                     <li class="{{ request()->is('category-product*') ? 'active' : '' }}"><a href="/category-product"><i class="fa fa-tags"></i><span>Category</span></a></li>
                     <li class="{{ request()->is('product*') ? 'active' : '' }}"><a href="/product"><i class="fa fa-archive"></i><span>Products</span></a></li>
                     <li class="{{ request()->is('stock*') ? 'active' : '' }}"><a href="/stock"><i class="fa fa-cubes"></i><span>Stocks</span></a></li>
+                    <li class="{{ request()->is('stock.kartu') ? 'active' : '' }}"><a href="/stock-kartu"><i class="fa fa-cube"></i><span>Stocks Kartu</span></a></li>
                 </ul>
             </li>
             <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan*') || request()->is('refund*')

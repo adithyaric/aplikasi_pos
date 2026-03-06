@@ -83,6 +83,7 @@
                                 </tbody>
                             </table>
 
+                            {{-- //TODO add Product pop-up (nanti bisa lanjut di select²) --}}
                             <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">Add</button>
                             <hr>
                             <div class="form-group">
@@ -133,9 +134,10 @@
                 $.each(products, function(i, product) {
                     // Include stock count if your API returns it; otherwise omit.
                     let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
+                    //TODO add rekomendasi kekurangan stock
                     $select.append($('<option>', {
                         value: product.id,
-                        text: product.name + stockText,
+                        text: product.code + ' ' + product.name + stockText,
                         'data-serialized': product.is_serialized ? 1 : 0
                     }));
                 });

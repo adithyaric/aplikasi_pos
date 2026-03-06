@@ -19,7 +19,7 @@
                                     <td>Harga Beli</td>
                                     <td>Stock Owner</td>
                                     <td>Qty Reserved</td>
-                                    <td>Qty Available</td>
+                                    <td>Qty Warehouse</td>
                                     <td>Created</td>
                                     <td>Expired</td>
                                     <td>Status</td>

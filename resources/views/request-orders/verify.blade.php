@@ -202,6 +202,7 @@
                                     <label for="verification_notes">Catatan Verifikasi (opsional)</label>
                                     <textarea class="form-control" name="verification_notes" rows="3">{{ old('verification_notes', $requestOrder->verification_notes) }}</textarea>
                                 </div>
+                                @if (!isset($requestOrder->pickingList))
                                 <button type="submit" class="btn btn-primary">
                                     @if ($requestOrder->status == 'pending')
                                         Proses Verifikasi
@@ -209,6 +210,7 @@
                                         Update Verifikasi
                                     @endif
                                 </button>
+                                @endif
                             </form>
                         @endif
                     </div>

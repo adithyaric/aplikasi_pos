@@ -27,8 +27,10 @@
                                     <td>Nama</td>
                                     <td>items</td>
                                     <td>Total</td>
+                                    <td>Status Bayar</td>
+                                    <td>Status Penerimaan</td>
                                     <td>Aksi</td>
-                                    <td>Posting</td>
+                                    {{-- <td>Posting</td> --}}
                                 </tr>
                             </thead>
                             @foreach ($pembelians as $value)
@@ -49,10 +51,14 @@
                                         </ul>
                                     </td>
                                     <td>@currency($value->total)</td>
+                                    <td>{{ $value->pembelianTransaction?->status }}</td>
+                                    <td>{{ $value->receipt_status }}</td>
                                     <td>
-                                        <a class=" btn-sm btn btn-success" href="{{ route('pembelian.pembayaran.edit', $value->id) }}">Bayar</a>
+                                        <a class=" btn-sm btn btn-success"
+                                            href="{{ route('pembelian.pembayaran.edit', $value->id) }}">Bayar</a>
                                         @if (!$value->is_published)
-                                            <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
+                                            <a class=" btn-sm btn btn-warning"
+                                                href="{{ route('pembelian.edit', $value->id) }}">Edit</a>
                                             <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
                                                 style="display: inline;">
                                                 @method('delete')
@@ -61,27 +67,27 @@
                                                     onclick="return confirm('Are you sure?')">Hapus</button>
                                             </form>
                                         @else
-                                        {{-- <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.show', $value->id) }}">Print Barcode</a> --}}
-                                        {{-- <a class=" btn-sm btn btn-info" href="{{ route('pembelian.print', $value->id) }}">Print</a> --}}
+                                            {{-- <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.show', $value->id) }}">Print Barcode</a> --}}
+                                            {{-- <a class=" btn-sm btn btn-info" href="{{ route('pembelian.print', $value->id) }}">Print</a> --}}
+                                        @endif
+                                        @if (!$value->is_published)
+                                            <a href="{{ route('pembelian.penerimaan', $value) }}"
+                                                class="btn btn-sm btn-primary">
+                                                Penerimaan Barang
+                                            </a>
+                                        @else
+                                            <a href="{{ route('pembelian.penerimaan', $value) }}"
+                                                class="btn btn-sm btn-info">
+                                                Detail
+                                            </a>
                                         @endif
                                     </td>
                                     {{-- <td> --}}
-                                        {{-- <form action="{{ route('pembelian.publish', $value) }}" method="POST"> --}}
-                                            {{-- @csrf --}}
-                                            {{-- <button class="btn btn-sm btn-primary" type="submit" @disabled($value->is_published)>Publish</button> --}}
-                                        {{-- </form> --}}
+                                    {{-- <form action="{{ route('pembelian.publish', $value) }}" method="POST"> --}}
+                                    {{-- @csrf --}}
+                                    {{-- <button class="btn btn-sm btn-primary" type="submit" @disabled($value->is_published)>Publish</button> --}}
+                                    {{-- </form> --}}
                                     {{-- </td> --}}
-<td>
-    @if (!$value->is_published)
-        <a href="{{ route('pembelian.penerimaan', $value) }}" class="btn btn-sm btn-primary">
-            Penerimaan Barang
-        </a>
-    @else
-        <a href="{{ route('pembelian.penerimaan', $value) }}" class="btn btn-sm btn-info">
-            Detail
-        </a>
-    @endif
-</td>
                                 </tr>
                             @endforeach
                         </table>

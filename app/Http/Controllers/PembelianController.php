@@ -41,7 +41,7 @@ class PembelianController extends Controller
     public function getProductsBySupplier(Supplier $supplier)
     {
         $products = $supplier->products()
-            ->select('products.id', 'name', 'is_serialized', 'harga_beli')
+            ->select('products.id', 'code', 'name', 'is_serialized', 'harga_beli')
             ->get()
             ->map(function ($product) {
                 $product->stock_count = $product->stocks()->sum('qty_available');
@@ -165,9 +165,11 @@ class PembelianController extends Controller
             'items' => 'required|array',
             'items.*.stock_id' => 'nullable|exists:stocks,id',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.sku' => 'required|string',
+            'items.*.sku' => 'required|string|unique:stocks,sku',
             'items.*.qty_diterima' => 'required|integer|min:1',
             'items.*.expired_at' => 'nullable|date',
+        ], [
+            'items.*.sku.unique' => 'The SKU ":input" is already taken.',
         ]);
 
         DB::beginTransaction();
@@ -288,6 +290,46 @@ class PembelianController extends Controller
 
             return redirect()->route('pembelian.penerimaan', $pembelian)
                 ->with('toast_success', 'Penerimaan updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('toast_error', $e->getMessage())->withInput();
+        }
+    }
+
+    public function updatePenerimaan(Request $request, Pembelian $pembelian)
+    {
+        $request->validate([
+            'code_gr' => 'required|string',
+            'receipt_date' => 'required|date',
+            'receipt_pic' => 'required|string',
+            'receipt_status' => 'required|in:draft,validated,completed',
+            'receipt_photo' => 'nullable|image|max:2048',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $photoPath = $pembelian->receipt_photo;
+            if ($request->hasFile('receipt_photo')) {
+                $photoPath = $request->file('receipt_photo')->store('receipt-photos', 'public');
+            }
+
+            $pembelian->update([
+                'code_gr' => $request->code_gr,
+                'receipt_date' => $request->receipt_date,
+                'receipt_pic' => $request->receipt_pic,
+                'receipt_status' => $request->receipt_status,
+                'receipt_photo' => $photoPath,
+            ]);
+
+            if ($request->receipt_status == 'completed' && ! $pembelian->is_published) {
+                $pembelian->update(['is_published' => true]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('pembelian.penerimaan', $pembelian)
+                ->with('toast_success', 'Penerimaan details updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
 

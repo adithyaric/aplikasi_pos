@@ -6,9 +6,8 @@
     </section>
 
     <section class="content">
-        <form action="{{ route('pembelian.store-penerimaan', $pembelian) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('pembelian.update-penerimaan', $pembelian) }}" method="POST" enctype="multipart/form-data">
             @csrf
-
             <div class="row">
                 <div class="col-md-6">
                     <div class="box box-primary">
@@ -43,12 +42,14 @@
                             <div class="form-group">
                                 <label>Goods receipt <span class="text-danger">*</span></label>
                                 <input type="text" name="code_gr" class="form-control"
-                                    value="{{ str_replace('PO', 'GR', old('code_gr', $pembelian->code_gr ?? $pembelian->code)) }}" required>
+                                    value="{{ str_replace('PO', 'GR', old('code_gr', $pembelian->code_gr ?? $pembelian->code)) }}"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label>Tanggal Penerimaan <span class="text-danger">*</span></label>
                                 <input type="datetime-local" name="receipt_date" class="form-control"
-                                    value="{{ old('receipt_date', $pembelian->receipt_date?->format('Y-m-d\TH:i')) }}" required>
+                                    value="{{ old('receipt_date', $pembelian->receipt_date?->format('Y-m-d\TH:i')) }}"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label>PIC Penerima <span class="text-danger">*</span></label>
@@ -61,7 +62,6 @@
                                     <option value="draft"
                                         {{ old('receipt_status', $pembelian->receipt_status) == 'draft' ? 'selected' : '' }}>
                                         Draft</option>
-                                    {{-- <option value="validated"{{ old('receipt_status', $pembelian->receipt_status) == 'validated' ? 'selected' : '' }}>Validated</option> --}}
                                     <option value="completed"
                                         {{ old('receipt_status', $pembelian->receipt_status) == 'completed' ? 'selected' : '' }}>
                                         Completed</option>
@@ -72,17 +72,25 @@
                                 <input type="file" name="receipt_photo" class="form-control" accept="image/*">
                                 <small class="text-muted">Format: JPG, PNG. Max: 2MB</small><br>
                                 @if ($pembelian->receipt_photo)
-                                <a href="{{ asset('storage/' . $pembelian->receipt_photo) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $pembelian->receipt_photo) }}"
-                                        style="max-width: 200px;">
-                                </a>
+                                    <a href="{{ asset('storage/' . $pembelian->receipt_photo) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $pembelian->receipt_photo) }}"
+                                            style="max-width: 200px;">
+                                    </a>
                                 @endif
                             </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fa fa-save"></i> Update Penerimaan
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </form>
 
+        <form action="{{ route('pembelian.store-penerimaan', $pembelian) }}" method="POST" enctype="multipart/form-data">
+            @csrf
             <div class="row">
                 <div class="col-xs-12">
                     <div class="box">
@@ -134,7 +142,8 @@
                                                 <td>{{ $item->qty }}</td>
                                                 <td>
                                                     @if ($stock)
-                                                        <span class="label label-success">{{ $item->qty - $stock->qty }} In Stock</span>
+                                                        <span class="label label-success">{{ $item->qty - $stock->qty }} In
+                                                            Stock</span>
                                                     @else
                                                         <span class="label label-warning">New</span>
                                                     @endif
@@ -155,7 +164,8 @@
                                                 <td>
                                                     <input type="number"
                                                         name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][qty_diterima]"
-                                                        class="form-control input-sm" min="1" max="{{ $item->qty }}"
+                                                        class="form-control input-sm" min="1"
+                                                        max="{{ $item->qty }}"
                                                         value="{{ old('items.' . $loop->parent->index . '_' . $stockIndex . '.qty_diterima', $stock->qty ?? $item->qty) }}"
                                                         required>
                                                 </td>
@@ -167,12 +177,9 @@
                         </div>
                         <div class="box-footer">
                             <a href="{{ route('pembelian.index') }}" class="btn btn-default">Kembali</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-save"></i> Simpan Penerimaan
-                            </button>
-                            @if (!$pembelian->is_published && $pembelian->stocks()->count() > 0)
-                                <button type="submit" name="receipt_status" value="completed" class="btn btn-success">
-                                    <i class="fa fa-check"></i> Simpan & Publish
+                            @if (!$pembelian->stocks()->count() > 0)
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save"></i> Simpan Penerimaan
                                 </button>
                             @endif
                         </div>

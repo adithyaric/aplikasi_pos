@@ -76,6 +76,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
     Route::get('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'penerimaan'])->name('pembelian.penerimaan');
     Route::post('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'storePenerimaan'])->name('pembelian.store-penerimaan');
+    Route::post('/pembelian/{pembelian}/update-penerimaan', [PembelianController::class, 'updatePenerimaan'])->name('pembelian.update-penerimaan');
     Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
     Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
     Route::get('/supplier/{supplier}/products', [App\Http\Controllers\PembelianController::class, 'getProductsBySupplier'])->name('supplier.products');
@@ -134,7 +135,10 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
 
     Route::get('/product/{product}/price-history', [App\Http\Controllers\ProductController::class, 'priceHistory'])->name('product.price-history');
     Route::get('/stock/{stock}/history', [App\Http\Controllers\StockController::class, 'history'])->name('stock.history');
-});
+
+    //Stock Kartu
+    Route::get('/stock-kartu', [App\Http\Controllers\StockController::class, 'kartu'])->name('stock.kartu');
+    Route::get('/stock/kartu/data', [App\Http\Controllers\StockController::class, 'getKartuData'])->name('stock.kartu.data'); });
 
 Route::middleware(['role:superadmin'])->group(function () {
     Route::resource('/admin', AdminController::class);

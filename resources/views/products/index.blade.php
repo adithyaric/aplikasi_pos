@@ -25,7 +25,7 @@
                             <thead>
                                 <tr>
                                     <td>No</td>
-                                    <td>Code</td>
+                                    <td>Barcode</td>
                                     {{-- <td>Nama Outlet</td> --}}
                                     <td>Nama</td>
                                     <td>Kategori</td>
@@ -33,8 +33,10 @@
                                     <td>Stock Reserverd</td>
                                     <td>Stock Warehouse</td>
                                     <td>Stock INBOUND</td>
+                                    <td>Stock Minimum</td>
                                     <td>Harga Beli</td>
                                     <td>Harga Jual</td>
+                                    <td>Notif</td>
                                     {{-- <td>Serialized</td> --}}
                                     <td>Aksi</td>
                                 </tr>
@@ -51,6 +53,7 @@
                                         <td>{{ $value->stocks()->sum('qty_reserved') }}</td>
                                         <td>{{ $value->stocks()->sum('qty_available') }}</td>
                                         <td>{{ $value->stockPembelians()->sum('qty') }}</td>
+                                        <td>{{ $value->min_stock }}</td>
                                         <td>
                                             <button type="button" class="btn btn-xs btn-info btn-price-history"
                                                 data-toggle="modal" data-target="#priceHistoryModal"
@@ -59,6 +62,13 @@
                                             </button>
                                         </td>
                                         <td>@currency($value->harga_jual)</td>
+                                        <td>
+                                            @if ($value->stocks()->sum('qty_available') < $value->min_stock)
+                                            hampir habis, saat ini stock tinggal {{ $value->stocks()->sum('qty_available') }}
+                                            @else
+                                            aman
+                                            @endif
+                                        </td>
                                         {{-- <td>{{ $value->is_serialized ? 'Yes' : 'No' }}</td> --}}
                                         <td>
                                             <a class="btn btn-warning"
