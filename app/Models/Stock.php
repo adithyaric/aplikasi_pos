@@ -84,6 +84,11 @@ class Stock extends Model
         return $this->hasOne(OwnerStock::class);
     }
 
+    public function adjustment()
+    {
+        return $this->hasOne(StockAdjustment::class);
+    }
+
     // public function scopeAvailable($query)
     // {
     //     return $query->where('qty', '>', 0);

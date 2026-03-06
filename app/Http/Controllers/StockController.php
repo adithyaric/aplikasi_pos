@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Stock;
+use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
 
 class StockController extends Controller
@@ -79,6 +82,7 @@ class StockController extends Controller
         return response()->json(['success' => true, 'activities' => $activities, 'movements' => $movements]);
     }
 
+    //kartu
     public function kartu(Request $request)
     {
         $stocks = Stock::with('product', 'pembelian.supplier')
@@ -162,5 +166,96 @@ class StockController extends Controller
             ],
             'transactions' => $result
         ]);
+    }
+
+    //opname
+    public function opname(Request $request)
+    {
+        $products = Product::with('stocks')->orderBy('name')->get();
+
+        return view('stocks.opname', [
+            'products' => $products,
+        ]);
+    }
+
+    public function getOpnameData(Request $request)
+    {
+        $stocks = Stock::with('product')
+            ->where('qty', '>', 0)
+            ->whereNotNull('sku')
+            ->orderBy('product_id')
+            ->orderBy('sku')
+            ->get()
+            ->map(function ($stock) {
+                return [
+                    'id' => $stock->id,
+                    'product_id' => $stock->product_id,
+                    'product_name' => $stock->product->name,
+                    'product_code' => $stock->product->code,
+                    'sku' => $stock->sku,
+                    'satuan' => $stock->product->satuan ?? 'pcs',
+                    'qty' => $stock->qty,
+                    'qty_reserved' => $stock->qty_reserved,
+                    'qty_available' => $stock->qty_available,
+                    'keterangan' => $stock->adjustment?->keterangan ?? '',
+                ];
+            });
+
+        return response()->json(['stocks' => $stocks->values()]);
+    }
+
+    public function saveOpname(Request $request)
+    {
+        $request->validate([
+            'adjustment_date' => 'required|date',
+            'items' => 'required|array',
+            'items.*.stock_id' => 'required|exists:stocks,id',
+            'items.*.selisih' => 'required|numeric',
+            'items.*.keterangan' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->items as $item) {
+                if ($item['selisih'] != 0) {
+                    $stock = Stock::find($item['stock_id']);
+
+                    // Create adjustment record
+                    StockAdjustment::create([
+                        'adjustment_date' => $request->adjustment_date,
+                        'product_id' => $stock->product_id,
+                        'stock_id' => $stock->id,
+                        'sku' => $stock->sku,
+                        'quantity' => $item['selisih'],
+                        'keterangan' => $item['keterangan'],
+                    ]);
+
+                    // Update stock quantity
+                    $newQty = $stock->qty + $item['selisih'];
+                    $stock->update(['qty' => $newQty]);
+
+                    // Log movement
+                    StockMovement::create([
+                        'product_id' => $stock->product_id,
+                        'user_id' => auth()->id(),
+                        'type' => 'adjustment',
+                        'reference_type' => StockAdjustment::class,
+                        'reference_id' => $stock->id,
+                        'qty_in' => $item['selisih'] > 0 ? $item['selisih'] : 0,
+                        'qty_out' => $item['selisih'] < 0 ? abs($item['selisih']) : 0,
+                        'balance' => $newQty,
+                        'notes' => "Stock opname adjustment - SKU: {$stock->sku} - ".($item['keterangan'] ?? 'Stock adjustment'),
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Stok opname berhasil disimpan']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['success' => false, 'message' => 'Gagal menyimpan: '.$e->getMessage()], 500);
+        }
     }
 }

@@ -138,7 +138,13 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
 
     //Stock Kartu
     Route::get('/stock-kartu', [App\Http\Controllers\StockController::class, 'kartu'])->name('stock.kartu');
-    Route::get('/stock/kartu/data', [App\Http\Controllers\StockController::class, 'getKartuData'])->name('stock.kartu.data'); });
+    Route::get('/stock/kartu/data', [App\Http\Controllers\StockController::class, 'getKartuData'])->name('stock.kartu.data');
+
+    //Stock Opname
+    Route::get('/stock-opname', [App\Http\Controllers\StockController::class, 'opname'])->name('stock.opname');
+    Route::get('/stock-opname/data', [App\Http\Controllers\StockController::class, 'getOpnameData'])->name('stock.opname.data');
+    Route::post('/stock-opname/save', [App\Http\Controllers\StockController::class, 'saveOpname'])->name('stock.opname.save');
+});
 
 Route::middleware(['role:superadmin'])->group(function () {
     Route::resource('/admin', AdminController::class);
