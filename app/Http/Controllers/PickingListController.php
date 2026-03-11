@@ -142,4 +142,31 @@ class PickingListController extends Controller
         return redirect()->route('picking-lists.show', $pickingList)
             ->with('toast_success', 'Picking completed');
     }
+
+    public function bulkUpdate(Request $request, PickingList $pickingList)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.qty_picked' => 'required|integer|min:0',
+        ]);
+
+        $items = $pickingList->items()->get()->keyBy('id');
+
+        foreach ($request->items as $itemId => $data) {
+            if (! isset($items[$itemId])) { continue; }
+            $item = $items[$itemId];
+            $qty = $data['qty_picked'];
+
+            if ($qty > $item->qty_to_pick) {
+                return back()->withErrors("Qty picked for item {$item->sku} exceeds max");
+            }
+
+            $item->update([
+                'qty_picked' => $qty,
+                'is_picked' => $qty == $item->qty_to_pick,
+            ]);
+        }
+
+        return redirect()->back()->with('toast_success', 'Bulk update successful');
+    }
 }

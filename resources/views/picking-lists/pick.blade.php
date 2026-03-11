@@ -12,56 +12,60 @@
                         <h3 class="box-title">Scan & Pick Items</h3>
                     </div>
                     <div class="box-body">
-                        @foreach ($pickingList->items as $item)
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4>
-                                        {{ $item->product->name }}
-                                        @if ($item->is_picked)
-                                            <span class="label label-success pull-right">✓ PICKED</span>
-                                        @else
-                                            <span class="label label-warning pull-right">PENDING</span>
-                                        @endif
-                                    </h4>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <p><strong>Location:</strong> {{ $item->location ?? $item->product?->lokasi }}</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <p><strong>SKU:</strong> {{ $item->sku ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <p><strong>Qty to Pick:</strong> {{ $item->qty_to_pick }}</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <form action="{{ route('picking-list-items.update', $item->id) }}"
-                                                method="post" class="form-inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <div class="form-group">
-                                                    <label>Qty Picked:</label>
-                                                    <input type="number" name="qty_picked" class="form-control"
-                                                        value="{{ $item->qty_picked }}" min="0"
+                        <form action="{{ route('picking-lists.bulk-update', $pickingList->id) }}" method="POST">
+                            @csrf
+                            <div class="table-responsive text-nowrap">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Location</th>
+                                            <th>SKU</th>
+                                            <th>Qty to Pick</th>
+                                            <th>Qty Picked</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($pickingList->items as $item)
+                                            <tr>
+                                                <td>{{ $item->product->name }}</td>
+                                                <td>{{ $item->location ?? $item->product?->lokasi }}</td>
+                                                <td>{{ $item->sku ?? '-' }}</td>
+                                                <td>{{ $item->qty_to_pick }}</td>
+                                                <td>
+                                                    <input type="number" name="items[{{ $item->id }}][qty_picked]"
+                                                        class="form-control" value="{{ $item->qty_picked }}" min="0"
                                                         max="{{ $item->qty_to_pick }}" style="width: 80px;">
-                                                    <button type="submit" class="btn btn-primary">Update</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                                </td>
+                                                <td>
+                                                    @if ($item->is_picked)
+                                                        <span class="label label-success">✓ PICKED</span>
+                                                    @else
+                                                        <span class="label label-warning">PENDING</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr>
+                                            <td colspan="4"></td>
+                                            <td>
+                                                <button type="submit" class="btn btn-primary">Bulk Update</button>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        @endforeach
-
-                        <div class="text-center" style="margin-top: 20px;">
-                            <form action="{{ route('picking-lists.complete', $pickingList->id) }}" method="post">
-                                @csrf
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-check"></i> Complete Picking
-                                </button>
-                            </form>
-                        </div>
+                        </form>
+                    </div>
+                    <div class="box-footer text-center">
+                        <form action="{{ route('picking-lists.complete', $pickingList->id) }}" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-check"></i> Complete Picking
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -31,7 +31,7 @@ class RequestOrderController extends Controller
     {
         return view('request-orders.create', [
             'outlets' => Outlet::get(),
-            'products' => Product::whereHas('stocks', function ($q) {
+            'products' => Product::with('stocks')->whereHas('stocks', function ($q) {
                 $q->where('qty_available', '>', 0)
                     ->where('status', 'available');
             })

@@ -74,7 +74,7 @@
                                                             <td>
                                                                 <select
                                                                     name="stock_assignments[{{ $index }}_0][stock_id]"
-                                                                    class="form-control stock-select"
+                                                                    class="form-control stock-select select2"
                                                                     data-product-id="{{ $item->product_id }}" required>
                                                                     <option value="">Select SKU</option>
                                                                     @foreach ($item->product->stocks()->where('qty_available', '>', 0)->orderBy('expired_at')->get() as $stock)
@@ -261,47 +261,58 @@
                 updateRemainingQty($(this).closest('.item-panel'));
             });
 
-            // Add new stock row
-            $(document).on('click', '.add-stock-row', function() {
-                const itemId = $(this).data('item-id');
-                const panel = $(this).closest('.item-panel');
-                const tbody = panel.find('.stock-rows');
-                const productId = panel.find('.stock-select').first().data('product-id');
-                const remainingQty = parseInt(panel.find('.remaining-qty').text()) || 0;
+// Add new stock row
+$(document).on('click', '.add-stock-row', function() {
+    const itemId = $(this).data('item-id');
+    const panel = $(this).closest('.item-panel');
+    const tbody = panel.find('.stock-rows');
+    const productId = panel.find('.stock-select').first().data('product-id');
+    const remainingQty = parseInt(panel.find('.remaining-qty').text()) || 0;
 
-                if (!rowCounters[itemId]) rowCounters[itemId] = 1;
-                else rowCounters[itemId]++;
+    if (!rowCounters[itemId]) rowCounters[itemId] = 1;
+    else rowCounters[itemId]++;
 
-                const newRow = `
-            <tr class="stock-row">
-                <td>
-                    <select name="stock_assignments[${itemId}_${rowCounters[itemId]}][stock_id]"
-                            class="form-control stock-select"
-                            data-product-id="${productId}"
-                            required>
-                        ${panel.find('.stock-select').first().html()}
-                    </select>
-                    <input type="hidden" name="stock_assignments[${itemId}_${rowCounters[itemId]}][item_id]" value="${itemId}">
-                </td>
-                <td class="available-qty">-</td>
-                <td>
-                    <input type="number"
-                           name="stock_assignments[${itemId}_${rowCounters[itemId]}][qty]"
-                           class="form-control assign-qty"
-                           min="1"
-                           value="${remainingQty > 0 ? remainingQty : ''}"
-                           required>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-stock-row">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-                tbody.append(newRow);
-                updateRemainingQty(panel);
-            });
+    // Clone the first select's HTML to get all options, but then clear selection
+    const firstSelectHtml = panel.find('.stock-select').first().html();
+
+    const newRow = `
+        <tr class="stock-row">
+            <td>
+                <select name="stock_assignments[${itemId}_${rowCounters[itemId]}][stock_id]"
+                        class="form-control stock-select select2"
+                        data-product-id="${productId}"
+                        required
+                        style="width:100%;">
+                    ${firstSelectHtml}
+                </select>
+                <input type="hidden" name="stock_assignments[${itemId}_${rowCounters[itemId]}][item_id]" value="${itemId}">
+            </td>
+            <td class="available-qty">-</td>
+            <td>
+                <input type="number"
+                       name="stock_assignments[${itemId}_${rowCounters[itemId]}][qty]"
+                       class="form-control assign-qty"
+                       min="1"
+                       value="${remainingQty > 0 ? remainingQty : ''}"
+                       required>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-stock-row">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
+    tbody.append(newRow);
+
+    // Initialize Select2 on the new select with width 100%
+    let $newSelect = tbody.find('tr:last .stock-select');
+    $newSelect.select2({ width: '100%' });
+    $newSelect.val(''); // Ensure no option is selected by default
+
+    updateRemainingQty(panel);
+});
 
             // Remove stock row
             $(document).on('click', '.remove-stock-row', function() {

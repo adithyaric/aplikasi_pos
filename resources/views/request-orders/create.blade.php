@@ -51,13 +51,13 @@
                                 <tbody>
                                     <tr class="item-row">
                                         <td>
-                                            <select name="items[0][product_id]" class="form-control product-select"
+                                            <select name="items[0][product_id]" class="form-control product-select select2"
                                                 required>
                                                 <option value="">Select Product</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}"
                                                         data-available="{{ $product->stocks()->sum('qty_available') }}">
-                                                        {{ $product->code }} - {{ $product->name }}
+                                                        {{ $product->code }} - {{ $product->name }} : {{ $product->stocks()->sum('qty_available') }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -91,26 +91,53 @@
 
 @section('page-script')
     <script>
-        let rowIndex = 1;
+        let products = @json($products);
+        let rowIndex = {{ isset($requestOrder) ? count($requestOrder->items) : 1 }};
+
+function populateProductSelect($select, selectedId = null) {
+    $select.empty().append('<option value="">Select Product</option>');
+    $.each(products, function(index, product) {
+        // Calculate available qty from loaded stocks (if any)
+        let available = 0;
+        if (product.stocks && product.stocks.length) {
+            available = product.stocks.reduce((sum, stock) => sum + (stock.qty_available || 0), 0);
+        }
+        let option = $('<option>', {
+            value: product.id,
+            'data-available': available,
+            text: product.code + ' - ' + product.name + ' : ' + available
+        });
+        $select.append(option);
+    });
+    if (selectedId) {
+        $select.val(selectedId);
+    }
+    $select.trigger('change');
+}
+
+        $(document).ready(function() {
+            // Initialize all existing product-select with select2 and width 100%
+            $('.product-select').each(function() {
+                let $select = $(this);
+                let currentVal = $select.val();
+                populateProductSelect($select, currentVal);
+                $select.select2({ width: '100%' });
+            });
+        });
 
         $(document).on('change', '.product-select', function() {
-            const row = $(this).closest('tr');
-            const availableQty = $(this).find(':selected').data('available') || 0;
-            row.find('.available-qty').text(availableQty);
-            // row.find('input[name*="qty_requested"]').attr('max', availableQty);
+            let $row = $(this).closest('tr');
+            let available = $(this).find(':selected').data('available') || 0;
+            $row.find('.available-qty').text(available);
+            $row.find('input[name*="qty_requested"]').attr('max', available);
         });
 
         $('#add-row').click(function() {
-            const newRow = `
+            let newRow = `
         <tr class="item-row">
             <td>
-                <select name="items[${rowIndex}][product_id]" class="form-control product-select" required>
+                <select name="items[${rowIndex}][product_id]" class="form-control product-select" required style="width:100%;">
                     <option value="">Select Product</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-available="{{ $product->stocks()->sum('qty_available') }}">
-                            {{ $product->code }} - {{ $product->name }}
-                        </option>
-                    @endforeach
                 </select>
             </td>
             <td class="available-qty">-</td>
@@ -123,6 +150,9 @@
         </tr>
     `;
             $('#items-table tbody').append(newRow);
+            let $newSelect = $('#items-table tbody tr:last .product-select');
+            populateProductSelect($newSelect);
+            $newSelect.select2({ width: '100%' });
             rowIndex++;
         });
 

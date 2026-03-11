@@ -178,25 +178,34 @@
             });
         });
 
+        // Helper: format number with thousand separators (Indonesian style)
+        function formatRupiah(angka) {
+            if (!angka) return '0';
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         function addBahanBaku() {
             productIndex++;
             let productTemplate = `
-        <tr>
-            <td>
-                <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
-                    <option value="" disabled selected>Pilih Produk</option>
-                </select>
-            </td>
-            <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
-            <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
-            <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
-        </tr>`;
+                <tr>
+                    <td>
+                        <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                            <option value="" disabled selected>Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
+                    <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
+                    <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                </tr>`;
             $('#product-repeater').append(productTemplate);
-            let $newSelect = $('#product-repeater .select2').last();
-            $newSelect.select2();
+
+            let $newRow = $('#product-repeater tr:last');
+            $newRow.find('.numeral-mask').mask("#,##0", { reverse: true });
+            $newRow.find('.select2').select2();
+
             if (currentProducts) {
-                populateProductSelects(currentProducts, $newSelect);
+                populateProductSelects(currentProducts, $newRow.find('.product'));
             }
             updateSubtotalAndTotal();
         }
@@ -221,16 +230,14 @@
         function updateSubtotalAndTotal() {
             let total = 0;
             $('tbody tr').each(function() {
-                let qty = $(this).find('.qty').val();
-                let harga_beli = $(this).find('.harga_beli').cleanVal();
+                let $row = $(this);
+                let qty = $row.find('.qty').val();
+                let harga_beli = $row.find('.harga_beli').cleanVal();
                 let subtotal = qty * harga_beli;
-                $(this).find('.subtotal').val(subtotal);
-            });
-            $('.subtotal').each(function() {
-                let subtotal = parseInt($(this).val());
+                $row.find('.subtotal').val(formatRupiah(subtotal));
                 total += subtotal;
             });
-            $('#total').val(total);
+            $('#total').val(formatRupiah(total));
         }
 
         $('.numeral-mask').mask("#,##0", {
@@ -246,22 +253,19 @@
         }
 
         $(document).on('change', '.product', function() {
-            let harga_beli = $(this).closest('tr').find('.harga_beli');
+            let $row = $(this).closest('tr');
+            let harga_beli = $row.find('.harga_beli');
             let product_id = $(this).val();
             let isProductSerialized = $(this).find('option:selected').data('serialized');
-            let row = $(this).closest('tr');
-            let serialContainer = row.find('.serial-container');
-            let noSerialMessage = row.find('.no-serial-message');
-            let qtyInput = row.find('.qty');
-            let serialTextarea = row.find('.serial-numbers');
+            let serialContainer = $row.find('.serial-container');
+            let noSerialMessage = $row.find('.no-serial-message');
+            let qtyInput = $row.find('.qty');
+            let serialTextarea = $row.find('.serial-numbers');
 
-            // Show/hide serial number input based on product type
             if (isProductSerialized) {
                 serialContainer.show();
                 noSerialMessage.hide();
                 qtyInput.prop('readonly', true);
-
-                // Only set qty to 1 if this is a new row (no existing serial numbers)
                 if (!serialTextarea.val()) {
                     qtyInput.val(1);
                 }
@@ -269,15 +273,13 @@
                 serialContainer.hide();
                 noSerialMessage.show();
                 qtyInput.prop('readonly', false);
-
-                // Only reset qty if this is a new row
                 if (!qtyInput.val() || qtyInput.val() == 0) {
                     qtyInput.val(1);
                 }
             }
 
             $.get('/product/' + product_id, function(data) {
-                harga_beli.val(data.harga_beli);
+                harga_beli.val(data.harga_beli).trigger('input');
                 updateSubtotalAndTotal();
             });
         });
@@ -286,6 +288,9 @@
         $(document).ready(function() {
             $('.product').each(function() {
                 $(this).trigger('change');
+            });
+            $('.harga_beli').each(function() {
+                $(this).trigger('input');
             });
         });
     </script>

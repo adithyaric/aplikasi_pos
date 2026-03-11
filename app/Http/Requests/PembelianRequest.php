@@ -6,6 +6,32 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PembelianRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'total' => $this->cleanNumeric($this->total),
+        ]);
+
+        if ($this->has('product')) {
+            $products = $this->product;
+            foreach ($products as $key => $product) {
+                if (isset($product['harga_beli'])) {
+                    $products[$key]['harga_beli'] = $this->cleanNumeric($product['harga_beli']);
+                }
+                if (isset($product['subtotal'])) {
+                    $products[$key]['subtotal'] = $this->cleanNumeric($product['subtotal']);
+                }
+            }
+            $this->merge(['product' => $products]);
+        }
+    }
+
+    private function cleanNumeric($value)
+    {
+        // Remove all non-digit characters (thousand separators: comma or dot)
+        return preg_replace('/[^\d]/', '', $value);
+    }
+
     public function authorize()
     {
         return true;

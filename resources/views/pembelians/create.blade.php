@@ -134,7 +134,7 @@
                 $.each(products, function(i, product) {
                     // Include stock count if your API returns it; otherwise omit.
                     let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
-                    //TODO add rekomendasi kekurangan stock
+                    //TODO add rekomendasi kekurangan stock ($product->min_stock - $product->stocks()->sum('qty_available'))
                     $select.append($('<option>', {
                         value: product.id,
                         text: product.code + ' ' + product.name + stockText,
@@ -152,28 +152,35 @@
             });
         }
 
+        // Helper: format number with thousand separators (Indonesian style)
+        function formatRupiah(angka) {
+            if (!angka) return '0';
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         function addBahanBaku() {
             productIndex++;
             let productTemplate = `
-        <tr>
-            <td>
-                <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
-                    <option value="" disabled selected>Pilih Produk</option>
-                </select>
-            </td>
-            <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
-            <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
-            <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
-            <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
-        </tr>`;
+                <tr>
+                    <td>
+                        <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                            <option value="" disabled selected>Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
+                    <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
+                    <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                </tr>`;
             $('#product-repeater').append(productTemplate);
 
-            let $newSelect = $('#product-repeater .select2').last();
-            $newSelect.select2(); // initialize Select2
+            let $newRow = $('#product-repeater tr:last');
+            // Reinitialize mask on new harga_beli
+            $newRow.find('.numeral-mask').mask("#,##0", { reverse: true });
+            $newRow.find('.select2').select2();
 
-            // If we already have products from a selected supplier, populate this new select
             if (currentProducts) {
-                populateProductSelects(currentProducts, $newSelect);
+                populateProductSelects(currentProducts, $newRow.find('.product'));
             }
 
             updateSubtotalAndTotal();
@@ -199,16 +206,16 @@
         function updateSubtotalAndTotal() {
             let total = 0;
             $('tbody tr').each(function() {
-                let qty = $(this).find('.qty').val();
-                let harga_beli = $(this).find('.harga_beli').cleanVal();
+                let $row = $(this);
+                let qty = $row.find('.qty').val();
+                let harga_beli = $row.find('.harga_beli').cleanVal(); // numeric value from masked input
                 let subtotal = qty * harga_beli;
-                $(this).find('.subtotal').val(subtotal);
-            });
-            $('.subtotal').each(function() {
-                let subtotal = parseInt($(this).val());
+                // Set formatted subtotal (readonly)
+                $row.find('.subtotal').val(formatRupiah(subtotal));
                 total += subtotal;
             });
-            $('#total').val(total);
+            // Set formatted total
+            $('#total').val(formatRupiah(total));
         }
 
         $('.numeral-mask').mask("#,##0", {
@@ -224,29 +231,29 @@
         }
 
         $(document).on('change', '.product', function() {
-            let harga_beli = $(this).closest('tr').find('.harga_beli');
+            let $row = $(this).closest('tr');
+            let harga_beli = $row.find('.harga_beli');
             let product_id = $(this).val();
             let isProductSerialized = $(this).find('option:selected').data('serialized');
-            let row = $(this).closest('tr');
-            let serialContainer = row.find('.serial-container');
-            let noSerialMessage = row.find('.no-serial-message');
-            let qtyInput = row.find('.qty');
+            let serialContainer = $row.find('.serial-container');
+            let noSerialMessage = $row.find('.no-serial-message');
+            let qtyInput = $row.find('.qty');
 
-            // Show/hide serial number input based on product type
             if (isProductSerialized) {
                 serialContainer.show();
                 noSerialMessage.hide();
                 qtyInput.prop('readonly', true);
-                qtyInput.val(1); // Default to 1 for serialized items
+                qtyInput.val(1);
             } else {
                 serialContainer.hide();
                 noSerialMessage.show();
                 qtyInput.prop('readonly', false);
-                qtyInput.val(1); // Reset to 1
+                qtyInput.val(1);
             }
 
             $.get('/product/' + product_id, function(data) {
-                harga_beli.val(data.harga_beli);
+                // Set raw value and trigger input to apply mask formatting
+                harga_beli.val(data.harga_beli).trigger('input');
                 updateSubtotalAndTotal();
             });
         });
@@ -255,6 +262,9 @@
         $(document).ready(function() {
             $('.product').each(function() {
                 $(this).trigger('change');
+            });
+            $('.harga_beli').each(function() {
+                $(this).trigger('input');
             });
         });
 
