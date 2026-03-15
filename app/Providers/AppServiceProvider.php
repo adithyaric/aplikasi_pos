@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,5 +25,15 @@ class AppServiceProvider extends ServiceProvider
             $view->with('categories', \App\Models\Category::where('type', 'product')->get());
         });
 
+        View::composer('layouts.master', function ($view) {
+            if (Auth::check()) {
+                $lowStockProducts = Product::with('stocks')
+                    ->get()
+                    ->filter(function ($product) {
+                        return $product->stocks()->sum('qty_available') < $product->min_stock;
+                    });
+                $view->with('lowStockProducts', $lowStockProducts);
+            }
+        });
     }
 }
