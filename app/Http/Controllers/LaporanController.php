@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DeliveryOrderSingleExport;
 use App\Exports\LabaRugiExport;
 use App\Exports\PembelianExport;
 use App\Exports\PembelianSingleExport;
@@ -13,6 +14,7 @@ use App\Exports\PenjualanSupplierExport;
 use App\Exports\PickingListSingleExport;
 use App\Exports\RequestOrderSingleExport;
 use App\Exports\StockExport;
+use App\Models\DeliveryOrder;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\PickingList;
@@ -63,6 +65,18 @@ class LaporanController extends Controller
             $requestOrder = RequestOrder::with(['owner', 'items.product'])->findOrFail($id);
 
             return Excel::download(new RequestOrderSingleExport($requestOrder), 'Dokumen_Surat_Permintaan_Barang_(SPB)-'.$requestOrder->code.'.xlsx');
+        }
+
+        return abort(404);
+        // return Excel::download(new RequestOrderExport($request), 'laporan-requestOrder.xlsx');
+    }
+
+    public function exportDeliveryOrder(Request $request, $id = null)
+    {
+        if ($id) {
+            $deliveryOrder = DeliveryOrder::with(['owner', 'requestOrder', 'items.product'])->findOrFail($id);
+
+            return Excel::download(new DeliveryOrderSingleExport($deliveryOrder), 'Dokumen_Surat_Jalan-'.$deliveryOrder->code.'.xlsx');
         }
 
         return abort(404);

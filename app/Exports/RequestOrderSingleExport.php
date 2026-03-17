@@ -55,7 +55,7 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
 
     public function startCell(): string
     {
-        return 'B15';
+        return 'B17';
     }
 
     public function styles(Worksheet $sheet)
@@ -76,38 +76,34 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
 
         $sheet->getRowDimension(5)->setRowHeight(20);
 
-        $sheet->mergeCells('B5:H5');
-        $sheet->getStyle('B5:H5')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
-
-        $sheet->setCellValue('B6', 'SURAT PERMINTAAN BARANG (SPB)');
         $sheet->mergeCells('B6:H6');
-        $sheet->getStyle('B6')->applyFromArray([
+        $sheet->getStyle('B6:H6')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
+
+        $sheet->setCellValue('B8', 'SURAT PERMINTAAN BARANG (SPB)');
+        $sheet->mergeCells('B8:H8');
+        $sheet->getStyle('B8')->applyFromArray([
             'font' => ['bold' => true, 'size' => 12],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
-        $sheet->setCellValue('B8', 'Nomor SPB :');
-        $sheet->setCellValue('D8', $this->requestOrder->code);
-        $sheet->getStyle('B8')->getFont()->setBold(true);
-
-        $sheet->setCellValue('B9', 'Tanggal :');
-        $sheet->setCellValue('D9', Carbon::parse($this->requestOrder->request_date)->isoFormat('DD MMMM YYYY'));
-        $sheet->getStyle('B9')->getFont()->setBold(true);
-
-        $sheet->setCellValue('B10', 'Nama Outlet :');
-        $sheet->setCellValue('D10', $this->requestOrder->owner->name ?? '-');
+        $sheet->setCellValue('B10', 'Nomor SPB :');
+        $sheet->setCellValue('D10', $this->requestOrder->code);
         $sheet->getStyle('B10')->getFont()->setBold(true);
-
-        $sheet->setCellValue('B11', 'Pemohon :');
-        $sheet->setCellValue('D11', $this->requestOrder->requestedBy->name ?? '-');
+        $sheet->setCellValue('B11', 'Tanggal :');
+        $sheet->setCellValue('D11', Carbon::parse($this->requestOrder->request_date)->isoFormat('DD MMMM YYYY'));
         $sheet->getStyle('B11')->getFont()->setBold(true);
-
-        $sheet->setCellValue('B12', 'Jabatan :');
-        $sheet->setCellValue('D12', $this->requestOrder->requestedBy->jabatan ?? '-');
+        $sheet->setCellValue('B12', 'Nama Outlet :');
+        $sheet->setCellValue('D12', $this->requestOrder->owner->name ?? '-');
         $sheet->getStyle('B12')->getFont()->setBold(true);
-
-        $sheet->setCellValue('B14', 'Detail Permintaan Barang');
+        $sheet->setCellValue('B13', 'Pemohon :');
+        $sheet->setCellValue('D13', $this->requestOrder->requestedBy->name ?? '-');
+        $sheet->getStyle('B13')->getFont()->setBold(true);
+        $sheet->setCellValue('B14', 'Jabatan :');
+        $sheet->setCellValue('D14', $this->requestOrder->requestedBy->jabatan ?? '-');
         $sheet->getStyle('B14')->getFont()->setBold(true);
+
+        $sheet->setCellValue('B16', 'Detail Permintaan Barang');
+        $sheet->getStyle('B16')->getFont()->setBold(true);
 
         $sheet->getStyle('B15:H15')->applyFromArray([
             'font' => ['bold' => true],
@@ -117,8 +113,8 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         ]);
 
         $highestRow = $sheet->getHighestRow();
-        if ($highestRow > 15) {
-            $sheet->getStyle('B16:H'.$highestRow)
+        if ($highestRow > 17) {
+            $sheet->getStyle('B18:H'.$highestRow)
                 ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         }
 
