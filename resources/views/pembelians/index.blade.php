@@ -68,7 +68,8 @@
                                             </form>
                                         @else
                                             {{-- <a class=" btn-sm btn btn-warning" href="{{ route('pembelian.show', $value->id) }}">Print Barcode</a> --}}
-                                            {{-- <a class=" btn-sm btn btn-info" href="{{ route('pembelian.print', $value->id) }}">Print</a> --}}
+                                            {{-- <a class=" btn-sm btn btn-success" href="{{ route('pembelian.print', $value->id) }}"><i class="fa fa-excel"></i>Print</a> --}}
+                                            <a class=" btn-sm btn btn-success" href="{{ route('laporan.pembelian', $value->id) }}"><i class="fa fa-excel"></i>Export</a>
                                         @endif
                                         @if (!$value->is_published)
                                             <a href="{{ route('pembelian.penerimaan', $value) }}"

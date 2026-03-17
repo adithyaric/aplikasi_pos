@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\LabaRugiExport;
 use App\Exports\PembelianExport;
+use App\Exports\PembelianSingleExport;
 use App\Exports\PembelianSupplierExport;
 use App\Exports\PengeluaranExport;
 use App\Exports\PenjualanExport;
@@ -11,6 +12,7 @@ use App\Exports\PenjualanKasirExport;
 use App\Exports\PenjualanSupplierExport;
 use App\Exports\StockExport;
 use App\Models\Outlet;
+use App\Models\Pembelian;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,8 +29,15 @@ class LaporanController extends Controller
         ]);
     }
 
-    public function exportPembelian(Request $request)
+    public function exportPembelian(Request $request, $id = null)
     {
+        if ($id) {
+            $pembelian = Pembelian::with(['supplier', 'pembelianProducts.product'])->findOrFail($id);
+
+            return Excel::download(new PembelianSingleExport($pembelian), 'PO-'.$pembelian->code.'.xlsx');
+        }
+
+        // Existing logic for date‑filtered exports...
         return Excel::download(new PembelianExport($request), 'laporan-pembelian.xlsx');
     }
 
