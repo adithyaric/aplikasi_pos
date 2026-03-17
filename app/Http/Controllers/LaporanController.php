@@ -8,6 +8,7 @@ use App\Exports\LabaRugiExport;
 use App\Exports\PembelianExport;
 use App\Exports\PembelianSingleExport;
 use App\Exports\PembelianSupplierExport;
+use App\Exports\PenerimaanExport;
 use App\Exports\PengeluaranExport;
 use App\Exports\PenjualanExport;
 use App\Exports\PenjualanKasirExport;
@@ -115,6 +116,16 @@ class LaporanController extends Controller
             ->get();
 
         return Excel::download(new StockOpnameExport($adjustments, $date), 'Stock_Opname-'.$date.'.xlsx');
+    }
+
+    public function exportPenerimaan(Request $request, Pembelian $pembelian, $type = 'po')
+    {
+        $pembelian->load(['supplier', 'pembelianProducts.product', 'stocks.product']);
+
+        return Excel::download(
+            new PenerimaanExport($pembelian, $type),
+            'Penerimaan-'.$type.' '.$pembelian->code.'.xlsx'
+        );
     }
 
     public function exportPembelianSupplier(Request $request)
