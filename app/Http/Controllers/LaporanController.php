@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\DeliveryOrderSingleExport;
+use App\Exports\KartuStokExport;
 use App\Exports\LabaRugiExport;
 use App\Exports\PembelianExport;
 use App\Exports\PembelianSingleExport;
@@ -14,11 +15,15 @@ use App\Exports\PenjualanSupplierExport;
 use App\Exports\PickingListSingleExport;
 use App\Exports\RequestOrderSingleExport;
 use App\Exports\StockExport;
+use App\Exports\StockOpnameExport;
 use App\Models\DeliveryOrder;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\PickingList;
 use App\Models\RequestOrder;
+use App\Models\Stock;
+use App\Models\StockAdjustment;
+use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -81,6 +86,35 @@ class LaporanController extends Controller
 
         return abort(404);
         // return Excel::download(new RequestOrderExport($request), 'laporan-requestOrder.xlsx');
+    }
+
+    public function exportKartuStok(Request $request, $id = null)
+    {
+        if (! $id) { return abort(404); }
+
+        $stock = Stock::with(['product', 'pembelian.supplier'])->findOrFail($id);
+        $movements = StockMovement::where('product_id', $stock->product_id)
+            ->where(function ($q) use ($stock) {
+                $q->where('notes', 'like', "%SKU: {$stock->sku}%")
+                    ->orWhere(function ($q2) use ($stock) {
+                        $q2->where('reference_type', 'App\Models\Pembelian')
+                            ->where('reference_id', $stock->pembelian_id);
+                    });
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return Excel::download(new KartuStokExport($stock, $movements), 'Kartu_Stok-'.$stock->sku.'.xlsx');
+    }
+
+    public function exportStockOpname(Request $request)
+    {
+        $date = $request->input('tanggal', date('Y-m-d'));
+        $adjustments = StockAdjustment::with(['product', 'stock'])
+            ->whereDate('adjustment_date', $date)
+            ->get();
+
+        return Excel::download(new StockOpnameExport($adjustments, $date), 'Stock_Opname-'.$date.'.xlsx');
     }
 
     public function exportPembelianSupplier(Request $request)

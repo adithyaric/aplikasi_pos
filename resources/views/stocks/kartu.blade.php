@@ -33,6 +33,12 @@
                                     <i class="fa fa-search"></i> Tampilkan Kartu
                                 </button>
                             </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <a id="btnExportKartu" href="#" class="btn btn-success form-control" style="pointer-events:none; opacity:0.6;">
+                                    <i class="fa fa-file-excel-o"></i> Export Excel
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Info Stock -->
@@ -136,6 +142,10 @@
 
                         $('#btnLoadKartu').prop('disabled', false).html(
                             '<i class="fa fa-search"></i> Tampilkan Kartu');
+
+                        $('#btnExportKartu')
+                            .attr('href', '{{ route('laporan.kartu-stok') }}/' + stockId)
+                            .css({'pointer-events': 'auto', 'opacity': '1'});
                     },
                     error: function() {
                         alert('Gagal memuat data kartu stok');

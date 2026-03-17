@@ -15,9 +15,8 @@
                         <table class="table table-borderless mb-2" style="width: 40%">
                             <tr>
                                 <td>Tanggal Stock Opname</td>
-                                <td>:
-                                    <input type="date" id="tglStockOpname" class="form-control"
-                                        value="{{ date('Y-m-d') }}" />
+                                <td>
+                                    <input type="date" id="tglStockOpname" class="form-control" value="{{ date('Y-m-d') }}" />
                                 </td>
                             </tr>
                         </table>
@@ -51,6 +50,12 @@
                             <button class="btn btn-success" id="btnSaveOpname">
                                 <i class="fa fa-save"></i> Save Stock Opname
                             </button>
+                            <form method="GET" action="{{ route('laporan.stock-opname') }}" style="display:inline;">
+                                <input type="hidden" name="tanggal" id="exportTanggal" value="{{ date('Y-m-d') }}" />
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-file-excel-o"></i> Export Excel
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -83,8 +88,7 @@
                     const newRow = `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><input type="text" class="form-control product-name" value="${item.product_name}"
-                               data-stock-id="${item.id}" data-product-id="${item.product_id}" disabled /></td>
+                    <td><input type="text" class="form-control product-name" value="${item.product_name}" data-stock-id="${item.id}" data-product-id="${item.product_id}" disabled /></td>
                     <td><input type="text" class="form-control sku" value="${item.sku}" disabled /></td>
                     <td><input type="text" class="form-control satuan" value="${item.satuan}" disabled /></td>
                     <td><input type="number" step="0.01" class="form-control stock_fisik" value="${item.qty}" /></td>
@@ -167,6 +171,10 @@
                 });
             });
 
+            $('#tglStockOpname').on('change', function() {
+                $('#exportTanggal').val($(this).val());
+            });
+
             $('#btnSaveOpname').on('click', function() {
                 const tglStockOpname = $('#tglStockOpname').val();
                 if (!tglStockOpname) {
@@ -208,11 +216,12 @@
                 $.ajax({
                     url: '{{ route('stock.opname.save') }}',
                     method: 'POST',
-                    data: {
+                    contentType: 'application/json',
+                    data: JSON.stringify({
                         _token: '{{ csrf_token() }}',
                         adjustment_date: tglStockOpname,
                         items: items
-                    },
+                    }),
                     success: function(data) {
                         if (data.success) {
                             alert('Stock opname berhasil disimpan!');
