@@ -10,9 +10,11 @@ use App\Exports\PengeluaranExport;
 use App\Exports\PenjualanExport;
 use App\Exports\PenjualanKasirExport;
 use App\Exports\PenjualanSupplierExport;
+use App\Exports\PickingListSingleExport;
 use App\Exports\StockExport;
 use App\Models\Outlet;
 use App\Models\Pembelian;
+use App\Models\PickingList;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -34,11 +36,23 @@ class LaporanController extends Controller
         if ($id) {
             $pembelian = Pembelian::with(['supplier', 'pembelianProducts.product'])->findOrFail($id);
 
-            return Excel::download(new PembelianSingleExport($pembelian), 'PO-'.$pembelian->code.'.xlsx');
+            return Excel::download(new PembelianSingleExport($pembelian), 'Dokumen_PO-'.$pembelian->code.'.xlsx');
         }
 
         // Existing logic for date‑filtered exports...
         return Excel::download(new PembelianExport($request), 'laporan-pembelian.xlsx');
+    }
+
+    public function exportPickingList(Request $request, $id = null)
+    {
+        if ($id) {
+            $pickinglist = PickingList::with(['requestOrder', 'items.product'])->findOrFail($id);
+
+            return Excel::download(new PickingListSingleExport($pickinglist), 'Dokumen_Picking_list-'.$pickinglist->code.'.xlsx');
+        }
+
+        return abort(404);
+        // return Excel::download(new PickingListExport($request), 'laporan-pickinglist.xlsx');
     }
 
     public function exportPembelianSupplier(Request $request)

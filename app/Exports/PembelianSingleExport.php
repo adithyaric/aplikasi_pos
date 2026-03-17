@@ -57,7 +57,7 @@ class PembelianSingleExport implements FromCollection, WithHeadings, WithMapping
             $item->product->code ?? '',
             $item->product->name ?? '',
             $item->qty,
-            $item->product->unit ?? 'PCS',
+            $item->product->satuan ?? 'PCS',
             'Rp '.number_format($item->harga_beli, 0, ',', '.'),
             'Rp '.number_format($item->subtotal, 0, ',', '.'),
         ];
@@ -65,120 +65,103 @@ class PembelianSingleExport implements FromCollection, WithHeadings, WithMapping
 
     public function startCell(): string
     {
-        return 'A14';
+        return 'B14';
     }
 
     public function styles(Worksheet $sheet)
     {
-        // Logo spacing
         $sheet->getRowDimension(1)->setRowHeight(50);
 
-        // HEADER TEXT
-        $sheet->setCellValue('C2', 'NAMA PERUSAHAAN');
-        $sheet->mergeCells('C2:G2');
-        $sheet->getStyle('C2')->applyFromArray([
+        $sheet->setCellValue('D2', 'NAMA PERUSAHAAN');
+        $sheet->mergeCells('D2:H2');
+        $sheet->getStyle('D2')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
+        $sheet->setCellValue('D3', 'ALAMAT');
+        $sheet->mergeCells('D3:H3');
+        $sheet->setCellValue('D4', 'NO TELP | EMAIL | WEBSITE');
+        $sheet->mergeCells('D4:H4');
+        $sheet->getStyle('D2:D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->setCellValue('C3', 'ALAMAT');
-        $sheet->mergeCells('C3:G3');
-
-        $sheet->setCellValue('C4', 'NO TELP | EMAIL | WEBSITE');
-        $sheet->mergeCells('C4:G4');
-
-        $sheet->getStyle('C2:C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        // ADD EMPTY ROW (spacing before line)
         $sheet->getRowDimension(5)->setRowHeight(20);
 
-        // LINE (moved down)
-        $sheet->mergeCells('A6:G6');
-        $sheet->getStyle('A6:G6')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
+        $sheet->mergeCells('B6:H6');
+        $sheet->getStyle('B6:H6')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
 
-        // TITLE
-        $sheet->setCellValue('A8', 'PURCHASE ORDER (PO)');
-        $sheet->mergeCells('A8:G8');
-        $sheet->getStyle('A8')->applyFromArray([
+        $sheet->setCellValue('B8', 'PURCHASE ORDER (PO)');
+        $sheet->mergeCells('B8:H8');
+        $sheet->getStyle('B8')->applyFromArray([
             'font' => ['bold' => true, 'size' => 12],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
-        // INFO
-        $sheet->setCellValue('B10', 'Kode PO :');
-        $sheet->setCellValue('C10', $this->pembelian->code);
+        $sheet->setCellValue('C10', 'Kode PO :');
+        $sheet->setCellValue('D10', $this->pembelian->code);
+        $sheet->setCellValue('C11', 'Tanggal PO :');
+        $sheet->setCellValue('D11', Carbon::parse($this->pembelian->created_at)->isoFormat('DD MMMM YYYY'));
+        $sheet->setCellValue('C12', 'Nama Supplier :');
+        $sheet->setCellValue('D12', $this->pembelian->supplier->name ?? '');
 
-        $sheet->setCellValue('B11', 'Tanggal PO :');
-        $sheet->setCellValue('C11', Carbon::parse($this->pembelian->created_at)->isoFormat('DD MMMM YYYY'));
-
-        $sheet->setCellValue('B12', 'Nama Supplier :');
-        $sheet->setCellValue('C12', $this->pembelian->supplier->name ?? '');
-
-        // TABLE HEADER STYLE
-        $sheet->getStyle('A14:G14')->applyFromArray([
+        $sheet->getStyle('B14:H14')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '8EAADB'],
-            ],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '8EAADB']],
         ]);
 
         $highestRow = $sheet->getHighestRow();
-
         if ($highestRow > 14) {
-            $sheet->getStyle('A15:G'.$highestRow)
+            $sheet->getStyle('B15:H'.$highestRow)
                 ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         }
 
-        // WIDTH
-        $sheet->getColumnDimension('A')->setWidth(5);
-        $sheet->getColumnDimension('B')->setWidth(18);
-        $sheet->getColumnDimension('C')->setWidth(30);
-        $sheet->getColumnDimension('D')->setWidth(8);
-        $sheet->getColumnDimension('E')->setWidth(10);
-        $sheet->getColumnDimension('F')->setWidth(15);
-        $sheet->getColumnDimension('G')->setWidth(18);
+        $sheet->getColumnDimension('B')->setWidth(5);
+        $sheet->getColumnDimension('C')->setWidth(18);
+        $sheet->getColumnDimension('D')->setWidth(30);
+        $sheet->getColumnDimension('E')->setWidth(8);
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(15);
+        $sheet->getColumnDimension('H')->setWidth(18);
 
-        // ALIGNMENT
-        $sheet->getStyle('D')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('E')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('F')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('F')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('G')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('H')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        // SIGNATURE
-        $row = $highestRow + 3;
+        $totalRow = $highestRow + 1;
+        $sheet->setCellValue('D'.$totalRow, 'Total');
+        $sheet->setCellValue('H'.$totalRow, 'Rp '.number_format($this->pembelian->total, 0, ',', '.'));
+        $sheet->getStyle('B'.$totalRow.':H'.$totalRow)->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet->getStyle('B'.$totalRow.':H'.$totalRow)->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('B'.$totalRow.':H'.$totalRow)->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('B'.$totalRow.':H'.$totalRow)->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('D'.$totalRow)->getFont()->setBold(true);
+        $sheet->getStyle('H'.$totalRow)->getFont()->setBold(true);
+        $sheet->getStyle('D'.$totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('H'.$totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        $sheet->mergeCells('A'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->setCellValue('A'.$row, 'Dibuat Oleh');
-        $sheet->setCellValue('E'.$row, 'Disetujui Oleh');
-
-        $sheet->getStyle('A'.$row.':G'.$row)
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $row = $totalRow + 3;
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':H'.$row);
+        $sheet->setCellValue('B'.$row, 'Dibuat Oleh');
+        $sheet->setCellValue('F'.$row, 'Disetujui Oleh');
+        $sheet->getStyle('B'.$row.':H'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $row++;
-        $sheet->mergeCells('A'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->setCellValue('A'.$row, 'Staff Gudang');
-        $sheet->setCellValue('E'.$row, 'Manager');
-
-        $sheet->getStyle('A'.$row.':C'.$row)
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $sheet->getStyle('E'.$row.':G'.$row)
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':H'.$row);
+        $sheet->setCellValue('B'.$row, 'Staff Gudang');
+        $sheet->setCellValue('F'.$row, 'Manager');
+        $sheet->getStyle('B'.$row.':D'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F'.$row.':H'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $row += 5;
-        $sheet->mergeCells('A'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->setCellValue('A'.$row, 'Nama');
-        $sheet->setCellValue('E'.$row, 'Nama');
-
-        $sheet->getStyle('A'.($row - 1).':G'.($row - 1))
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':H'.$row);
+        $sheet->setCellValue('B'.$row, 'Nama');
+        $sheet->setCellValue('F'.$row, 'Nama');
+        $sheet->getStyle('B'.($row - 1).':H'.($row - 1))
             ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
     }
 

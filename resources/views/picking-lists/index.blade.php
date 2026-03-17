@@ -40,6 +40,7 @@
                                     </td>
                                     <td>{{ $value->items->count() }} items</td>
                                     <td>
+                                        <a class=" btn-sm btn btn-success" href="{{ route('laporan.pickinglist', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                         <a class="btn-sm btn btn-info" href="{{ route('picking-lists.show', $value->id) }}">Detail</a>
                                         @if (!isset($value->deliveryOrder))
                                             @if ($value->status == 'draft')
