@@ -11,10 +11,12 @@ use App\Exports\PenjualanExport;
 use App\Exports\PenjualanKasirExport;
 use App\Exports\PenjualanSupplierExport;
 use App\Exports\PickingListSingleExport;
+use App\Exports\RequestOrderSingleExport;
 use App\Exports\StockExport;
 use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\PickingList;
+use App\Models\RequestOrder;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -53,6 +55,18 @@ class LaporanController extends Controller
 
         return abort(404);
         // return Excel::download(new PickingListExport($request), 'laporan-pickinglist.xlsx');
+    }
+
+    public function exportRequestOrder(Request $request, $id = null)
+    {
+        if ($id) {
+            $requestOrder = RequestOrder::with(['owner', 'items.product'])->findOrFail($id);
+
+            return Excel::download(new RequestOrderSingleExport($requestOrder), 'Dokumen_Surat_Permintaan_Barang_(SPB)-'.$requestOrder->code.'.xlsx');
+        }
+
+        return abort(404);
+        // return Excel::download(new RequestOrderExport($request), 'laporan-requestOrder.xlsx');
     }
 
     public function exportPembelianSupplier(Request $request)

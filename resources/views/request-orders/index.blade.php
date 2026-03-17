@@ -83,6 +83,7 @@
                                             </form>
                                             <br>
                                         @endif
+                                        <a class=" btn-sm btn btn-success" href="{{ route('laporan.request-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                         <a class="btn-sm btn btn-info" href="{{ route('request-orders.verify', $value->id) }}">Detail</a>
                                     </td>
                                 </tr>
