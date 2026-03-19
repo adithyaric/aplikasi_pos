@@ -12,7 +12,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -96,38 +95,33 @@ class DashboardController extends Controller
 
     public function setting()
     {
-        // $apiKey = env('APP_KEY_RAJAONGKIR');
-        // $headers = ['key' => $apiKey];
-        // $response = Http::withoutVerifying()->withHeaders($headers)->get('https://api.rajaongkir.com/starter/province');
-        // $provinces = json_decode($response->body(), true)['rajaongkir']['results'];
-        // $origin = json_decode(Storage::disk('public')->get('settings.json'), true)['origin'];
-        // $response = Http::withoutVerifying()->withHeaders($headers)->get("https://api.rajaongkir.com/starter/city?id=$origin");
-        // $CityName = json_decode($response->body(), true)['rajaongkir']['results']['city_name'];
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
 
         return view('dashboard.setting', [
-            'provinces' => [],
-            'origin' => '-',
-            'CityName' => '-',
-            'email' => json_decode(Storage::disk('public')->get('settings.json'), true)['email'],
-            'telp' => json_decode(Storage::disk('public')->get('settings.json'), true)['telp'],
-            'address' => json_decode(Storage::disk('public')->get('settings.json'), true)['address'],
+            'name'    => $settings['name'] ?? '',
+            'email'   => $settings['email'] ?? '',
+            'telp'    => $settings['telp'] ?? '',
+            'address' => $settings['address'] ?? '',
+            'website' => $settings['website'] ?? '',
         ]);
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'city' => 'required',
-            'email' => 'required',
-            'telp' => 'required',
+            'name'    => 'required',
+            'email'   => 'required|email',
+            'telp'    => 'required',
             'address' => 'required',
+            'website' => 'nullable|url',
         ]);
 
         Storage::disk('public')->put('settings.json', json_encode([
-            'origin' => $request->city,
-            'email' => $request->email,
-            'telp' => $request->telp,
+            'name'    => $request->name,
+            'email'   => $request->email,
+            'telp'    => $request->telp,
             'address' => $request->address,
+            'website' => $request->website,
         ]));
 
         return redirect(route('setting'))->with('toast_success', 'Berhasil Menyimpan Data!');

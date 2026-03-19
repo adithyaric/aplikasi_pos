@@ -14,46 +14,29 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="box">
-                    <div class="box-header">
-                        <label for="" class="text-muted">Asal Pengiriman Barang : </label>
-                        <h3>Kabupaten/Kota <b>{{ $CityName }}</b></h3>
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                    </div><!-- /.box-header -->
+                    <div class="box-header"></div><!-- /.box-header -->
                     <div class="box-body">
                         <form id="form" method="POST" action="{{ route('setting.store') }}">
                             @csrf
                             <div class="form-group">
-                                <label for="province">Province:</label>
-                                <select class="form-control select2" name="province" id="province" required>
-                                    <option value="" disabled selected>Pilih Provinsi</option>
-                                    @foreach ($provinces as $province)
-                                        <option value="{{ $province['province_id'] }}">{{ $province['province'] }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="name">Nama Perusahaan :</label>
+                                <input class="form-control" type="text" name="name" id="name" value="{{ $name }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="city">City:</label>
-                                <select class="form-control select2" name="city" id="city" required></select>
+                                <label for="address">Alamat Perusahaan :</label>
+                                <input class="form-control" type="text" name="address" id="address" value="{{ $address }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telp">No Telp :</label>
+                                <input class="form-control" type="text" name="telp" id="telp" value="{{ $telp }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email :</label>
-                                <input class="form-control" type="text" name="email" id="" value="{{ $email }}">
+                                <input class="form-control" type="email" name="email" id="email" value="{{ $email }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="telp">Telp :</label>
-                                <input class="form-control" type="text" name="telp" id="" value="{{ $telp }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="telp">Address :</label>
-                                <input class="form-control" type="text" name="address" id="" value="{{ $address }}">
+                                <label for="website">Website :</label>
+                                <input class="form-control" type="url" name="website" id="website" value="{{ $website }}">
                             </div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>
@@ -66,21 +49,7 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
-            $('#city').prop('disabled', true);
-            $('#province').on('change', function() {
-                const provinceId = $(this).val();
-
-                $.get(`/cities?province_id=${provinceId}`, function(data) {
-                    $('#city').empty();
-                    $('#city').prop('disabled', false);
-
-                    $('#city').append(`<option value="" disabled selected>Pilih Kota</option>`);
-                    data.forEach(city => {
-                        $('#city').append(`<option value="${city.city_id}">${city.type} ${city.city_name}</option>`);
-                    });
-                });
-            });
-            // $('#city').on('change', function() { const cityId = $(this).val(); $('#form').submit(); });
+            //
         });
     </script>
 @endsection

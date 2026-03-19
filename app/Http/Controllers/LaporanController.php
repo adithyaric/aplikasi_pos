@@ -28,6 +28,7 @@ use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LaporanController extends Controller
@@ -43,55 +44,63 @@ class LaporanController extends Controller
 
     public function exportPembelian(Request $request, $id = null)
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         if ($id) {
             $pembelian = Pembelian::with(['supplier', 'pembelianProducts.product'])->findOrFail($id);
 
-            return Excel::download(new PembelianSingleExport($pembelian), 'Dokumen_PO-'.$pembelian->code.'.xlsx');
+            return Excel::download(new PembelianSingleExport($pembelian, $settings), 'Dokumen_PO-'.$pembelian->code.'.xlsx');
         }
 
-        // Existing logic for date‑filtered exports...
-        return Excel::download(new PembelianExport($request), 'laporan-pembelian.xlsx');
+        return Excel::download(new PembelianExport($request, $settings), 'laporan-pembelian.xlsx');
     }
 
     public function exportPickingList(Request $request, $id = null)
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         if ($id) {
             $pickinglist = PickingList::with(['requestOrder', 'items.product'])->findOrFail($id);
 
-            return Excel::download(new PickingListSingleExport($pickinglist), 'Dokumen_Picking_list-'.$pickinglist->code.'.xlsx');
+            return Excel::download(new PickingListSingleExport($pickinglist, $settings), 'Dokumen_Picking_list-'.$pickinglist->code.'.xlsx');
         }
 
         return abort(404);
-        // return Excel::download(new PickingListExport($request), 'laporan-pickinglist.xlsx');
     }
 
     public function exportRequestOrder(Request $request, $id = null)
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         if ($id) {
             $requestOrder = RequestOrder::with(['owner', 'items.product'])->findOrFail($id);
 
-            return Excel::download(new RequestOrderSingleExport($requestOrder), 'Dokumen_Surat_Permintaan_Barang_(SPB)-'.$requestOrder->code.'.xlsx');
+            return Excel::download(new RequestOrderSingleExport($requestOrder, $settings), 'Dokumen_Surat_Permintaan_Barang_(SPB)-'.$requestOrder->code.'.xlsx');
         }
 
         return abort(404);
-        // return Excel::download(new RequestOrderExport($request), 'laporan-requestOrder.xlsx');
     }
 
     public function exportDeliveryOrder(Request $request, $id = null)
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         if ($id) {
             $deliveryOrder = DeliveryOrder::with(['owner', 'requestOrder', 'items.product'])->findOrFail($id);
 
-            return Excel::download(new DeliveryOrderSingleExport($deliveryOrder), 'Dokumen_Surat_Jalan-'.$deliveryOrder->code.'.xlsx');
+            return Excel::download(new DeliveryOrderSingleExport($deliveryOrder, $settings), 'Dokumen_Surat_Jalan-'.$deliveryOrder->code.'.xlsx');
         }
 
         return abort(404);
-        // return Excel::download(new RequestOrderExport($request), 'laporan-requestOrder.xlsx');
     }
 
     public function exportKartuStok(Request $request, $id = null)
     {
-        if (! $id) { return abort(404); }
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
+        if (! $id) {
+            return abort(404);
+        }
 
         $stock = Stock::with(['product', 'pembelian.supplier'])->findOrFail($id);
         $movements = StockMovement::where('product_id', $stock->product_id)
@@ -105,25 +114,29 @@ class LaporanController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return Excel::download(new KartuStokExport($stock, $movements), 'Kartu_Stok-'.$stock->sku.'.xlsx');
+        return Excel::download(new KartuStokExport($stock, $movements, $settings), 'Kartu_Stok-'.$stock->sku.'.xlsx');
     }
 
     public function exportStockOpname(Request $request)
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         $date = $request->input('tanggal', date('Y-m-d'));
         $adjustments = StockAdjustment::with(['product', 'stock'])
             ->whereDate('adjustment_date', $date)
             ->get();
 
-        return Excel::download(new StockOpnameExport($adjustments, $date), 'Stock_Opname-'.$date.'.xlsx');
+        return Excel::download(new StockOpnameExport($adjustments, $date, $settings), 'Stock_Opname-'.$date.'.xlsx');
     }
 
     public function exportPenerimaan(Request $request, Pembelian $pembelian, $type = 'po')
     {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
         $pembelian->load(['supplier', 'pembelianProducts.product', 'stocks.product']);
 
         return Excel::download(
-            new PenerimaanExport($pembelian, $type),
+            new PenerimaanExport($pembelian, $type, $settings),
             'Penerimaan-'.$type.' '.$pembelian->code.'.xlsx'
         );
     }

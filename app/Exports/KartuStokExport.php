@@ -23,10 +23,12 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
     protected $stock;
     protected $movements;
     protected $transactions = [];
+    protected $settings;
 
-    public function __construct(Stock $stock, $movements)
+    public function __construct(Stock $stock, $movements, array $settings = [])
     {
         $this->stock = $stock;
+        $this->settings = $settings;
 
         $runningStock = 0;
         $currentPrice = $stock->harga_beli;
@@ -76,17 +78,24 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
 
     public function styles(Worksheet $sheet)
     {
+        $companyName = $this->settings['name'] ?? 'NAMA PERUSAHAAN';
+        $address     = $this->settings['address'] ?? 'ALAMAT';
+        $phone       = $this->settings['telp'] ?? '';
+        $email       = $this->settings['email'] ?? '';
+        $website     = $this->settings['website'] ?? '';
+        $contactInfo = trim("$phone | $email | $website", ' |');
+
         $sheet->getRowDimension(1)->setRowHeight(50);
 
-        $sheet->setCellValue('D2', 'NAMA PERUSAHAAN');
+        $sheet->setCellValue('D2', $companyName);
         $sheet->mergeCells('D2:H2');
         $sheet->getStyle('D2')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
-        $sheet->setCellValue('D3', 'ALAMAT');
+        $sheet->setCellValue('D3', $address);
         $sheet->mergeCells('D3:H3');
-        $sheet->setCellValue('D4', 'NO TELP | EMAIL | WEBSITE');
+        $sheet->setCellValue('D4', $contactInfo);
         $sheet->mergeCells('D4:H4');
         $sheet->getStyle('D3:D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
