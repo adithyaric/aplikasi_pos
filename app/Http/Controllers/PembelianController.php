@@ -148,6 +148,8 @@ class PembelianController extends Controller
         return redirect()->route('pembelian.penerimaan', $pembelian);
     }
 
+    //TODO pisah halaman PO & Penerimaan
+    //Tombol Update Penerimaan dibuat 1 saja
     public function penerimaan(Pembelian $pembelian)
     {
         $pembelian->load(['pembelianProducts.product', 'stocks.product', 'supplier']);
@@ -157,19 +159,32 @@ class PembelianController extends Controller
 
     public function storePenerimaan(Request $request, Pembelian $pembelian)
     {
+        // $request->validate([
+        //     'receipt_date' => 'required|date',
+        //     'receipt_pic' => 'required|string',
+        //     'receipt_status' => 'required|in:draft,validated,completed',
+        //     'receipt_photo' => 'nullable|image|max:2048',
+        //     'items' => 'required|array',
+        //     'items.*.stock_id' => 'nullable|exists:stocks,id',
+        //     'items.*.product_id' => 'required|exists:products,id',
+        //     'items.*.sku' => 'required|string|unique:stocks,sku',
+        //     'items.*.qty_diterima' => 'required|integer|min:1',
+        //     'items.*.expired_at' => 'nullable|date',
+        // ], [
+        //     'items.*.sku.unique' => 'The SKU ":input" is already taken.',
+        // ]);
+
         $request->validate([
-            'receipt_date' => 'required|date',
-            'receipt_pic' => 'required|string',
-            'receipt_status' => 'required|in:draft,validated,completed',
+            'receipt_date' => 'nullable|date',
+            'receipt_pic' => 'nullable|string',
+            'receipt_status' => 'nullable|in:draft,validated,completed',
             'receipt_photo' => 'nullable|image|max:2048',
             'items' => 'required|array',
             'items.*.stock_id' => 'nullable|exists:stocks,id',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.sku' => 'required|string|unique:stocks,sku',
+            'items.*.sku' => 'required|string',
             'items.*.qty_diterima' => 'required|integer|min:1',
             'items.*.expired_at' => 'nullable|date',
-        ], [
-            'items.*.sku.unique' => 'The SKU ":input" is already taken.',
         ]);
 
         DB::beginTransaction();
@@ -300,10 +315,10 @@ class PembelianController extends Controller
     public function updatePenerimaan(Request $request, Pembelian $pembelian)
     {
         $request->validate([
-            'code_gr' => 'required|string',
-            'receipt_date' => 'required|date',
-            'receipt_pic' => 'required|string',
-            'receipt_status' => 'required|in:draft,validated,completed',
+            'code_gr' => 'nullable|string',
+            'receipt_date' => 'nullable|date',
+            'receipt_pic' => 'nullable|string',
+            'receipt_status' => 'nullable|in:draft,validated,completed',
             'receipt_photo' => 'nullable|image|max:2048',
         ]);
 
