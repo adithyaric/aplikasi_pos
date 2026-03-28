@@ -40,26 +40,26 @@
                                     </td>
                                     <td>{{ $value->items->count() }} items</td>
                                     <td>
-                                        <a class=" btn-sm btn btn-success" href="{{ route('laporan.pickinglist', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
-                                        <a class="btn-sm btn btn-info" href="{{ route('picking-lists.show', $value->id) }}">Detail</a>
+                                        <a class="btn-xs btn btn-default" href="{{ route('picking-lists.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @if (!isset($value->deliveryOrder))
                                             @if ($value->status == 'draft')
                                                 <form action="{{ route('picking-lists.start', $value->id) }}" method="post"
                                                     style="display: inline;">
                                                     @csrf
-                                                    <button class="btn-sm btn btn-success">Start Picking</button>
+                                                    <button class="btn-xs btn btn-success">Start Picking</button>
                                                 </form>
                                             @elseif ($value->status == 'in_progress')
-                                                <a class="btn-sm btn btn-warning"
+                                                <a class="btn-xs btn btn-warning"
                                                     href="{{ route('picking-lists.pick', $value->id) }}">Continue</a>
                                             @elseif ($value->status == 'completed')
                                                 <form action="{{ route('delivery-orders.generate', $value->id) }}"
                                                     method="post" style="display: inline;">
                                                     @csrf
-                                                    <button class="btn-sm btn btn-primary">Generate DO & Send to outlet</button>
+                                                    <button class="btn-xs btn btn-primary">Generate DO & Send to outlet</button>
                                                 </form>
                                             @endif
                                         @endif
+                                        <a class=" btn-xs btn btn-success" href="{{ route('laporan.pickinglist', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                     </td>
                                 </tr>
                             @endforeach

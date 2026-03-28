@@ -148,8 +148,15 @@ class PembelianController extends Controller
         return redirect()->route('pembelian.penerimaan', $pembelian);
     }
 
-    //TODO pisah halaman PO & Penerimaan
-    //Tombol Update Penerimaan dibuat 1 saja
+    public function penerimaanIndex()
+    {
+        $pembelians = Pembelian::with(['supplier', 'pembelianProducts.product'])
+            ->latest()
+            ->get();
+
+        return view('pembelians.penerimaan-index', compact('pembelians'));
+    }
+
     public function penerimaan(Pembelian $pembelian)
     {
         $pembelian->load(['pembelianProducts.product', 'stocks.product', 'supplier']);
@@ -182,9 +189,11 @@ class PembelianController extends Controller
             'items' => 'required|array',
             'items.*.stock_id' => 'nullable|exists:stocks,id',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.sku' => 'required|string',
+            'items.*.sku' => 'required|string|unique:stocks,sku',
             'items.*.qty_diterima' => 'required|integer|min:1',
             'items.*.expired_at' => 'nullable|date',
+        ], [
+            'items.*.sku.unique' => 'The SKU ":input" is already taken.',
         ]);
 
         DB::beginTransaction();

@@ -74,9 +74,12 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::put('/pembelian/{pembelian}/pembayaran', [PembelianController::class, 'updatePembayaran'])->name('pembelian.pembayaran.update');
     // Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
     Route::get('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');
+
+    Route::get('/penerimaan', [PembelianController::class, 'penerimaanIndex'])->name('penerimaan.index');
     Route::get('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'penerimaan'])->name('pembelian.penerimaan');
     Route::post('/pembelian/{pembelian}/penerimaan', [PembelianController::class, 'storePenerimaan'])->name('pembelian.store-penerimaan');
     Route::post('/pembelian/{pembelian}/update-penerimaan', [PembelianController::class, 'updatePenerimaan'])->name('pembelian.update-penerimaan');
+
     Route::get('/pembelian/{pembelian}/print', [PembelianController::class, 'print'])->name('pembelian.print');
     Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
     Route::get('/supplier/{supplier}/products', [App\Http\Controllers\PembelianController::class, 'getProductsBySupplier'])->name('supplier.products');

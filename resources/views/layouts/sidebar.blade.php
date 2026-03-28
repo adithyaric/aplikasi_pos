@@ -34,7 +34,7 @@
                     <li class="{{ request()->routeIs('stock.opname') ? 'active' : '' }}"><a href="/stock-opname"><i class="fa fa-cube"></i><span>Stocks Opname</span></a></li>
                 </ul>
             </li>
-            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penjualan*') || request()->is('refund*')
+            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penerimaan*') || request()->is('penjualan*') || request()->is('refund*')
                 || request()->is('request-orders*')
                 || request()->is('picking-lists*')
                 || request()->is('delivery-orders*')
@@ -43,7 +43,12 @@
                 <ul class="treeview-menu">
                     {{-- <li class="{{ request()->is('category-pengeluaran*') ? 'active' : '' }}"><a href="/category-pengeluaran"><i class="fa fa-tags"></i><span>Category Pengeluaran</span></a></li> --}}
                     {{-- <li class="{{ request()->is('pengeluaran*') ? 'active' : '' }}"><a href="/pengeluaran"><i class="fa fa-folder-open"></i><span>Pengeluaran</span></a></li> --}}
-                    <li class="{{ request()->is('pembelian*') ? 'active' : '' }}"><a href="/pembelian"><i class="fa fa-cube "></i><span>INBOUND (Gudang Minta Supplier)</span></a></li>
+                    <li class="{{ request()->is('pembelian*') && !request()->is('pembelian/*/penerimaan') ? 'active' : '' }}">
+                        <a href="/pembelian"><i class="fa fa-file-text-o"></i><span>(PO) - INBOUND (Gudang Minta Supplier)</span></a>
+                    </li>
+                    <li class="{{ request()->is('penerimaan*') || request()->is('pembelian/*/penerimaan') ? 'active' : '' }}">
+                        <a href="/penerimaan"><i class="fa fa-download"></i><span>(GR) Penerimaan Barang</span></a>
+                    </li>
                     <li class="{{ request()->is('request-orders*') ? 'active' : '' }}"><a href="/request-orders"><i class="fa fa-cube"></i><span>Outlet Minta Gudang</span></a></li>
                     <li class="{{ request()->is('picking-lists*') ? 'active' : '' }}"><a href="/picking-lists"><i class="fa fa-cube"></i><span>PICKING & PACKING</span></a></li>
                     <li class="{{ request()->is('delivery-orders*') ? 'active' : '' }}"><a href="/delivery-orders"><i class="fa fa-cube"></i><span>OUTBOUND (Kirim ke Outlet)</span></a></li>

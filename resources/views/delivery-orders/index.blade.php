@@ -40,10 +40,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a class="btn-sm btn btn-info" href="{{ route('delivery-orders.show', $value->id) }}">Detail</a>
-                                        <a class=" btn-sm btn btn-success" href="{{ route('laporan.delivery-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
+                                        <a class="btn-xs btn btn-default" href="{{ route('delivery-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @if ($value->status == 'draft' || $value->status == 'sent')
-                                            <button class="btn-sm btn btn-success" data-toggle="modal"
+                                            <button class="btn-xs btn btn-success" data-toggle="modal"
                                                 data-target="#sendModal{{ $value->id }}">Send</button>
 
                                             <!-- Send Modal -->
@@ -78,6 +77,7 @@
                                                 </div>
                                             </div>
                                         @endif
+                                        <a class=" btn-xs btn btn-success" href="{{ route('laporan.delivery-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -27,13 +27,13 @@
                                         <div class="ms-auto align-self-start">
                                             <h5>
                                                 @if ($pembelian->pembelianTransaction?->status == 'unpaid')
-                                                    <span class="badge rounded bg-danger">Unpaid</span>
+                                                    <span class="btn rounded bg-danger">Unpaid</span>
                                                 @elseif($pembelian->pembelianTransaction?->status == 'partial')
-                                                    <span class="badge rounded bg-warning">Partial</span>
+                                                    <span class="btn rounded bg-warning">Partial</span>
                                                 @elseif($pembelian->pembelianTransaction?->status == 'paid')
-                                                    <span class="badge rounded bg-success">Paid</span>
+                                                    <span class="btn rounded bg-success">Paid</span>
                                                 @else
-                                                    <span class="badge rounded bg-secondary">No Payment</span>
+                                                    <span class="btn rounded bg-secondary">No Payment</span>
                                                 @endif
                                             </h5>
                                         </div>
@@ -73,7 +73,7 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <strong>Paid Amount: </strong>
                                             <h5>
-                                                <span class="badge bg-success">Rp.
+                                                <span class="btn bg-success">Rp.
                                                     {{ number_format($pembelian->pembelianTransaction?->amount ?? 0, 0, ',', '.') }}</span>
                                             </h5>
                                         </div>
@@ -81,7 +81,7 @@
                                             <strong>Outstanding Balance: </strong>
                                             <h5>
                                                 <span
-                                                    class="badge bg-danger">Rp.{{ number_format($pembelian->total - ($pembelian->pembelianTransaction?->amount ?? 0), 0, ',', '.') }}</span>
+                                                    class="btn bg-secondary">Rp.{{ number_format($pembelian->total - ($pembelian->pembelianTransaction?->amount ?? 0), 0, ',', '.') }}</span>
                                             </h5>
                                         </div>
                                     </div>
