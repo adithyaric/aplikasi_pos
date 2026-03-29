@@ -18,7 +18,7 @@ class ProductsExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['kode', 'nama', 'kategori', 'brand', 'model', 'warna', 'ukuran', 'satuan', 'min_stock', 'lokasi', 'harga_beli', 'harga_jual', 'diskon', 'berat', 'deskripsi'];
+        return ['kode', 'nama', 'kategori', 'supplier', 'brand', 'model', 'warna', 'ukuran', 'satuan', 'min_stock', 'lokasi', 'harga_beli', 'harga_jual', 'diskon', 'berat', 'deskripsi'];
     }
 
     public function map($row): array
@@ -27,6 +27,7 @@ class ProductsExport implements FromCollection, WithHeadings, WithMapping
             $row->code,
             $row->name,
             $row->category?->name,
+            $row->suppliers->pluck('name')->implode(', '),
             $row->brand,
             $row->model,
             $row->warna,

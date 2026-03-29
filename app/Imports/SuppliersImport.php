@@ -11,12 +11,14 @@ class SuppliersImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 {
     public function model(array $row)
     {
-        return new Supplier([
-            'kode_supplier' => $row['kode_supplier'],
-            'name'          => $row['nama'],
-            'pic_supplier'  => $row['pic'] ?? null,
-            'alamat'        => $row['alamat'] ?? null,
-            'no_telp'       => $row['no_telp'] ?? null,
-        ]);
+        return Supplier::updateOrCreate(
+            ['kode_supplier' => $row['kode_supplier']],
+            [
+                'name'         => $row['nama'],
+                'pic_supplier' => $row['pic'] ?? null,
+                'alamat'       => $row['alamat'] ?? null,
+                'no_telp'      => $row['no_telp'] ?? null,
+            ]
+        );
     }
 }
