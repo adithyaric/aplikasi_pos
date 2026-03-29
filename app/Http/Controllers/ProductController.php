@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Imports\ProductsImport;
 use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Activitylog\Models\Activity;
 
 class ProductController extends Controller
@@ -178,5 +181,25 @@ class ProductController extends Controller
             })->values();
 
         return response()->json(['success' => true, 'data' => $activities]);
+    }
+
+    ///-----------------------------------------------------------------------------------------------
+
+    public function export()
+    {
+        return Excel::download(new ProductsExport(), 'products.xlsx');
+    }
+
+    public function exportTemplate()
+    {
+        return Excel::download(new ProductsExport(templateOnly: true), 'template_products.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        Excel::import(new ProductsImport(), $request->file('file'));
+
+        return redirect()->back()->with('toast_success', 'Berhasil Import Data!');
     }
 }

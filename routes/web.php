@@ -156,6 +156,23 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/stock-opname', [App\Http\Controllers\StockController::class, 'opname'])->name('stock.opname');
     Route::get('/stock-opname/data', [App\Http\Controllers\StockController::class, 'getOpnameData'])->name('stock.opname.data');
     Route::post('/stock-opname/save', [App\Http\Controllers\StockController::class, 'saveOpname'])->name('stock.opname.save');
+
+
+    // Supplier
+    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('supplier.export');
+    Route::get('suppliers/export-template', [SupplierController::class, 'exportTemplate'])->name('supplier.export.template');
+    Route::post('suppliers/import', [SupplierController::class, 'import'])->name('supplier.import');
+
+    // Category
+    Route::get('categories/product/export', [CategoryController::class, 'exportProduct'])->name('category.product.export');
+    Route::get('categories/pengeluaran/export', [CategoryController::class, 'exportPengeluaran'])->name('category.pengeluaran.export');
+    Route::get('categories/export-template', [CategoryController::class, 'exportTemplate'])->name('category.export.template');
+    Route::post('categories/import', [CategoryController::class, 'import'])->name('category.import');
+
+    // Product
+    Route::get('products/export', [ProductController::class, 'export'])->name('product.export');
+    Route::get('products/export-template', [ProductController::class, 'exportTemplate'])->name('product.export.template');
+    Route::post('products/import', [ProductController::class, 'import'])->name('product.import');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

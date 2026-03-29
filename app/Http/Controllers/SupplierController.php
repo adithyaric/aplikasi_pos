@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SuppliersExport;
 use App\Http\Requests\SupplierRequest;
+use App\Imports\SuppliersImport;
 use App\Models\Supplier;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierController extends Controller
 {
@@ -54,5 +58,25 @@ class SupplierController extends Controller
         $supplier->delete();
 
         return redirect(route('supplier.index'))->with('toast_success', 'Berhasil Menghapus Data!');
+    }
+
+    ///-----------------------------------------------------------------------------------------------
+
+    public function export()
+    {
+        return Excel::download(new SuppliersExport(), 'suppliers.xlsx');
+    }
+
+    public function exportTemplate()
+    {
+        return Excel::download(new SuppliersExport(templateOnly: true), 'template_suppliers.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        Excel::import(new SuppliersImport(), $request->file('file'));
+
+        return redirect()->back()->with('toast_success', 'Berhasil Import Data!');
     }
 }

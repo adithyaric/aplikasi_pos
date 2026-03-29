@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoriesExport;
 use App\Http\Requests\CategoryRequest;
+use App\Imports\CategoriesImport;
 use App\Models\Category;
 use App\Models\Outlet;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CategoryController extends Controller
 {
@@ -95,5 +99,30 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->back()->with('toast_success', 'Berhasil Menghapus Data!');
+    }
+
+    ///-----------------------------------------------------------------------------------------------
+
+    public function exportProduct()
+    {
+        return Excel::download(new CategoriesExport(type: 'product'), 'categories_product.xlsx');
+    }
+
+    public function exportPengeluaran()
+    {
+        return Excel::download(new CategoriesExport(type: 'pengeluaran'), 'categories_pengeluaran.xlsx');
+    }
+
+    public function exportTemplate()
+    {
+        return Excel::download(new CategoriesExport(templateOnly: true), 'template_categories.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        Excel::import(new CategoriesImport(), $request->file('file'));
+
+        return redirect()->back()->with('toast_success', 'Berhasil Import Data!');
     }
 }
