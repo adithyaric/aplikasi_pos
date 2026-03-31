@@ -183,7 +183,15 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         $drawing = new Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('img/logo.jpeg'));
+
+        // Use stored logo path or fallback to default
+        $logoPath = $this->settings['logo'] ?? null;
+        if ($logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {
+            $drawing->setPath(\Illuminate\Support\Facades\Storage::disk('public')->path($logoPath));
+        } else {
+            $drawing->setPath(public_path('img/logo.jpeg')); // fallback
+        }
+
         $drawing->setHeight(80);
         $drawing->setCoordinates('B2');
 

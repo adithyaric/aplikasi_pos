@@ -103,6 +103,7 @@ class DashboardController extends Controller
             'telp'    => $settings['telp'] ?? '',
             'address' => $settings['address'] ?? '',
             'website' => $settings['website'] ?? '',
+            'logo'    => $settings['logo'] ?? '',
         ]);
     }
 
@@ -114,15 +115,28 @@ class DashboardController extends Controller
             'telp'    => 'required',
             'address' => 'required',
             'website' => 'nullable|url',
+            'logo'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'logo.image' => 'File yang diunggah harus berupa gambar.',
+            'logo.mimes' => 'Logo harus bertipe: jpeg, png, jpg, atau gif.',
+            'logo.max'   => 'Ukuran logo maksimal 2 MB.',
         ]);
 
-        Storage::disk('public')->put('settings.json', json_encode([
+        $data = [
             'name'    => $request->name,
             'email'   => $request->email,
             'telp'    => $request->telp,
             'address' => $request->address,
             'website' => $request->website,
-        ]));
+        ];
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('logos', 'public');
+            $data['logo'] = $path;
+        }
+
+        Storage::disk('public')->put('settings.json', json_encode($data));
 
         return redirect(route('setting'))->with('toast_success', 'Berhasil Menyimpan Data!');
     }

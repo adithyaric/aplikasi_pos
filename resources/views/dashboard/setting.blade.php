@@ -16,7 +16,7 @@
                 <div class="box">
                     <div class="box-header"></div><!-- /.box-header -->
                     <div class="box-body">
-                        <form id="form" method="POST" action="{{ route('setting.store') }}">
+                        <form id="form" method="POST" action="{{ route('setting.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group">
                                 <label for="name">Nama Perusahaan :</label>
@@ -37,6 +37,15 @@
                             <div class="form-group">
                                 <label for="website">Website :</label>
                                 <input class="form-control" type="url" name="website" id="website" value="{{ $website }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="logo">Logo Perusahaan :</label>
+                                <input class="form-control" type="file" name="logo" id="logo" accept="image/*">
+                                @if(isset($logo) && $logo)
+                                    <div class="mt-2">
+                                        <img src="{{ Storage::url($logo) }}" alt="Logo" style="max-height: 80px;">
+                                    </div>
+                                @endif
                             </div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>
