@@ -63,30 +63,31 @@
         @if (auth()->user()->role == 'superadmin')
             {{-- <li class="{{ request()->is('kas*') ? 'active' : '' }}"><a href="/kas"><i class="fa fa-bank"></i><span>Kas</span></a></li> --}}
             <li class="{{ in_array(Route::currentRouteName(), ['outlet.index', 'outlet.create', 'outlet.edit']) ? 'active' : '' }}"><a href="/outlet"><i class="fa fa-home"></i><span>Outlets</span></a></li>
+            <li class="{{ in_array(Route::currentRouteName(), ['laporan.index']) ? 'active' : '' }}"><a href="/laporan"><i class="fa fa-file-excel-o"></i><span>Laporan</span></a></li>
             {{-- <li class="{{ request()->is('voucher*') ? 'active' : '' }}"><a href="/voucher"><i class="fa fa-newspaper-o"></i><span>Vouchers</span></a></li> --}}
             {{-- <li class="{{ request()->is('slider*') ? 'active' : '' }}"><a href="/slider"><i class="fa fa-image"></i><span>Sliders</span></a></li> --}}
         @endif
-        <li class="treeview {{ request()->is('laporan*') ? 'active' : '' }}">
-            <a href="#">
-                <i class="fa fa-file-excel-o"></i><span>Laporan</span><i class="fa fa-angle-left pull-right"></i>
-            </a>
-            <ul class="treeview-menu">
-                <li class="{{ request()->is('laporan*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.index') }}"><i class="fa fa-file-excel-o"></i><span>Laporan</span></a>
-                </li>
-                @if (auth()->user()->role != 'kasir')
-                <li class="{{ request()->is('laporan/stock*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.stock') }}"><i class="fa fa-file-text-o"></i><span> - Stock</span></a>
-                </li>
-                <li class="{{ request()->is('laporan/pengeluaran*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.pengeluaran') }}"><i class="fa fa-file-text-o"></i><span> - Pengeluaran</span></a>
-                </li>
-                <li class="{{ request()->is('laporan/labarugi*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.labarugi') }}"><i class="fa fa-file-text-o"></i><span> - Laba Rugi</span></a>
-                </li>
-                @endif
-            </ul>
-        </li>
+        {{-- <li class="treeview {{ request()->is('laporan*') ? 'active' : '' }}"> --}}
+            {{-- <a href="#"> --}}
+                {{-- <i class="fa fa-file-excel-o"></i><span>Laporan</span><i class="fa fa-angle-left pull-right"></i> --}}
+            {{-- </a> --}}
+            {{-- <ul class="treeview-menu"> --}}
+                {{-- <li class="{{ request()->is('laporan*') ? 'active' : '' }}"> --}}
+                    {{-- <a href="{{ route('laporan.index') }}"><i class="fa fa-file-excel-o"></i><span>Laporan</span></a> --}}
+                {{-- </li> --}}
+                {{-- @if (auth()->user()->role != 'kasir') --}}
+                {{-- <li class="{{ request()->is('laporan/stock*') ? 'active' : '' }}"> --}}
+                    {{-- <a href="{{ route('laporan.stock') }}"><i class="fa fa-file-text-o"></i><span> - Stock</span></a> --}}
+                {{-- </li> --}}
+                {{-- <li class="{{ request()->is('laporan/pengeluaran*') ? 'active' : '' }}"> --}}
+                    {{-- <a href="{{ route('laporan.pengeluaran') }}"><i class="fa fa-file-text-o"></i><span> - Pengeluaran</span></a> --}}
+                {{-- </li> --}}
+                {{-- <li class="{{ request()->is('laporan/labarugi*') ? 'active' : '' }}"> --}}
+                    {{-- <a href="{{ route('laporan.labarugi') }}"><i class="fa fa-file-text-o"></i><span> - Laba Rugi</span></a> --}}
+                {{-- </li> --}}
+                {{-- @endif --}}
+            {{-- </ul> --}}
+        {{-- </li> --}}
     </ul>
     </section>
 </aside>

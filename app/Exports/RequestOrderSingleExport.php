@@ -114,7 +114,7 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         $sheet->setCellValue('B16', 'Detail Permintaan Barang');
         $sheet->getStyle('B16')->getFont()->setBold(true);
 
-        $sheet->getStyle('B15:H15')->applyFromArray([
+        $sheet->getStyle('B17:H17')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],

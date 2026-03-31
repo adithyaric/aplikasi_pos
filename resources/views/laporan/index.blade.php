@@ -1,304 +1,209 @@
 @extends('layouts.master')
-
-@section('title', 'ExportData')
-
+@section('title', 'Laporan')
 @section('container')
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <h1>
-            Export Data
-        </h1>
-    </section>
+<section class="content-header">
+    <h1>Laporan & Export Data</h1>
+</section>
+<section class="content">
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="row">
-            @if (auth()->user()->role != 'kasir')
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPembelian">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Pembelian
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPembelianSupplier">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Pembelian Supplier & Outlet
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPenjualan">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Penjualan
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPenjualanKasir">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Penjualan By Kasir
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPenjualanSupplier">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Penjualan By Supplier
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            @else
-            <div class="col-md-12 col-xs-12">
-                <div class="box">
-                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPenjualanKasir">
-                        <i class="fa fa-print"></i>
-                        Export Laporan Penjualan By Kasir
-                    </button>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
-            @endif
-        </div><!-- /.row -->
-        <!--Modals-->
-        <div id="exportPembelian" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Export Laporan Pembelian</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <form action="{{ route('laporan.pembelian') }}" method="GET">
-                        <div class="modal-body">
-                            <p>Pilih Hari</p>
-                            <div class="form-group">
-                                <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
-                            </div>
-                            <hr />
-                            <p>Pilih Tanggal</p>
-                            <div class="form-group">
-                                <input type="text" placeholder="Pilih Tanggal" name="tanggal" class="form-control tanggal" value="{{ old('tanggal') }}" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                        </div>
-                    </form>
-                </div>
+{{-- Helper macro: date range inputs in modal --}}
+
+{{-- 1. LAPORAN PURCHASE ORDER --}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-primary">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan Purchase Order</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_po"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
-        <div id="exportPembelianSupplier" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Export Laporan Pembelian Supplier</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <form action="{{ route('laporan.pembelian-supplier') }}" method="GET">
-                        <div class="modal-body">
-                            @if (auth()->user()->role == 'superadmin')
-                            <p>Pilih Outlet</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <hr />
-                            @else
-                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
-                            @endif
-                            <p>Pilih Supplier</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Supplier</option>
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}"
-                                            {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                            {{ $supplier->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <hr />
-                            <p>Pilih Hari</p>
-                            <div class="form-group">
-                                <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
-                            </div>
-                            <p>Pilih Tanggal</p>
-                            <div class="form-group">
-                                <input type="text" placeholder="Pilih Tanggal" name="tanggal" class="form-control tanggal" value="{{ old('tanggal') }}" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                        </div>
-                    </form>
-                </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-primary">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan Purchase Request</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_pr"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
-        <div id="exportPenjualan" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Export Laporan Penjualan</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <form action="{{ route('laporan.penjualan') }}" method="GET">
-                        <div class="modal-body">
-                            @if (auth()->user()->role == 'superadmin')
-                            <p>Pilih Outlet</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"
-                                            {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
-                                            {{ $outlet->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <hr />
-                            @else
-                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
-                            @endif
-                            <p>Pilih Hari</p>
-                            <div class="form-group">
-                                <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
-                            </div>
-                            <p>Pilih Tanggal</p>
-                            <div class="form-group">
-                                <input type="text" placeholder="Pilih Tanggal" name="tanggal" class="form-control tanggal" value="{{ old('tanggal') }}" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                        </div>
-                    </form>
-                </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-success">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-arrow-down"></i> Laporan Barang Masuk</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_masuk"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
-        <div id="exportPenjualanKasir" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Export Laporan Penjualan By Kasir</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <form action="{{ route('laporan.penjualan-kasir') }}" method="GET">
-                        <div class="modal-body">
-                            <p>Pilih Kasir</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="kasir_id" data-placeholder="Pilih Kasir" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Kasir</option>
-                                    @foreach ($cashiers as $cashier)
-                                        <option value="{{ $cashier->id }}"
-                                            {{ old('kasir_id') == $cashier->id ? 'selected' : '' }}>
-                                            {{ $cashier->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @if (auth()->user()->role == 'superadmin')
-                            <p>Pilih Outlet</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="outlet_id" data-placeholder="Pilih Outlet" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Outlet</option>
-                                    @foreach ($outlets as $outlet)
-                                        <option value="{{ $outlet->id }}"{{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>{{ $outlet->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <hr />
-                            @else
-                            <input type="hidden" name="outlet_id" value="{{ auth()->user()->outlet_id }}">
-                            @endif
-                            <p>Pilih Hari</p>
-                            <div class="form-group">
-                                <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
-                            </div>
-                            <p>Pilih Tanggal</p>
-                            <div class="form-group">
-                                <input type="text" placeholder="Pilih Tanggal" name="tanggal" class="form-control tanggal" value="{{ old('tanggal') }}" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                        </div>
-                    </form>
-                </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-warning">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-arrow-up"></i> Laporan Barang Keluar</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_keluar"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
-        <div id="exportPenjualanSupplier" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Export Laporan Penjualan By Supplier</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <form action="{{ route('laporan.penjualan-supplier') }}" method="GET">
-                        <div class="modal-body">
-                            <p>Pilih Supplier</p>
-                            <div class="form-group">
-                                <select required class="form-control select2" name="supplier_id" data-placeholder="Pilih Supplier" style="width: 100%;">
-                                    <option value="" disabled selected>Pilih Supplier</option>
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}"
-                                            {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                            {{ $supplier->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <hr />
-                            <p>Pilih Hari</p>
-                            <div class="form-group">
-                                <input type="date" placeholder="Pilih Tanggal" name="hari" class="form-control" value="{{ old('hari') }}" />
-                            </div>
-                            <p>Pilih Tanggal</p>
-                            <div class="form-group">
-                                <input type="text" placeholder="Pilih Tanggal" name="tanggal" class="form-control tanggal" value="{{ old('tanggal') }}" />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                        </div>
-                    </form>
-                </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-info">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-cubes"></i> Laporan Stok Barang</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_stok"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
-        <!--End Modal-->
-    </section><!-- /.content -->
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-success">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-inbox"></i> Laporan Penerimaan Barang</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_penerimaan"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-warning">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-truck"></i> Laporan Pengiriman Barang</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_pengiriman"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-primary">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-list-ol"></i> Laporan Picking &amp; Packing</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_picking"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-info">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-tasks"></i> Laporan Aktivitas Gudang</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_aktifitas"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-primary">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-shopping-cart"></i> Laporan Pembelian Barang</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_pembelian"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-danger">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-balance-scale"></i> Laporan Stok Opname &amp; Adjusment</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_opname"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-info">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-line-chart"></i> Laporan Pergerakan &amp; Kebutuhan Stok</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_pergerakan"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ============ MODALS ============ --}}
+
+@php
+$modals = [
+    ['id'=>'po',          'title'=>'Laporan Purchase Order',          'pdf'=>'laporan.pdf.po',        'xls'=>'laporan.export.po',        'date'=>true],
+    ['id'=>'pr',          'title'=>'Laporan Purchase Request',        'pdf'=>'laporan.pdf.pr',        'xls'=>'laporan.export.pr',        'date'=>true],
+    ['id'=>'masuk',       'title'=>'Laporan Barang Masuk',            'pdf'=>'laporan.pdf.barang-masuk',  'xls'=>'laporan.export.barang-masuk',  'date'=>true],
+    ['id'=>'keluar',      'title'=>'Laporan Barang Keluar',           'pdf'=>'laporan.pdf.barang-keluar', 'xls'=>'laporan.export.barang-keluar', 'date'=>true],
+    ['id'=>'stok',        'title'=>'Laporan Stok Barang',             'pdf'=>'laporan.pdf.stok',      'xls'=>'laporan.stock',            'date'=>false],
+    ['id'=>'penerimaan',  'title'=>'Laporan Penerimaan Barang',       'pdf'=>'laporan.pdf.penerimaan','xls'=>'laporan.export.penerimaan','date'=>true],
+    ['id'=>'pengiriman',  'title'=>'Laporan Pengiriman Barang',       'pdf'=>'laporan.pdf.pengiriman','xls'=>'laporan.export.pengiriman','date'=>true],
+    ['id'=>'picking',     'title'=>'Laporan Picking &amp; Packing',   'pdf'=>'laporan.pdf.picking',   'xls'=>'laporan.export.picking',   'date'=>true],
+    ['id'=>'aktifitas',   'title'=>'Laporan Aktivitas Gudang',        'pdf'=>'laporan.pdf.aktifitas', 'xls'=>'laporan.export.aktifitas', 'date'=>true],
+    ['id'=>'pembelian',   'title'=>'Laporan Pembelian Barang',        'pdf'=>'laporan.pdf.pembelian', 'xls'=>'laporan.export.pembelian', 'date'=>true],
+    ['id'=>'opname',      'title'=>'Laporan Stok Opname &amp; Adjusment', 'pdf'=>'laporan.pdf.opname','xls'=>'laporan.stock-opname',     'date'=>true],
+    ['id'=>'pergerakan',  'title'=>'Laporan Pergerakan &amp; Kebutuhan Stok','pdf'=>'laporan.pdf.pergerakan','xls'=>'laporan.export.pergerakan','date'=>false],
+];
+@endphp
+
+@foreach($modals as $m)
+<div id="modal_{{ $m['id'] }}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">{!! $m['title'] !!}</h4>
+            </div>
+            <div class="modal-body">
+                @if($m['date'])
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Tanggal Mulai</label>
+                            <input type="date" id="mulai_{{ $m['id'] }}" class="form-control"
+                                value="{{ now()->startOfMonth()->format('Y-m-d') }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Tanggal Selesai</label>
+                            <input type="date" id="selesai_{{ $m['id'] }}" class="form-control"
+                                value="{{ now()->format('Y-m-d') }}">
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success btn-preview-pdf"
+                    data-id="{{ $m['id'] }}"
+                    data-url="{{ route($m['pdf']) }}"
+                    data-date="{{ $m['date'] ? 'true' : 'false' }}">
+                    <i class="fa fa-eye"></i> Preview PDF
+                </button>
+                <a href="{{ route($m['xls']) }}" id="xls_{{ $m['id'] }}" class="btn btn-primary btn-export-xls"
+                    data-id="{{ $m['id'] }}"
+                    data-url="{{ route($m['xls']) }}"
+                    data-date="{{ $m['date'] ? 'true' : 'false' }}">
+                    <i class="fa fa-file-excel-o"></i> Export Excel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
+</section>
 @endsection
-@section('page-script')
-    <script>
-        $(document).ready(function() {
-            var startDate = new Date();
-            var endDate = new Date();
 
-            $('.tanggal').daterangepicker({
-                timePicker: true,
-                timePickerIncrement: 30,
-                format: 'YYYY-MM-DD H:mm',
-                startDate: startDate,
-                endDate: endDate
-            });
-        });
-    </script>
+@section('page-script')
+<script>
+$(document).ready(function () {
+
+    function buildUrl(baseUrl, id, hasDate) {
+        if (!hasDate) return baseUrl;
+        var mulai   = $('#mulai_'   + id).val();
+        var selesai = $('#selesai_' + id).val();
+        return baseUrl + '?tanggal_mulai=' + mulai + '&tanggal_selesai=' + selesai;
+    }
+
+    $(document).on('click', '.btn-preview-pdf', function () {
+        var id      = $(this).data('id');
+        var url     = $(this).data('url');
+        var hasDate = $(this).data('date') === true || $(this).data('date') === 'true';
+        window.open(buildUrl(url, id, hasDate), '_blank');
+    });
+
+    $(document).on('click', '.btn-export-xls', function (e) {
+        e.preventDefault();
+        var id      = $(this).data('id');
+        var url     = $(this).data('url');
+        var hasDate = $(this).data('date') === true || $(this).data('date') === 'true';
+        window.location.href = buildUrl(url, id, hasDate);
+    });
+
+});
+</script>
 @endsection

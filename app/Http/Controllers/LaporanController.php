@@ -5,6 +5,16 @@ namespace App\Http\Controllers;
 use App\Exports\DeliveryOrderSingleExport;
 use App\Exports\KartuStokExport;
 use App\Exports\LabaRugiExport;
+use App\Exports\LaporanAktifitasExport;
+use App\Exports\LaporanBarangKeluarExport;
+use App\Exports\LaporanBarangMasukExport;
+use App\Exports\LaporanPembelianBarangExport;
+use App\Exports\LaporanPenerimaanBarangExport;
+use App\Exports\LaporanPengirimanExport;
+use App\Exports\LaporanPergerakanExport;
+use App\Exports\LaporanPickingPackingExport;
+use App\Exports\LaporanPOExport;
+use App\Exports\LaporanPRExport;
 use App\Exports\PembelianExport;
 use App\Exports\PembelianSingleExport;
 use App\Exports\PembelianSupplierExport;
@@ -27,6 +37,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -174,5 +185,401 @@ class LaporanController extends Controller
     public function exportLabaRugi()
     {
         return Excel::download(new LabaRugiExport, 'laporan-laba-rugi.xlsx');
+    }
+
+    // ── PDF Methods ──────────────────────────────────────────────────────────
+
+    protected function getSettings(): array
+    {
+        return json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+    }
+
+    protected function dateRange(Request $request): array
+    {
+        return [
+            $request->input('tanggal_mulai', now()->startOfMonth()->format('Y-m-d')),
+            $request->input('tanggal_selesai', now()->format('Y-m-d')),
+        ];
+    }
+
+    public function pdfPO(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $pembelians = Pembelian::with(['supplier', 'pembelianProducts.product'])
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get();
+
+        $rows = [];
+        $no   = 1;
+        foreach ($pembelians as $p) {
+            foreach ($p->pembelianProducts as $pp) {
+                $rows[] = [
+                    'no' => $no++,
+                    'tanggal' => $p->created_at->isoFormat('DD MMM YYYY'),
+                    'kode_po' => $p->code,
+                    'no_pr' => $p->requestOrder?->code ?? '-',
+                    'supplier' => $p->supplier?->name ?? '-',
+                    'kode_barang' => $pp->product?->code ?? '-',
+                    'nama_barang' => $pp->product?->name ?? '-',
+                    'qty' => $pp->qty,
+                    'satuan' => $pp->product?->satuan ?? 'PCS',
+                    'harga_total' => $pp->subtotal,
+                    'qty_diterima' => $pp->qty_received ?? $pp->qty,
+                    'status' => ucfirst($p->status ?? '-'),
+                    'keterangan' => '',
+                ];
+            }
+        }
+
+        return Pdf::loadView('exports.pdf.laporan-po', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_PO.pdf');
+    }
+
+    public function pdfPR(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $orders = RequestOrder::with(['owner', 'items.product'])
+            ->whereDate('request_date', '>=', $mulai)->whereDate('request_date', '<=', $selesai)
+            ->orderBy('request_date')->get();
+
+        $rows = [];
+        $no   = 1;
+        foreach ($orders as $ro) {
+            foreach ($ro->items as $item) {
+                $rows[] = [
+                    'no' => $no++,
+                    'tanggal' => \Carbon\Carbon::parse($ro->request_date)->isoFormat('DD MMM YYYY'),
+                    'kode_pr' => $ro->code,
+                    'outlet' => $ro->owner?->name ?? '-',
+                    'kode_barang' => $item->product?->code ?? '-',
+                    'nama_barang' => $item->product?->name ?? '-',
+                    'qty' => $item->qty_requested,
+                    'satuan' => $item->product?->satuan ?? 'PCS',
+                    'status' => ucfirst($ro->status ?? '-'),
+                    'kode_po' => '-',
+                    'keterangan' => '',
+                ];
+            }
+        }
+
+        return Pdf::loadView('exports.pdf.laporan-pr', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_PR.pdf');
+    }
+
+    public function pdfBarangMasuk(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $movements = StockMovement::with(['product'])
+            ->where('qty_in', '>', 0)
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get()
+            ->map(function ($m) {
+                $docCode = '-';
+                $supplier = '-';
+                if ($m->reference_type && $m->reference_id) {
+                    $ref = $m->reference_type::find($m->reference_id);
+                    $docCode = $ref?->code ?? '-';
+                    if ($m->reference_type === 'App\Models\Pembelian') { $supplier = $ref?->supplier?->name ?? '-'; }
+                }
+                preg_match('/SKU:\s*(\S+)/', $m->notes ?? '', $matches);
+                $m->doc_code = $docCode;
+                $m->supplier_n = $supplier;
+                $m->batch = $matches[1] ?? '-';
+
+                return $m;
+            });
+
+        return Pdf::loadView('exports.pdf.laporan-barang-masuk', compact('movements', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Barang_Masuk.pdf');
+    }
+
+    public function pdfBarangKeluar(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $movements = StockMovement::with(['product'])
+            ->where('qty_out', '>', 0)
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get()
+            ->map(function ($m) {
+                $docCode = '-';
+                $tujuan = '-';
+                if ($m->reference_type && $m->reference_id) {
+                    $ref = $m->reference_type::find($m->reference_id);
+                    $docCode = $ref?->code ?? '-';
+                    $tujuan = $ref?->owner?->name ?? $ref?->requestOrder?->owner?->name ?? '-';
+                }
+                preg_match('/SKU:\s*(\S+)/', $m->notes ?? '', $matches);
+                $m->doc_code = $docCode;
+                $m->tujuan = $tujuan;
+                $m->batch = $matches[1] ?? '-';
+
+                return $m;
+            });
+
+        return Pdf::loadView('exports.pdf.laporan-barang-keluar', compact('movements', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Barang_Keluar.pdf');
+    }
+
+    public function pdfStok(Request $request)
+    {
+        $settings = $this->getSettings();
+        $stocks   = Stock::with(['product.category', 'pembelian'])->orderBy('product_id')->get();
+
+        return Pdf::loadView('exports.pdf.laporan-stok', compact('stocks', 'settings'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Stok_Barang.pdf');
+    }
+
+    public function pdfPenerimaanBarang(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $stocks = Stock::with(['pembelian.supplier', 'product'])
+            ->whereHas('pembelian')
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get();
+
+        return Pdf::loadView('exports.pdf.laporan-penerimaan', compact('stocks', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Penerimaan_Barang.pdf');
+    }
+
+    public function pdfPengiriman(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $deliveries = DeliveryOrder::with(['owner', 'requestOrder', 'items.product'])
+            ->whereDate('delivery_date', '>=', $mulai)->whereDate('delivery_date', '<=', $selesai)
+            ->orderBy('delivery_date')->get();
+
+        $rows = [];
+        $no = 1;
+        foreach ($deliveries as $do) {
+            foreach ($do->items as $item) {
+                $rows[] = [
+                    'no' => $no++,
+                    'tanggal' => \Carbon\Carbon::parse($do->delivery_date)->isoFormat('DD MMM YYYY'),
+                    'no_sj' => $do->code,
+                    'no_do' => $do->requestOrder?->code ?? '-',
+                    'tujuan' => $do->owner?->name ?? '-',
+                    'kode_barang' => $item->product?->code ?? '-',
+                    'nama_barang' => $item->product?->name ?? '-',
+                    'batch' => '-',
+                    'qty_kirim' => $item->qty,
+                    'satuan' => $item->product?->satuan ?? 'PCS',
+                    'status' => ucfirst($do->status ?? '-'),
+                    'keterangan' => '',
+                ];
+            }
+        }
+
+        return Pdf::loadView('exports.pdf.laporan-pengiriman', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Pengiriman.pdf');
+    }
+
+    public function pdfPicking(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $pickings = PickingList::with(['requestOrder.owner', 'items.product'])
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get();
+
+        $rows = [];
+        $no = 1;
+        foreach ($pickings as $pk) {
+            foreach ($pk->items as $item) {
+                $rows[] = [
+                    'no' => $no++,
+                    'tanggal' => $pk->created_at->isoFormat('DD MMM YYYY'),
+                    'kode_picking' => $pk->code,
+                    'kode_do' => $pk->deliveryOrder?->code ?? '-',
+                    'tujuan' => $pk->requestOrder?->owner?->name ?? '-',
+                    'kode_barang' => $item->product?->code ?? '-',
+                    'nama_barang' => $item->product?->name ?? '-',
+                    'lokasi' => $item->location ?? '-',
+                    'qty_order' => $item->qty_to_pick,
+                    'qty_pick' => $item->qty_picked,
+                    'qty_pack' => $item->qty_picked,
+                    'status' => ucfirst($pk->status ?? '-'),
+                    'picker' => '-',
+                    'packer' => '-',
+                    'keterangan' => $pk->notes ?? '',
+                ];
+            }
+        }
+
+        return Pdf::loadView('exports.pdf.laporan-picking', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Picking_Packing.pdf');
+    }
+
+    public function pdfAktifitas(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $movements = StockMovement::with(['product'])
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get()
+            ->map(function ($m) {
+                $docCode = '-';
+                if ($m->reference_type && $m->reference_id) {
+                    $ref = $m->reference_type::find($m->reference_id);
+                    $docCode = $ref?->code ?? '-';
+                }
+                $m->jenis    = $m->qty_in > 0 ? 'Penerimaan' : 'Pengiriman';
+                $m->doc_code = $docCode;
+                $m->pic      = '-';
+                $m->lokasi   = '-';
+                $m->status   = 'Selesai';
+                $m->qty      = max($m->qty_in ?? 0, $m->qty_out ?? 0);
+
+                return $m;
+            });
+
+        return Pdf::loadView('exports.pdf.laporan-aktifitas', compact('movements', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Aktifitas_Gudang.pdf');
+    }
+
+    public function pdfPembelianBarang(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $pembelians = Pembelian::with(['supplier', 'pembelianProducts.product'])
+            ->whereDate('created_at', '>=', $mulai)->whereDate('created_at', '<=', $selesai)
+            ->orderBy('created_at')->get();
+
+        $rows = [];
+        $no = 1;
+        foreach ($pembelians as $p) {
+            foreach ($p->pembelianProducts as $pp) {
+                $rows[] = [
+                    'no' => $no++,
+                    'tanggal' => $p->created_at->isoFormat('DD MMM YYYY'),
+                    'kode_po' => $p->code,
+                    'supplier' => $p->supplier?->name ?? '-',
+                    'kode_barang' => $pp->product?->code ?? '-',
+                    'nama_barang' => $pp->product?->name ?? '-',
+                    'qty' => $pp->qty,
+                    'satuan' => $pp->product?->satuan ?? 'PCS',
+                    'harga_satuan' => $pp->harga_beli,
+                    'total_harga' => $pp->subtotal,
+                    'status' => ucfirst($p->status ?? '-'),
+                    'keterangan' => '',
+                ];
+            }
+        }
+
+        return Pdf::loadView('exports.pdf.laporan-pembelian', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Pembelian_Barang.pdf');
+    }
+
+    public function pdfOpname(Request $request)
+    {
+        [$mulai, $selesai] = $this->dateRange($request);
+        $settings = $this->getSettings();
+
+        $adjustments = StockAdjustment::with(['product', 'stock'])
+            ->whereDate('adjustment_date', '>=', $mulai)->whereDate('adjustment_date', '<=', $selesai)
+            ->orderBy('adjustment_date')->get();
+
+        return Pdf::loadView('exports.pdf.laporan-opname', compact('adjustments', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Stock_Opname.pdf');
+    }
+
+    public function pdfPergerakan(Request $request)
+    {
+        $settings = $this->getSettings();
+
+        $movementStats = StockMovement::selectRaw('product_id, SUM(qty_out) as total_out, MIN(created_at) as first_date, MAX(created_at) as last_date')
+            ->groupBy('product_id')->get()->keyBy('product_id');
+
+        $rows = Stock::with(['product.category'])->get()->map(function ($s) use ($movementStats) {
+            $stat       = $movementStats[$s->product_id] ?? null;
+            $totalOut   = (int) ($stat?->total_out ?? 0);
+            $months     = max(1, (int) \Carbon\Carbon::parse($stat?->first_date ?? now())->diffInMonths(now()) + 1);
+            $avgKeluar  = round($totalOut / $months, 1);
+            $hariTanpa  = $stat ? now()->diffInDays(\Carbon\Carbon::parse($stat->last_date)) : 0;
+            $minStok    = $s->product?->min_stock ?? 0;
+
+            return [
+                'kode_barang'   => $s->product?->code ?? '-',
+                'nama_barang'   => $s->product?->name ?? '-',
+                'stok'          => $s->qty ?? 0,
+                'avg_keluar'    => $avgKeluar,
+                'hari_tanpa'    => $hariTanpa,
+                'kategori'      => $avgKeluar >= 10 ? 'Fast Moving' : ($avgKeluar >= 3 ? 'Medium Moving' : 'Slow Moving'),
+                'status_stok'   => ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis'),
+                'min_stok'      => $minStok,
+                'saran_reorder' => ($s->qty ?? 0) <= $minStok ? 'Ya' : 'Tidak',
+                'qty_reorder'   => ($s->qty ?? 0) <= $minStok ? max(0, $minStok * 2 - ($s->qty ?? 0)) : 0,
+                'keterangan'    => '',
+            ];
+        })->values()->all();
+
+        return Pdf::loadView('exports.pdf.laporan-pergerakan', compact('rows', 'settings'))
+            ->setPaper('a4', 'landscape')->stream('Laporan_Pergerakan_Stok.pdf');
+    }
+
+    // ── Excel Methods (new) ──────────────────────────────────────────────────
+
+    public function exportLaporanPO(Request $request)
+    {
+        return Excel::download(new LaporanPOExport($request), 'laporan-po.xlsx');
+    }
+
+    public function exportPR(Request $request)
+    {
+        return Excel::download(new LaporanPRExport($request), 'laporan-pr.xlsx');
+    }
+
+    public function exportBarangMasuk(Request $request)
+    {
+        return Excel::download(new LaporanBarangMasukExport($request), 'laporan-barang-masuk.xlsx');
+    }
+
+    public function exportBarangKeluar(Request $request)
+    {
+        return Excel::download(new LaporanBarangKeluarExport($request), 'laporan-barang-keluar.xlsx');
+    }
+
+    public function exportPenerimaanBarang(Request $request)
+    {
+        return Excel::download(new LaporanPenerimaanBarangExport($request), 'laporan-penerimaan-barang.xlsx');
+    }
+
+    public function exportPengiriman(Request $request)
+    {
+        return Excel::download(new LaporanPengirimanExport($request), 'laporan-pengiriman.xlsx');
+    }
+
+    public function exportPickingPacking(Request $request)
+    {
+        return Excel::download(new LaporanPickingPackingExport($request), 'laporan-picking-packing.xlsx');
+    }
+
+    public function exportAktifitas(Request $request)
+    {
+        return Excel::download(new LaporanAktifitasExport($request), 'laporan-aktifitas-gudang.xlsx');
+    }
+
+    public function exportPembelianBarang(Request $request)
+    {
+        return Excel::download(new LaporanPembelianBarangExport($request), 'laporan-pembelian-barang.xlsx');
+    }
+
+    public function exportPergerakan(Request $request)
+    {
+        return Excel::download(new LaporanPergerakanExport($request), 'laporan-pergerakan-stok.xlsx');
     }
 }

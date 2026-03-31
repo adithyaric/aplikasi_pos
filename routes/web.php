@@ -173,6 +173,33 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('products/export', [ProductController::class, 'export'])->name('product.export');
     Route::get('products/export-template', [ProductController::class, 'exportTemplate'])->name('product.export.template');
     Route::post('products/import', [ProductController::class, 'import'])->name('product.import');
+
+    // -------------------------------------------------------------------------------------------------------------------------------------
+    // Laporan² PDF & Excel
+    Route::get('laporan/pdf/po', [LaporanController::class, 'pdfPO'])->name('laporan.pdf.po');
+    Route::get('laporan/pdf/pr', [LaporanController::class, 'pdfPR'])->name('laporan.pdf.pr');
+    Route::get('laporan/pdf/barang-masuk', [LaporanController::class, 'pdfBarangMasuk'])->name('laporan.pdf.barang-masuk');
+    Route::get('laporan/pdf/barang-keluar', [LaporanController::class, 'pdfBarangKeluar'])->name('laporan.pdf.barang-keluar');
+    Route::get('laporan/pdf/stok', [LaporanController::class, 'pdfStok'])->name('laporan.pdf.stok');
+    Route::get('laporan/pdf/penerimaan', [LaporanController::class, 'pdfPenerimaanBarang'])->name('laporan.pdf.penerimaan');
+    Route::get('laporan/pdf/pengiriman', [LaporanController::class, 'pdfPengiriman'])->name('laporan.pdf.pengiriman');
+    Route::get('laporan/pdf/picking', [LaporanController::class, 'pdfPicking'])->name('laporan.pdf.picking');
+    Route::get('laporan/pdf/aktifitas', [LaporanController::class, 'pdfAktifitas'])->name('laporan.pdf.aktifitas');
+    Route::get('laporan/pdf/pembelian', [LaporanController::class, 'pdfPembelianBarang'])->name('laporan.pdf.pembelian');
+    Route::get('laporan/pdf/opname', [LaporanController::class, 'pdfOpname'])->name('laporan.pdf.opname');
+    Route::get('laporan/pdf/pergerakan', [LaporanController::class, 'pdfPergerakan'])->name('laporan.pdf.pergerakan');
+
+    // Laporan Excel (new)
+    Route::get('laporan/export/po', [LaporanController::class, 'exportLaporanPO'])->name('laporan.export.po');
+    Route::get('laporan/export/pr', [LaporanController::class, 'exportPR'])->name('laporan.export.pr');
+    Route::get('laporan/export/barang-masuk', [LaporanController::class, 'exportBarangMasuk'])->name('laporan.export.barang-masuk');
+    Route::get('laporan/export/barang-keluar', [LaporanController::class, 'exportBarangKeluar'])->name('laporan.export.barang-keluar');
+    Route::get('laporan/export/penerimaan', [LaporanController::class, 'exportPenerimaanBarang'])->name('laporan.export.penerimaan');
+    Route::get('laporan/export/pengiriman', [LaporanController::class, 'exportPengiriman'])->name('laporan.export.pengiriman');
+    Route::get('laporan/export/picking', [LaporanController::class, 'exportPickingPacking'])->name('laporan.export.picking');
+    Route::get('laporan/export/aktifitas', [LaporanController::class, 'exportAktifitas'])->name('laporan.export.aktifitas');
+    Route::get('laporan/export/pembelian', [LaporanController::class, 'exportPembelianBarang'])->name('laporan.export.pembelian');
+    Route::get('laporan/export/pergerakan', [LaporanController::class, 'exportPergerakan'])->name('laporan.export.pergerakan');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {
