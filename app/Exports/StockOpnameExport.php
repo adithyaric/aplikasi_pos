@@ -20,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithDrawings, WithCustomStartCell, WithProperties
 {
     use Exportable;
+
     protected $adjustments;
     protected $date;
     protected $settings;
@@ -27,8 +28,8 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
     public function __construct($adjustments, $date, array $settings = [])
     {
         $this->adjustments = $adjustments;
-        $this->date = $date;
-        $this->settings = $settings;
+        $this->date        = $date;
+        $this->settings    = $settings;
     }
 
     public function collection()
@@ -38,31 +39,54 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
 
     public function headings(): array
     {
-        return ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Qty PO', 'Qty Diterima', 'Harga', 'Total'];
+        return [
+            'No',
+            'Kode Barang',
+            'Nama Barang',
+            'Batch',
+            'Expired',
+            'Satuan',
+            'Stok Sistem',
+            'Stok Fisik',
+            'Selisih',
+            'QTY Adjust',
+            'Alasan',
+            'Status',
+            'Keterangan',
+        ];
     }
 
     public function map($item): array
     {
         static $no = 0;
         $no++;
-        $qty = abs($item->quantity);
-        $harga = $item->stock->harga_beli ?? 0;
+
+        $systemQty   = $item->system_qty ?? 0;
+        $physicalQty = $item->physical_qty ?? 0;
+        $selisih     = $physicalQty - $systemQty;
 
         return [
             $no,
             $item->product->code ?? '-',
             $item->product->name ?? '-',
+            $item->sku ?? '-',
+            $item->stock?->expired_at
+                ? Carbon::parse($item->stock->expired_at)->format('d/m/Y')
+                : '-',
             $item->product->satuan ?? 'PCS',
-            $qty,
-            $qty,
-            'Rp '.number_format($harga, 0, ',', '.'),
-            'Rp '.number_format($qty * $harga, 0, ',', '.'),
+            $systemQty,
+            $physicalQty,
+            ($selisih >= 0 ? '+' : '').$selisih,
+            ($item->quantity >= 0 ? '+' : '').$item->quantity,
+            $item->reason ?? '-',
+            $item->status ?? 'Selesai',
+            $item->keterangan ?? '-',
         ];
     }
 
     public function startCell(): string
     {
-        return 'B14';
+        return 'B16';
     }
 
     public function styles(Worksheet $sheet)
@@ -77,31 +101,30 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
         $sheet->getRowDimension(1)->setRowHeight(50);
 
         $sheet->setCellValue('D2', $companyName);
-        $sheet->mergeCells('D2:J2');
+        $sheet->mergeCells('D2:O2');
         $sheet->getStyle('D2')->applyFromArray([
-            'font' => ['bold' => true, 'size' => 14],
+            'font'      => ['bold' => true, 'size' => 14],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
         $sheet->setCellValue('D3', $address);
-        $sheet->mergeCells('D3:J3');
+        $sheet->mergeCells('D3:O3');
         $sheet->setCellValue('D4', $contactInfo);
-        $sheet->mergeCells('D4:J4');
+        $sheet->mergeCells('D4:O4');
         $sheet->getStyle('D3:D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->getRowDimension(5)->setRowHeight(20);
 
-        $sheet->mergeCells('B6:J6');
-        $sheet->getStyle('B6:J6')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
+        $sheet->mergeCells('B6:O6');
+        $sheet->getStyle('B6:O6')->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
 
-        $sheet->setCellValue('B8', 'DOKUMEN PENYESUAIAN STOK');
-        $sheet->mergeCells('B8:J8');
+        $sheet->setCellValue('B8', 'LAPORAN STOK OPNAME & ADJUSTMENT');
+        $sheet->mergeCells('B8:O8');
         $sheet->getStyle('B8')->applyFromArray([
-            'font' => ['bold' => true, 'size' => 12],
+            'font'      => ['bold' => true, 'size' => 12],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
-        $docNo = 'PS/'.Carbon::parse($this->date)->format('Y/m').'/'.str_pad($this->adjustments->count(), 5, '0', STR_PAD_LEFT);
-
+        $docNo = 'SO/'.Carbon::parse($this->date)->format('Y/m').'/'.str_pad($this->adjustments->count(), 5, '0', STR_PAD_LEFT);
         $sheet->setCellValue('B10', 'No Dokumen :');
         $sheet->setCellValue('D10', $docNo);
         $sheet->getStyle('B10')->getFont()->setBold(true);
@@ -118,36 +141,41 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
         $sheet->setCellValue('D13', 'Stok Opname / Koreksi Stok');
         $sheet->getStyle('B13')->getFont()->setBold(true);
 
-        $sheet->setCellValue('B14', 'Detail Barang Diterima');
-        $sheet->getStyle('B14')->getFont()->setBold(true);
+        $sheet->setCellValue('B15', 'Detail Penyesuaian Stok');
+        $sheet->getStyle('B15')->getFont()->setBold(true);
 
-        // TABLE HEADER at row 14 via startCell B14 → header is row 14
-        $sheet->getStyle('B14:I14')->applyFromArray([
-            'font' => ['bold' => true],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '8EAADB']],
+        // TABLE HEADER — cols B:N = 13 columns
+        $sheet->getStyle('B16:N16')->applyFromArray([
+            'font'      => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
+            'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '8EAADB']],
         ]);
+        $sheet->getRowDimension(16)->setRowHeight(28);
 
         $highestRow = $sheet->getHighestRow();
-        if ($highestRow > 14) {
-            $sheet->getStyle('B15:I'.$highestRow)
+        if ($highestRow > 16) {
+            $sheet->getStyle('B17:N'.$highestRow)
                 ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         }
 
         $sheet->getColumnDimension('B')->setWidth(5);
-        $sheet->getColumnDimension('C')->setWidth(16);
-        $sheet->getColumnDimension('D')->setWidth(28);
-        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getColumnDimension('D')->setWidth(24);
+        $sheet->getColumnDimension('E')->setWidth(14);
         $sheet->getColumnDimension('F')->setWidth(10);
-        $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->getColumnDimension('H')->setWidth(14);
-        $sheet->getColumnDimension('I')->setWidth(16);
+        $sheet->getColumnDimension('G')->setWidth(7);
+        $sheet->getColumnDimension('H')->setWidth(10);
+        $sheet->getColumnDimension('I')->setWidth(10);
+        $sheet->getColumnDimension('J')->setWidth(9);
+        $sheet->getColumnDimension('K')->setWidth(9);
+        $sheet->getColumnDimension('L')->setWidth(16);
+        $sheet->getColumnDimension('M')->setWidth(10);
+        $sheet->getColumnDimension('N')->setWidth(16);
 
-        $sheet->getStyle('F')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('G')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('H')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('I')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        foreach (['G', 'H', 'I', 'J', 'K', 'M'] as $col) {
+            $sheet->getStyle($col)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
 
         // SUMMARY
         $totalMasuk  = $this->adjustments->where('quantity', '>', 0)->sum('quantity');
@@ -155,53 +183,55 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
 
         $summaryRow = $highestRow + 2;
         $sheet->setCellValue('B'.$summaryRow, 'Total Penyesuaian Masuk :');
-        $sheet->mergeCells('B'.$summaryRow.':D'.$summaryRow);
-        $sheet->setCellValue('E'.$summaryRow, $totalMasuk);
+        $sheet->mergeCells('B'.$summaryRow.':E'.$summaryRow);
+        $sheet->setCellValue('F'.$summaryRow, $totalMasuk);
+        $sheet->getStyle('B'.$summaryRow)->getFont()->setBold(true);
 
         $sheet->setCellValue('B'.($summaryRow + 1), 'Total Penyesuaian Keluar :');
-        $sheet->mergeCells('B'.($summaryRow + 1).':D'.($summaryRow + 1));
-        $sheet->setCellValue('E'.($summaryRow + 1), $totalKeluar);
+        $sheet->mergeCells('B'.($summaryRow + 1).':E'.($summaryRow + 1));
+        $sheet->setCellValue('F'.($summaryRow + 1), $totalKeluar);
+        $sheet->getStyle('B'.($summaryRow + 1))->getFont()->setBold(true);
 
-        $sheet->setCellValue('B'.($summaryRow + 2), 'Keterangan');
-        $sheet->setCellValue('D'.($summaryRow + 2), ':');
+        $sheet->getStyle('B'.$summaryRow.':N'.($summaryRow + 1))
+            ->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
 
         // SIGNATURE
-        $row = $summaryRow + 5;
-        $sheet->mergeCells('B'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->mergeCells('H'.$row.':I'.$row);
-        $sheet->setCellValue('B'.$row, 'Diterima Oleh');
-        $sheet->setCellValue('E'.$row, 'Diperiksa');
-        $sheet->setCellValue('H'.$row, 'Disetujui');
-        $sheet->getStyle('B'.$row.':I'.$row)->applyFromArray([
-            'font' => ['bold' => true],
+        $row = $summaryRow + 4;
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':I'.$row);
+        $sheet->mergeCells('K'.$row.':N'.$row);
+        $sheet->setCellValue('B'.$row, 'Dibuat Oleh');
+        $sheet->setCellValue('F'.$row, 'Diperiksa');
+        $sheet->setCellValue('K'.$row, 'Disetujui');
+        $sheet->getStyle('B'.$row.':N'.$row)->applyFromArray([
+            'font'      => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
         $row++;
-        $sheet->mergeCells('B'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->mergeCells('H'.$row.':I'.$row);
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':I'.$row);
+        $sheet->mergeCells('K'.$row.':N'.$row);
         $sheet->setCellValue('B'.$row, 'Staff Gudang');
-        $sheet->setCellValue('E'.$row, 'Supervisor Gudang');
-        $sheet->setCellValue('H'.$row, 'Manager');
-        $sheet->getStyle('B'.$row.':I'.$row)->applyFromArray([
-            'font' => ['bold' => true],
+        $sheet->setCellValue('F'.$row, 'Supervisor Gudang');
+        $sheet->setCellValue('K'.$row, 'Manager');
+        $sheet->getStyle('B'.$row.':N'.$row)->applyFromArray([
+            'font'      => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
         $row += 5;
-        $sheet->mergeCells('B'.$row.':C'.$row);
-        $sheet->mergeCells('E'.$row.':G'.$row);
-        $sheet->mergeCells('H'.$row.':I'.$row);
+        $sheet->mergeCells('B'.$row.':D'.$row);
+        $sheet->mergeCells('F'.$row.':I'.$row);
+        $sheet->mergeCells('K'.$row.':N'.$row);
         $sheet->setCellValue('B'.$row, 'Nama');
-        $sheet->setCellValue('E'.$row, 'Nama');
-        $sheet->setCellValue('H'.$row, 'Nama');
-        $sheet->getStyle('B'.$row.':I'.$row)->applyFromArray([
-            'font' => ['bold' => true],
+        $sheet->setCellValue('F'.$row, 'Nama');
+        $sheet->setCellValue('K'.$row, 'Nama');
+        $sheet->getStyle('B'.$row.':N'.$row)->applyFromArray([
+            'font'      => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
-        $sheet->getStyle('B'.($row - 1).':I'.($row - 1))
+        $sheet->getStyle('B'.($row - 1).':N'.($row - 1))
             ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
     }
 
@@ -211,12 +241,11 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
 
-        // Use stored logo path or fallback to default
         $logoPath = $this->settings['logo'] ?? null;
         if ($logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {
             $drawing->setPath(\Illuminate\Support\Facades\Storage::disk('public')->path($logoPath));
         } else {
-            $drawing->setPath(public_path('img/logo.jpeg')); // fallback
+            $drawing->setPath(public_path('img/logo.jpeg'));
         }
 
         $drawing->setHeight(80);
@@ -228,8 +257,8 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
     public function properties(): array
     {
         return [
-            'creator' => config('app.name'),
-            'title' => 'Dokumen Penyesuaian Stok',
+            'creator'     => config('app.name'),
+            'title'       => 'Laporan Stok Opname & Adjustment',
             'description' => 'Stock Opname '.$this->date,
         ];
     }

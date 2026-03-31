@@ -223,28 +223,31 @@ class StockController extends Controller
                     // Create adjustment record
                     StockAdjustment::create([
                         'adjustment_date' => $request->adjustment_date,
-                        'product_id' => $stock->product_id,
-                        'stock_id' => $stock->id,
-                        'sku' => $stock->sku,
-                        'quantity' => $item['selisih'],
-                        'keterangan' => $item['keterangan'],
+                        'product_id'      => $stock->product_id,
+                        'stock_id'        => $stock->id,
+                        'sku'             => $stock->sku,
+                        'quantity'        => $item['selisih'],
+                        'system_qty'      => $item['system_qty'] ?? $stock->qty,
+                        'physical_qty'    => $item['physical_qty'] ?? ($stock->qty + $item['selisih']),
+                        'reason'          => $item['keterangan'] ?? null,
+                        'status'          => 'Selesai',
+                        'keterangan'      => $item['keterangan'] ?? null,
                     ]);
 
-                    // Update stock quantity
                     $newQty = $stock->qty + $item['selisih'];
                     $stock->update(['qty' => $newQty]);
 
                     // Log movement
                     StockMovement::create([
-                        'product_id' => $stock->product_id,
-                        'user_id' => auth()->id(),
-                        'type' => 'adjustment',
+                        'product_id'     => $stock->product_id,
+                        'user_id'        => auth()->id(),
+                        'type'           => 'adjustment',
                         'reference_type' => StockAdjustment::class,
-                        'reference_id' => $stock->id,
-                        'qty_in' => $item['selisih'] > 0 ? $item['selisih'] : 0,
-                        'qty_out' => $item['selisih'] < 0 ? abs($item['selisih']) : 0,
-                        'balance' => $newQty,
-                        'notes' => "Stock opname adjustment - SKU: {$stock->sku} - ".($item['keterangan'] ?? 'Stock adjustment'),
+                        'reference_id'   => $stock->id,
+                        'qty_in'         => $item['selisih'] > 0 ? $item['selisih'] : 0,
+                        'qty_out'        => $item['selisih'] < 0 ? abs($item['selisih']) : 0,
+                        'balance'        => $newQty,
+                        'notes'          => "Stock opname adjustment - SKU: {$stock->sku} - ".($item['keterangan'] ?? 'Stock adjustment'),
                     ]);
                 }
             }

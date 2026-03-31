@@ -15,12 +15,18 @@ class StockAdjustment extends Model
         'stock_id',
         'sku',
         'quantity',
+        'system_qty',
+        'physical_qty',
+        'reason',
+        'status',
         'keterangan',
     ];
 
     protected $casts = [
         'adjustment_date' => 'date',
-        'quantity' => 'float',
+        'quantity'        => 'float',
+        'system_qty'      => 'float',
+        'physical_qty'    => 'float',
     ];
 
     public function product()

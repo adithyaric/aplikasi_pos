@@ -132,12 +132,15 @@ class LaporanController extends Controller
     {
         $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
 
-        $date = $request->input('tanggal', date('Y-m-d'));
+        $mulai   = $request->input('tanggal_mulai', $request->input('tanggal', date('Y-m-d')));
+        $selesai = $request->input('tanggal_selesai', $mulai);
+
         $adjustments = StockAdjustment::with(['product', 'stock'])
-            ->whereDate('adjustment_date', $date)
+            ->whereDate('adjustment_date', '>=', $mulai)
+            ->whereDate('adjustment_date', '<=', $selesai)
             ->get();
 
-        return Excel::download(new StockOpnameExport($adjustments, $date, $settings), 'Stock_Opname-'.$date.'.xlsx');
+        return Excel::download(new StockOpnameExport($adjustments, $mulai, $settings), 'Stock_Opname-'.$mulai.'.xlsx');
     }
 
     public function exportPenerimaan(Request $request, Pembelian $pembelian, $type = 'po')
