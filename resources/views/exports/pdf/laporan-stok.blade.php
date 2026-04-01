@@ -23,7 +23,7 @@
                 <th style="width:6%">Min Stok</th>
                 <th style="width:6%">Selisih</th>
                 <th style="width:7%">Status Stok</th>
-                <th style="width:7%">Expired</th>
+                <th style="width:7%">Status Expired</th>
                 <th style="width:9%">Lokasi</th>
             </tr>
         </thead>
