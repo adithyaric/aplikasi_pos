@@ -38,6 +38,7 @@ class LaporanPenerimaanBarangExport implements FromCollection, WithHeadings, Wit
             'Batch',
             'Expired',
             'Qty',
+            'Qty Diterima',
             'Satuan',
             'Kondisi',
             'Keterangan'
@@ -71,6 +72,7 @@ class LaporanPenerimaanBarangExport implements FromCollection, WithHeadings, Wit
                 $s->sku ?? '-',
                 $s->expired_date ? Carbon::parse($s->expired_date)->format('d/m/Y') : '-',
                 $s->qty ?? 0,
+                $s->qty_diterima ?? 0,
                 $s->product?->satuan ?? 'PCS',
                 'Baik',
                 $s->pembelian?->notes ?? 'Pembelian',

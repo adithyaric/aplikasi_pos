@@ -56,7 +56,8 @@
                                                         <span class="label label-default">{{ $item->qty }}</span>
                                                         @if($value->stocks->where('product_id', $item->product_id)->count())
                                                             <span class="label label-success">
-                                                                ✓ {{ $value->stocks->where('product_id', $item->product_id)->sum('qty') }} diterima
+                                                                {{-- ✓ {{ $value->stocks->where('product_id', $item->product_id)->sum('qty') }} diterima --}}
+                                                                ✓ {{ $item->qty_diterima }} diterima
                                                             </span>
                                                         @else
                                                             <span class="label label-warning">Belum diterima</span>

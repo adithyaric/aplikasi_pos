@@ -23,6 +23,7 @@
                 <th style="width:10%">Batch</th>
                 <th style="width:8%">Expired</th>
                 <th style="width:5%">Qty</th>
+                <th style="width:5%">Qty Diterima</th>
                 <th style="width:5%">Satuan</th>
                 <th style="width:6%">Kondisi</th>
                 <th style="width:8%">Keterangan</th>
@@ -43,6 +44,7 @@
                         {{ $s->expired_date ? \Carbon\Carbon::parse($s->expired_date)->format('d/m/Y') : '-' }}
                     </td>
                     <td class="tc">{{ $s->qty ?? 0 }}</td>
+                    <td class="tc">{{ $s->qty_diterima ?? 0 }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
                     <td class="tc">Baik</td>
                     <td>{{ $s->pembelian?->notes ?? 'Pembelian' }}</td>

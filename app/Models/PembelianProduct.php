@@ -17,6 +17,7 @@ class PembelianProduct extends Model
         'product_id',
         'harga_beli',
         'qty',
+        'qty_diterima',
         'subtotal',
         'expired_at',
         'serial_numbers' // JSON array for serialized items

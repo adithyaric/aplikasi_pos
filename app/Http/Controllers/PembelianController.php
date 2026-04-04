@@ -223,6 +223,10 @@ class PembelianController extends Controller
                     ->where('product_id', $itemData['product_id'])
                     ->first();
 
+                $pembelianProduct?->update([
+                    'qty_diterima' => $qtyDiterima,
+                ]);
+
                 if (! $pembelianProduct) { continue; }
 
                 // Check if updating existing stock or creating new
