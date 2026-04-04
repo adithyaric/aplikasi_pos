@@ -31,13 +31,18 @@ class RequestOrderController extends Controller
     {
         return view('request-orders.create', [
             'outlets' => Outlet::get(),
-            'products' => Product::with('stocks')->whereHas('stocks', function ($q) {
+            'products' => Product::with(['stocks' => function ($q) {
+                $q->where('qty_available', '>', 0)
+                    ->where('status', 'available');
+            }])->whereHas('stocks', function ($q) {
                 $q->where('qty_available', '>', 0)
                     ->where('status', 'available');
             })
                 // ->where('is_serialized', false)
-                ->get(),
-
+                ->get()
+                ->each(function ($product) {
+                    $product->stocks_qty_available = $product->stocks->sum('qty_available');
+                }),
         ]);
     }
 
