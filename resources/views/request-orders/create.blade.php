@@ -51,12 +51,13 @@
                                 <tbody>
                                     <tr class="item-row">
                                         <td>
-                                            <select name="items[0][product_id]" class="form-control product-select" required>
-                                                <option value="">Select Product</option>
+                                            <select name="items[0][product_id]" class="form-control product-select select2"
+                                                required>
+                                                <option value="">Select Product </option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}"
-                                                        data-available="{{ $product->stocks_qty_available }}">
-                                                        {{ $product->code }} - {{ $product->name }} : {{ $product->stocks_qty_available }}
+                                                        data-available="{{ $product->total_available }}">
+                                                        {{ $product->code }} - {{ $product->name }} : {{ $product->total_available }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -96,11 +97,7 @@
 function populateProductSelect($select, selectedId = null) {
     $select.empty().append('<option value="">Select Product</option>');
     $.each(products, function(index, product) {
-        // Calculate available qty from loaded stocks (if any)
-        let available = 0;
-        if (product.stocks && product.stocks.length) {
-            available = product.stocks.reduce((sum, stock) => sum + (stock.qty_available || 0), 0);
-        }
+        let available = product.total_available || 0;
         let option = $('<option>', {
             value: product.id,
             'data-available': available,
@@ -120,7 +117,7 @@ function populateProductSelect($select, selectedId = null) {
                 let $select = $(this);
                 let currentVal = $select.val();
                 populateProductSelect($select, currentVal);
-                // $select.select2({ width: '100%' });
+                $select.select2({ width: '100%' });
             });
         });
 
@@ -151,7 +148,7 @@ function populateProductSelect($select, selectedId = null) {
             $('#items-table tbody').append(newRow);
             let $newSelect = $('#items-table tbody tr:last .product-select');
             populateProductSelect($newSelect);
-            //$newSelect.select2({ width: '100%' });
+            $newSelect.select2({ width: '100%' });
             rowIndex++;
         });
 

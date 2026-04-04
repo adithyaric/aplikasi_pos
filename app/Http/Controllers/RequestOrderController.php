@@ -40,8 +40,10 @@ class RequestOrderController extends Controller
             })
                 // ->where('is_serialized', false)
                 ->get()
-                ->each(function ($product) {
-                    $product->stocks_qty_available = $product->stocks->sum('qty_available');
+                ->map(function ($product) {
+                    $product->total_available = (int) $product->stocks->sum('qty_available');
+
+                    return $product;
                 }),
         ]);
     }
