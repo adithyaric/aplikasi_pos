@@ -57,7 +57,7 @@
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}"
                                                         data-available="{{ $product->stocks_qty_available }}">
-                                                        {{ $product->code }} - {{ $product->name }} : {{ $product->stocks()->sum('qty_available') }}
+                                                        {{ $product->code }} - {{ $product->name }} : {{ $product->stocks_qty_available }}
                                                     </option>
                                                 @endforeach
                                             </select>
