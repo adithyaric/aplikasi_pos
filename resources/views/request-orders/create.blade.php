@@ -51,8 +51,7 @@
                                 <tbody>
                                     <tr class="item-row">
                                         <td>
-                                            <select name="items[0][product_id]" class="form-control product-select select2"
-                                                required>
+                                            <select name="items[0][product_id]" class="form-control product-select" required>
                                                 <option value="">Select Product</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}"
@@ -152,7 +151,7 @@ function populateProductSelect($select, selectedId = null) {
             $('#items-table tbody').append(newRow);
             let $newSelect = $('#items-table tbody tr:last .product-select');
             populateProductSelect($newSelect);
-            $newSelect.select2({ width: '100%' });
+            //$newSelect.select2({ width: '100%' });
             rowIndex++;
         });
 
