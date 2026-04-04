@@ -120,7 +120,7 @@ function populateProductSelect($select, selectedId = null) {
                 let $select = $(this);
                 let currentVal = $select.val();
                 populateProductSelect($select, currentVal);
-                $select.select2({ width: '100%' });
+                // $select.select2({ width: '100%' });
             });
         });
 
