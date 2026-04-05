@@ -34,16 +34,16 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
         $currentPrice = $stock->harga_beli;
         foreach ($movements as $movement) {
             $stokAwal  = $runningStock;
-            $masuk     = $movement->qty_in ?? 0;
-            $keluar    = $movement->qty_out ?? 0;
+            $masuk     = $movement->qty_in ?? '0';
+            $keluar    = $movement->qty_out ?? '0';
             $stokAkhir = $stokAwal + $masuk - $keluar;
             $this->transactions[] = [
                 'tanggal'    => $movement->created_at->isoFormat('DD MMMM YYYY'),
                 'batch'      => $movement->notes ?? '-',
                 'keterangan' => $movement->notes ?? '-',
-                'masuk'      => $masuk > 0 ? $masuk : 0,
-                'keluar'     => $keluar > 0 ? $keluar : 0,
-                'total'      => $stokAkhir,
+                'masuk'      => $masuk > 0 ? $masuk : '0',
+                'keluar'     => $keluar > 0 ? $keluar : '0',
+                'total'      => $stokAkhir ?? '0',
             ];
             $runningStock = $stokAkhir;
         }
@@ -129,7 +129,7 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
 
         // Lokasi from stock->location
         $sheet->setCellValue('F12', 'Lokasi Penyimpanan :');
-        $sheet->setCellValue('H12', $this->stock->location ?? '-');
+        $sheet->setCellValue('H12', $this->stock->product->lokasi ?? '-');
         $sheet->getStyle('F12')->getFont()->setBold(true);
 
         $sheet->setCellValue('B14', 'Detail Barang Diterima');
@@ -165,8 +165,8 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
         // SUMMARY
         $totalMasuk  = collect($this->transactions)->sum('masuk');
         $totalKeluar = collect($this->transactions)->sum('keluar');
-        $stokAwal    = collect($this->transactions)->first()['total'] ?? 0;
-        $stokAkhir   = collect($this->transactions)->last()['total'] ?? 0;
+        $stokAwal    = collect($this->transactions)->first()['total'] ?? '0';
+        $stokAkhir   = collect($this->transactions)->last()['total'] ?? '0';
 
         $summaryRow = $highestRow + 2;
         $sheet->setCellValue('B'.$summaryRow, 'Stok Awal :');

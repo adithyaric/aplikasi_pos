@@ -27,7 +27,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">&nbsp;</label>
                                 <button id="btnLoadKartu" class="btn btn-primary form-control" disabled>
                                     <i class="fa fa-search"></i> Tampilkan Kartu
@@ -37,6 +37,12 @@
                                 <label class="form-label">&nbsp;</label>
                                 <a id="btnExportKartu" href="#" class="btn btn-success form-control" style="pointer-events:none; opacity:0.6;">
                                     <i class="fa fa-file-excel-o"></i> Export Excel
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <a id="btnExportPdfKartu" href="#" target="_blank" class="btn btn-danger form-control" style="pointer-events:none; opacity:0.6;">
+                                    <i class="fa fa-file-pdf-o"></i> Export PDF
                                 </a>
                             </div>
                         </div>
@@ -146,6 +152,10 @@
                         $('#btnExportKartu')
                             .attr('href', '{{ route('laporan.kartu-stok') }}/' + stockId)
                             .css({'pointer-events': 'auto', 'opacity': '1'});
+
+                        $('#btnExportPdfKartu')
+                        .attr('href', '{{ url('laporan/pdf/kartu-stok') }}/' + stockId)
+                        .css({'pointer-events': 'auto', 'opacity': '1'});
                     },
                     error: function() {
                         alert('Gagal memuat data kartu stok');

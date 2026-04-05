@@ -181,7 +181,9 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('laporan/pdf/barang-masuk', [LaporanController::class, 'pdfBarangMasuk'])->name('laporan.pdf.barang-masuk');
     Route::get('laporan/pdf/barang-keluar', [LaporanController::class, 'pdfBarangKeluar'])->name('laporan.pdf.barang-keluar');
     Route::get('laporan/pdf/stok', [LaporanController::class, 'pdfStok'])->name('laporan.pdf.stok');
+    Route::get('laporan/pdf/kartu-stok/{id}', [LaporanController::class, 'pdfKartuStok'])->name('laporan.pdf.kartu-stok');
     Route::get('laporan/pdf/penerimaan', [LaporanController::class, 'pdfPenerimaanBarang'])->name('laporan.pdf.penerimaan');
+    Route::get('laporan/pdf/penerimaan/{id}', [LaporanController::class, 'pdfPenerimaanSingle'])->name('laporan.pdf.penerimaan-single');
     Route::get('laporan/pdf/pengiriman', [LaporanController::class, 'pdfPengiriman'])->name('laporan.pdf.pengiriman');
     Route::get('laporan/pdf/picking', [LaporanController::class, 'pdfPicking'])->name('laporan.pdf.picking');
     Route::get('laporan/pdf/aktifitas', [LaporanController::class, 'pdfAktifitas'])->name('laporan.pdf.aktifitas');

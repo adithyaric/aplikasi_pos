@@ -340,6 +340,51 @@ class LaporanController extends Controller
             ->setPaper('a4', 'landscape')->stream('Laporan_Stok_Barang.pdf');
     }
 
+    public function pdfKartuStok(Request $request, $id)
+    {
+        $settings = $this->getSettings();
+
+        $stock = Stock::with(['product.category', 'pembelian.supplier'])->findOrFail($id);
+
+        $movements = StockMovement::where('product_id', $stock->product_id)
+            ->where(function ($q) use ($stock) {
+                $q->where('notes', 'like', "%SKU: {$stock->sku}%")
+                    ->orWhere(function ($q2) use ($stock) {
+                        $q2->where('reference_type', 'App\Models\Pembelian')
+                            ->where('reference_id', $stock->pembelian_id);
+                    });
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $transactions = [];
+        $runningStock = 0;
+
+        foreach ($movements as $movement) {
+            $stokAwal  = $runningStock;
+            $masuk     = $movement->qty_in ?? 0;
+            $keluar    = $movement->qty_out ?? 0;
+            $stokAkhir = $stokAwal + $masuk - $keluar;
+
+            $transactions[] = [
+                'tanggal'    => $movement->created_at->isoFormat('DD MMM YYYY'),
+                'stok_awal'  => $stokAwal,
+                'masuk'      => $masuk,
+                'keluar'     => $keluar,
+                'stok_akhir' => $stokAkhir,
+                'harga'      => $stock->harga_beli,
+                'nilai'      => $stokAkhir * $stock->harga_beli,
+                'keterangan' => $movement->notes ?? '-',
+            ];
+
+            $runningStock = $stokAkhir;
+        }
+
+        return Pdf::loadView('exports.pdf.kartu-stok', compact('stock', 'transactions', 'settings'))
+            ->setPaper('a4', 'portrait')
+            ->stream('Kartu_Stok-'.$stock->sku.'.pdf');
+    }
+
     public function pdfPenerimaanBarang(Request $request)
     {
         [$mulai, $selesai] = $this->dateRange($request);
@@ -352,6 +397,21 @@ class LaporanController extends Controller
 
         return Pdf::loadView('exports.pdf.laporan-penerimaan', compact('stocks', 'settings', 'mulai', 'selesai'))
             ->setPaper('a4', 'landscape')->stream('Laporan_Penerimaan_Barang.pdf');
+    }
+
+    public function pdfPenerimaanSingle($id)
+    {
+        $settings = $this->getSettings();
+
+        $pembelian = Pembelian::with([
+            'supplier',
+            'pembelianProducts.product',
+            'stocks.product',
+        ])->findOrFail($id);
+
+        return Pdf::loadView('exports.pdf.laporan-penerimaan-single', compact('pembelian', 'settings'))
+            ->setPaper('a4', 'portrait')
+            ->stream('Penerimaan_Barang-'.($pembelian->code_gr ?? $pembelian->code).'.pdf');
     }
 
     public function pdfPengiriman(Request $request)
