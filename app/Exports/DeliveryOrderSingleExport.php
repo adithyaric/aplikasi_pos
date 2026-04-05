@@ -104,7 +104,9 @@ class DeliveryOrderSingleExport implements FromCollection, WithHeadings, WithMap
         $sheet->setCellValue('D13', $this->deliveryOrder->owner->name ?? '-');
         $sheet->setCellValue('B14', 'Nama Pengirim :');
         $sheet->setCellValue('D14', $this->deliveryOrder->preparedBy->name ?? '-');
-        $sheet->getStyle('B10:B14')->getFont()->setBold(true);
+        $sheet->setCellValue('B15', 'Status :');
+        $sheet->setCellValue('D15', $this->deliveryOrder->status ?? '-');
+        $sheet->getStyle('B10:B15')->getFont()->setBold(true);
 
         $sheet->setCellValue('B16', 'Detail Barang Dikirim');
         $sheet->getStyle('B16')->getFont()->setBold(true);

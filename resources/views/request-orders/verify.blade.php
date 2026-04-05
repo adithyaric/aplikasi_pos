@@ -165,7 +165,7 @@
                                                         data-max="{{ $maxQty }}"
                                                         data-available="{{ $totalAvailable }}"
                                                         data-requested="{{ $item->qty_requested }}" step="1"
-                                                        required>
+                                                        required @readonly(isset($requestOrder->pickingList))>
                                                     <small class="text-muted">Max: {{ $maxQty }}</small>
                                                     <input type="hidden" name="items[{{ $index }}][id]"
                                                         value="{{ $item->id }}">
@@ -176,7 +176,7 @@
                                                 <td>
                                                     <select class="form-control item-status"
                                                         name="items[{{ $index }}][item_status]"
-                                                        data-index="{{ $index }}" required>
+                                                        data-index="{{ $index }}" required @readonly(isset($requestOrder->pickingList))>
                                                         <option value="approved"
                                                             {{ old('items.' . $index . '.item_status', $item->item_status) == 'approved' ? 'selected' : '' }}>
                                                             Approved</option>
@@ -192,7 +192,7 @@
                                                     <input type="text" class="form-control"
                                                         name="items[{{ $index }}][notes]"
                                                         value="{{ old('items.' . $index . '.notes', $item->notes) }}"
-                                                        placeholder="Notes">
+                                                        placeholder="Notes" @readonly(isset($requestOrder->pickingList))>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -200,7 +200,7 @@
                                 </table>
                                 <div class="form-group">
                                     <label for="verification_notes">Catatan Verifikasi (opsional)</label>
-                                    <textarea class="form-control" name="verification_notes" rows="3">{{ old('verification_notes', $requestOrder->verification_notes) }}</textarea>
+                                    <textarea @readonly(isset($requestOrder->pickingList)) class="form-control" name="verification_notes" rows="3">{{ old('verification_notes', $requestOrder->verification_notes) }}</textarea>
                                 </div>
                                 @if (!isset($requestOrder->pickingList))
                                 <button type="submit" class="btn btn-primary">
@@ -350,7 +350,11 @@ $(document).on('click', '.add-stock-row', function() {
                     const remaining = parseInt($(this).find('.remaining-qty').text());
                     if (remaining !== 0) {
                         hasError = true;
-                        alert('Error: All requested quantities must be fully assigned!');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan',
+                            text: 'Semua kuantitas permintaan harus terisi penuh!',
+                        });
                         return false;
                     }
                 });

@@ -75,7 +75,7 @@ class LaporanPickingPackingExport implements FromCollection, WithHeadings, WithT
                     $item->qty_picked,
                     $item->qty_picked,
                     ucfirst($pk->status ?? '-'),
-                    '-',
+                    $pk->picker?->name ?? '-',
                     '-',
                     $pk->notes ?? '',
                 ]);

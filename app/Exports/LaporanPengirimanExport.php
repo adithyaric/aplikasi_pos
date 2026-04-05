@@ -67,7 +67,7 @@ class LaporanPengirimanExport implements FromCollection, WithHeadings, WithTitle
                     $do->owner?->name ?? '-',
                     $item->product?->code ?? '-',
                     $item->product?->name ?? '-',
-                    '-',
+                    $item->sku ?? '-',
                     $item->qty,
                     $item->product?->satuan ?? 'PCS',
                     ucfirst($do->status ?? '-'),

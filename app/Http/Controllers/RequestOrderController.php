@@ -246,8 +246,10 @@ class RequestOrderController extends Controller
         $request->validate([
             'stock_assignments' => 'required|array',
             'stock_assignments.*.item_id' => 'required|exists:request_order_items,id',
-            'stock_assignments.*.stock_id' => 'required|exists:stocks,id',
+            'stock_assignments.*.stock_id' => 'required|exists:stocks,id|distinct',
             'stock_assignments.*.qty' => 'required|integer|min:1',
+        ], [
+            'stock_assignments.*.stock_id.distinct' => 'Terdapat stok yang sama (ID :input) dimasukkan lebih dari satu kali.',
         ]);
 
         DB::beginTransaction();

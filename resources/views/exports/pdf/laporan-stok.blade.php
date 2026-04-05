@@ -34,7 +34,7 @@
                     $selisih = ($s->qty ?? 0) - $minStok;
                     $statusStok = ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis');
                     $statusExp =
-                        $s->expired_date && \Carbon\Carbon::parse($s->expired_date)->isPast() ? 'Expired' : '-';
+                        $s->expired_at && \Carbon\Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';
                 @endphp
                 <tr class="{{ $i % 2 == 1 ? 'alt' : '' }}">
                     <td class="tc">{{ $i + 1 }}</td>
@@ -42,7 +42,7 @@
                     <td>{{ $s->product?->name ?? '-' }}</td>
                     <td>{{ $s->sku ?? '-' }}</td>
                     <td class="tc">
-                        {{ $s->expired_date ? \Carbon\Carbon::parse($s->expired_date)->format('d/m/Y') : '-' }}
+                        {{ $s->expired_at ? \Carbon\Carbon::parse($s->expired_at)->format('d/m/Y') : '-' }}
                     </td>
                     <td>{{ $s->product?->category?->name ?? '-' }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
@@ -50,7 +50,7 @@
                     <td class="tc">{{ $minStok }}</td>
                     <td class="tc">{{ ($selisih >= 0 ? '+' : '') . $selisih }}</td>
                     <td class="tc">{{ $statusStok }}</td>
-                    <td class="tc">{{ $statusExp }}</td>
+                    <td class="tc">{{ $s->expired_at ? $statusExp : '-' }}</td>
                     <td>{{ $s->location ?? '-' }}</td>
                 </tr>
             @empty

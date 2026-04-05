@@ -50,21 +50,21 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             $minStok = $s->product?->min_stock ?? 0;
             $selisih = ($s->qty ?? 0) - $minStok;
             $statusStok = ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis');
-            $statusExp = $s->expired_date && Carbon::parse($s->expired_date)->isPast() ? 'Expired' : '-';
+            $statusExp = $s->expired_at && Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';
 
             $rows->push([
                 $no++,
                 $s->product?->code ?? '-',
                 $s->product?->name ?? '-',
                 $s->sku ?? '-',
-                $s->expired_date ? Carbon::parse($s->expired_date)->format('d/m/Y') : '-',
+                $s->expired_at ? Carbon::parse($s->expired_at)->format('d/m/Y') : '-',
                 $s->product?->category?->name ?? '-',
                 $s->product?->satuan ?? 'PCS',
                 $s->qty ?? 0,
                 $minStok,
                 ($selisih >= 0 ? '+' : '').$selisih,
                 $statusStok,
-                $statusExp,
+                $s->expired_at ? $statusExp : '-',
                 $s->location ?? '-',
             ]);
         }

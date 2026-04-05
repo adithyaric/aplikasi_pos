@@ -375,7 +375,7 @@ class LaporanController extends Controller
                     'tujuan' => $do->owner?->name ?? '-',
                     'kode_barang' => $item->product?->code ?? '-',
                     'nama_barang' => $item->product?->name ?? '-',
-                    'batch' => '-',
+                    'batch' => $item->sku ?? '-',
                     'qty_kirim' => $item->qty,
                     'satuan' => $item->product?->satuan ?? 'PCS',
                     'status' => ucfirst($do->status ?? '-'),
@@ -414,7 +414,7 @@ class LaporanController extends Controller
                     'qty_pick' => $item->qty_picked,
                     'qty_pack' => $item->qty_picked,
                     'status' => ucfirst($pk->status ?? '-'),
-                    'picker' => '-',
+                    'picker' => $pk->picker?->name ?? '-',
                     'packer' => '-',
                     'keterangan' => $pk->notes ?? '',
                 ];
@@ -441,9 +441,9 @@ class LaporanController extends Controller
                 }
                 $m->jenis    = $m->qty_in > 0 ? 'Penerimaan' : 'Pengiriman';
                 $m->doc_code = $docCode;
-                $m->pic      = '-';
-                $m->lokasi   = '-';
-                $m->status   = 'Selesai';
+                $m->pic = optional($m->product?->suppliers)->pluck('pic_supplier')?->filter()->implode(', ');
+                $m->lokasi   = $m->product?->lokasi;
+                $m->status   = $m->type;
                 $m->qty      = max($m->qty_in ?? 0, $m->qty_out ?? 0);
 
                 return $m;

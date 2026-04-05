@@ -68,6 +68,7 @@ class LaporanAktifitasExport implements FromCollection, WithHeadings, WithTitle
                     'doc_code'   => $docCode,
                     'product'    => $m->product,
                     'qty'        => $qty,
+                    'type'      => $m->type,
                     'notes'      => $m->notes,
                 ];
             });
@@ -85,9 +86,9 @@ class LaporanAktifitasExport implements FromCollection, WithHeadings, WithTitle
                 $m->product?->name ?? '-',
                 $m->qty,
                 $m->product?->satuan ?? 'PCS',
-                '-',
-                '-',
-                'Selesai',
+                $m->product?->lokasi,
+                optional($m->product?->suppliers)->pluck('pic_supplier')?->filter()->implode(', '),
+                $m->type,
                 $m->notes ?? '',
             ]);
         }
