@@ -188,6 +188,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('laporan/pdf/picking', [LaporanController::class, 'pdfPicking'])->name('laporan.pdf.picking');
     Route::get('laporan/pdf/aktifitas', [LaporanController::class, 'pdfAktifitas'])->name('laporan.pdf.aktifitas');
     Route::get('laporan/pdf/pembelian', [LaporanController::class, 'pdfPembelianBarang'])->name('laporan.pdf.pembelian');
+    Route::get('laporan/pdf/faktur-pembelian/{id}', [LaporanController::class, 'pdfFakturPembelian'])->name('laporan.pdf.faktur-pembelian');
     Route::get('laporan/pdf/opname', [LaporanController::class, 'pdfOpname'])->name('laporan.pdf.opname');
     Route::get('laporan/pdf/pergerakan', [LaporanController::class, 'pdfPergerakan'])->name('laporan.pdf.pergerakan');
 

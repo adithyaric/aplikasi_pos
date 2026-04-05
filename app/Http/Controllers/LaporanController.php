@@ -547,6 +547,23 @@ class LaporanController extends Controller
             ->setPaper('a4', 'landscape')->stream('Laporan_Pembelian_Barang.pdf');
     }
 
+    public function pdfFakturPembelian($id)
+    {
+        $settings = $this->getSettings();
+
+        $pembelian = Pembelian::with([
+            'supplier',
+            'pembelianProducts.product',
+            'pembelianTransaction',
+        ])->findOrFail($id);
+
+        $paymentHistory = $pembelian->pembelianTransaction?->payment_history ?? [];
+
+        return Pdf::loadView('exports.pdf.faktur-pembelian', compact('pembelian', 'paymentHistory', 'settings'))
+            ->setPaper('a4', 'portrait')
+            ->stream('Faktur_Pembelian-'.$pembelian->code.'.pdf');
+    }
+
     public function pdfOpname(Request $request)
     {
         [$mulai, $selesai] = $this->dateRange($request);

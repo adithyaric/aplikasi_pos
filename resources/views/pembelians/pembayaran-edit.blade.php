@@ -75,6 +75,10 @@
                                             <h5>
                                                 <span class="btn bg-success">Rp.
                                                     {{ number_format($pembelian->pembelianTransaction?->amount ?? 0, 0, ',', '.') }}</span>
+                                                <a href="{{ route('laporan.pdf.faktur-pembelian', $pembelian->id) }}" class="btn btn-danger" title="Faktur PDF"
+                                                    target="_blank">
+                                                    <i class="fa fa-file-pdf-o"></i> Faktur
+                                                </a>
                                             </h5>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">

@@ -87,7 +87,7 @@
                                                    class="btn btn-xs btn-success" title="Export GR">
                                                     <i class="fa fa-file-excel-o"></i> GR
                                                 </a>
-                                                <a href="{{ route('laporan.pdf.penerimaan-single', $value->id) }}" class="btn btn-xs btn-danger" title="Export PDF GR">
+                                                <a href="{{ route('laporan.pdf.penerimaan-single', $value->id) }}" target="_blank" class="btn btn-xs btn-danger" title="Export PDF GR">
                                                     <i class="fa fa-file-pdf-o"></i> GR
                                                 </a>
                                             @endif
