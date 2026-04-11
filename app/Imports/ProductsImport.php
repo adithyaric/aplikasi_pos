@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
