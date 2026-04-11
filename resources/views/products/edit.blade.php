@@ -58,6 +58,26 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label for="">Brand</label>
+                                <input type="text" class="form-control" name="brand"
+                                    value="{{ old('brand', $product->brand) }}" placeholder="Masukkan Brand">
+                                @error('brand')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="">Model</label>
+                                <input type="text" class="form-control" name="model"
+                                    value="{{ old('model', $product->model) }}" placeholder="Masukkan Model">
+                                @error('model')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="">Harga Beli</label>
                                 <input type="text" class="form-control" name="harga_beli"
                                     value="{{ old('harga_beli', $product->harga_beli) }}" placeholder="Masukkan Harga Beli">
@@ -67,17 +87,17 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
-                                <label for="">Harga Jual</label>
-                                <input type="text" class="form-control" name="harga_jual"
-                                    value="{{ old('harga_jual', $product->harga_jual) }}"
-                                    placeholder="Masukkan Harga Jual">
-                                @error('harga_jual')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            {{-- <div class="form-group"> --}}
+                                {{-- <label for="">Harga Jual</label> --}}
+                                {{-- <input type="text" class="form-control" name="harga_jual" --}}
+                                    {{-- value="{{ old('harga_jual', $product->harga_jual) }}" --}}
+                                    {{-- placeholder="Masukkan Harga Jual"> --}}
+                                {{-- @error('harga_jual') --}}
+                                    {{-- <div class="invalid-feedback text-danger"> --}}
+                                        {{-- {{ $message }} --}}
+                                    {{-- </div> --}}
+                                {{-- @enderror --}}
+                            {{-- </div> --}}
                             <div class="form-group">
                                 <label>Category</label>
                                 <select class="form-control select2" name="category_id" data-placeholder="Pilih Category"

@@ -19,7 +19,7 @@ class ProductRequest extends FormRequest
             'name' => 'required',
             'category_id' => 'required',
             // 'expired' => 'nullable',
-            // 'desc' => 'required',
+            'desc' => 'nullable',
             'warna' => 'nullable',
             'ukuran' => 'nullable',
             'brand' => 'nullable',

@@ -27,9 +27,9 @@ class ProductsImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                 'min_stock'   => $row['min_stock'] ?? 0,
                 'lokasi'      => $row['lokasi'] ?? null,
                 'harga_beli'  => $row['harga_beli'] ?? 0,
-                'harga_jual'  => $row['harga_jual'] ?? 0,
-                'diskon'      => $row['diskon'] ?? 0,
-                'berat'       => $row['berat'] ?? null,
+                // 'harga_jual'  => $row['harga_jual'] ?? 0,
+                // 'diskon'      => $row['diskon'] ?? 0,
+                // 'berat'       => $row['berat'] ?? null,
                 'desc'        => $row['deskripsi'] ?? null,
             ]
         );

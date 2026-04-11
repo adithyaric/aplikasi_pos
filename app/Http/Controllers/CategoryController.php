@@ -105,12 +105,12 @@ class CategoryController extends Controller
 
     public function exportProduct()
     {
-        return Excel::download(new CategoriesExport(type: 'product'), 'categories_product.xlsx');
+        return Excel::download(new CategoriesExport(), 'categories_product.xlsx');
     }
 
     public function exportPengeluaran()
     {
-        return Excel::download(new CategoriesExport(type: 'pengeluaran'), 'categories_pengeluaran.xlsx');
+        return Excel::download(new CategoriesExport(), 'categories_pengeluaran.xlsx');
     }
 
     public function exportTemplate()
