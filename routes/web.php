@@ -216,6 +216,9 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('laporan/export/aktifitas', [LaporanController::class, 'exportAktifitas'])->name('laporan.export.aktifitas');
     Route::get('laporan/export/pembelian', [LaporanController::class, 'exportPembelianBarang'])->name('laporan.export.pembelian');
     Route::get('laporan/export/pergerakan', [LaporanController::class, 'exportPergerakan'])->name('laporan.export.pergerakan');
+
+    Route::get('/laporan/retur-supplier', [LaporanController::class, 'exportReturSupplier'])->name('laporan.retur-supplier');
+    Route::get('/laporan/retur-outlet', [LaporanController::class, 'exportReturOutlet'])->name('laporan.retur-outlet');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

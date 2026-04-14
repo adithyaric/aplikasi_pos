@@ -25,6 +25,8 @@ use App\Exports\PenjualanKasirExport;
 use App\Exports\PenjualanSupplierExport;
 use App\Exports\PickingListSingleExport;
 use App\Exports\RequestOrderSingleExport;
+use App\Exports\ReturOutletExport;
+use App\Exports\ReturSupplierExport;
 use App\Exports\StockExport;
 use App\Exports\StockOpnameExport;
 use App\Models\DeliveryOrder;
@@ -188,6 +190,28 @@ class LaporanController extends Controller
     public function exportLabaRugi()
     {
         return Excel::download(new LabaRugiExport, 'laporan-laba-rugi.xlsx');
+    }
+
+    public function exportReturSupplier(Request $request)
+    {
+        $settings = $this->getSettings();
+        [$mulai, $selesai] = $this->dateRange($request);
+
+        return Excel::download(
+            new ReturSupplierExport($mulai, $selesai, $settings),
+            'laporan-retur-supplier.xlsx'
+        );
+    }
+
+    public function exportReturOutlet(Request $request)
+    {
+        $settings = $this->getSettings();
+        [$mulai, $selesai] = $this->dateRange($request);
+
+        return Excel::download(
+            new ReturOutletExport($mulai, $selesai, $settings),
+            'laporan-retur-outlet.xlsx'
+        );
     }
 
     // ── PDF Methods ──────────────────────────────────────────────────────────

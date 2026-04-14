@@ -12,9 +12,39 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <a href="{{ route('refundPembelian.create') }}" class="btn btn-md bg-green">
-                            <i class="fa fa-plus"></i> Tambah Retur
-                        </a>
+                        <div class="row align-items-center">
+
+                            <div class="col-md-4 col-sm-12 mb-2 mb-md-0">
+                                <a href="{{ route('refundPembelian.create') }}" class="btn btn-sm bg-green">
+                                    <i class="fa fa-plus"></i> Tambah Retur
+                                </a>
+                            </div>
+
+                            <div class="col-md-8 col-sm-12">
+                                <form method="GET" action="{{ route('laporan.retur-supplier') }}" id="exportForm">
+                                    <div class="row g-0">
+                                        <div class="col-md-3 col-6">
+                                            <input type="date" name="tanggal_mulai" class="form-control input-sm" required>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <input type="date" name="tanggal_selesai" class="form-control input-sm" required>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <select name="type" class="form-control input-sm"
+                                                onchange="updateFormAction(this.value)">
+                                                <option value="gudang_ke_supplier">Gudang ke Supplier</option>
+                                                <option value="outlet">Retur Outlet</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <button type="submit" class="btn btn-warning btn-sm w-100">
+                                                <i class="fa fa-file-excel-o"></i> Export
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
@@ -57,7 +87,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a class="btn btn-info btn-sm"
+                                            <a class="btn btn-default btn-sm"
                                                 href="{{ route('refundPembelian.show', $value->id) }}">
                                                 <i class="fa fa-eye"></i> Show
                                             </a>
@@ -90,4 +120,20 @@
             </div>
         </div>
     </section>
+@endsection
+@section('page-script')
+    <script>
+        function updateFormAction(type) {
+            const form = document.getElementById('exportForm');
+            const button = document.getElementById('exportButton');
+            if (type === 'gudang_ke_supplier') {
+                form.action = "{{ route('laporan.retur-supplier') }}";
+                button.className = 'btn btn-warning btn-sm';
+            } else {
+                form.action = "{{ route('laporan.retur-outlet') }}";
+                button.className = 'btn btn-info btn-sm';
+            }
+        }
+        updateFormAction('gudang_ke_supplier');
+    </script>
 @endsection
