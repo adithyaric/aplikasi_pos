@@ -2,154 +2,408 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RefundPembelianRequest;
+use App\Models\DeliveryOrder;
 use App\Models\Kas;
 use App\Models\Outlet;
-use App\Models\Pembelian;
-use App\Models\Product;
+use App\Models\OwnerStock;
 use App\Models\RefundPembelian;
 use App\Models\RefundPembelianItem;
+use App\Models\Stock;
+use App\Models\StockMovement;
 use App\Models\Supplier;
-use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RefundPembelianController extends Controller
 {
+    // -----------------------------------------------------------------------
+    // AJAX Helpers
+    // -----------------------------------------------------------------------
+
+    /**
+     * Warehouse stocks (Stock) for a supplier.
+     */
+    public function getSupplierProducts(Supplier $supplier)
+    {
+        $stocks = Stock::whereHas('pembelian', fn ($q) => $q->where('supplier_id', $supplier->id))
+            ->where('qty_available', '>', 0)
+            ->with(['product', 'pembelian'])
+            ->get()
+            ->map(fn ($s) => [
+                'stock_id'       => $s->id,
+                'product_id'     => $s->product_id,
+                'product_name'   => $s->product->name,
+                'sku'            => $s->sku ?? '-',
+                'qty_available'  => $s->qty_available,
+                'harga_beli'     => $s->harga_beli,
+                'pembelian_code' => $s->pembelian->code ?? '-',
+            ]);
+
+        return response()->json($stocks->values());
+    }
+
+    /**
+     * Received DeliveryOrders for an outlet.
+     */
+    public function getOutletDeliveryOrders(Outlet $outlet)
+    {
+        $orders = DeliveryOrder::where('owner_id', $outlet->id)
+            ->where('status', 'delivered')
+            ->whereHas('items.stock.ownerStock', fn ($q) => $q->where('qty', '>', 0))
+            ->get(['id', 'code', 'received_date']);
+
+        return response()->json($orders);
+    }
+
+    /**
+     * Items from a DeliveryOrder with current OwnerStock qty.
+     */
+    public function getDeliveryOrderItemsForRetur(DeliveryOrder $deliveryOrder)
+    {
+        $items = $deliveryOrder->items()
+            ->with(['product', 'stock.ownerStock'])
+            ->get()
+            ->map(fn ($item) => [
+                'stock_id'      => $item->stock_id,
+                'product_id'    => $item->product_id,
+                'product_name'  => $item->product->name,
+                'sku'           => $item->sku ?? $item->stock->sku ?? '-',
+                'qty_available' => $item->stock->ownerStock->qty ?? 0,
+                'harga_beli'    => $item->harga_beli ?? $item->stock->harga_beli ?? 0,
+            ])
+            ->filter(fn ($i) => $i['qty_available'] > 0)
+            ->values();
+
+        return response()->json($items);
+    }
+
+    // -----------------------------------------------------------------------
+    // Resource
+    // -----------------------------------------------------------------------
+
     public function index()
     {
         return view('refundPembelians.index', [
-            'refundPembelians' => RefundPembelian::get(),
+            'refundPembelians' => RefundPembelian::with('user', 'supplier', 'outlet')->latest()->get(),
         ]);
     }
 
     public function create()
     {
+        $lastRetur  = RefundPembelian::latest('id')->first();
+        $nextNumber = $lastRetur ? ((int) substr($lastRetur->code, 3) + 1) : 1;
+        $code       = 'RTR'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
         return view('refundPembelians.create', [
-            'outlets' => Outlet::whereHas('pembelian')->get(),
-            'customers' => User::where('role', 'customer')->get(),
-            'pembelians' => Pembelian::get(),
             'suppliers' => Supplier::get(),
-            'products' => Product::get(),
-            'kas' => Kas::get(),
+            'outlets'   => Outlet::get(),
+            'code'      => $code,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'code'              => 'required|string|unique:refund_pembelians,code',
+            'tanggal'           => 'required|date',
+            'type'              => 'required|in:gudang_ke_supplier,outlet_ke_gudang',
+            'supplier_id'       => 'required_if:type,gudang_ke_supplier|nullable|exists:suppliers,id',
+            'outlet_id'         => 'required_if:type,outlet_ke_gudang|nullable|exists:outlets,id',
+            'delivery_order_id' => 'required_if:type,outlet_ke_gudang|nullable|exists:delivery_orders,id',
+            'product'           => 'required|array|min:1',
+            'product.*.product_id' => 'required|exists:products,id',
+            'product.*.qty'        => 'required|integer|min:1',
+            'product.*.alasan'     => 'required|string',
+            'product.*.stock_id'   => 'required|exists:stocks,id',
+        ], [
+            'code.required' => 'Kode refund wajib diisi.',
+            'code.unique' => 'Kode refund sudah terdaftar.',
+            'tanggal.required' => 'Tanggal harus dipilih.',
+            'type.required' => 'Tipe refund wajib dipilih.',
+            'supplier_id.required_if' => 'Supplier wajib diisi untuk tipe Gudang ke Supplier.',
+            'outlet_id.required_if' => 'Outlet wajib diisi untuk tipe Outlet ke Gudang.',
+            'delivery_order_id.required_if' => 'Nomor DO wajib diisi untuk tipe Outlet ke Gudang.',
+            'product.required' => 'Minimal harus ada satu produk.',
+            'product.*.product_id.required' => 'ID Produk tidak valid.',
+            'product.*.qty.min' => 'Jumlah barang minimal 1.',
+            'product.*.alasan.required' => 'Alasan retur wajib diisi.',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $isOutlet = $request->type === 'outlet_ke_gudang';
+            $total    = 0;
+
+            $refundPembelian = RefundPembelian::create([
+                'code'              => $request->code,
+                'tanggal'           => $request->tanggal,
+                'type'              => $request->type,
+                'status'            => $isOutlet ? 'complete' : 'retur',
+                'supplier_id'       => $request->supplier_id,
+                'outlet_id'         => $request->outlet_id,
+                'delivery_order_id' => $request->delivery_order_id,
+                'user_id'           => auth()->id(),
+                'total'             => 0,
+            ]);
+
+            foreach ($request->product as $product) {
+
+                if (! $isOutlet) {
+                    // ── Gudang ke Supplier ──────────────────────────────────────
+                    $stock = Stock::findOrFail($product['stock_id']);
+
+                    if ($stock->qty_available < $product['qty']) {
+                        throw new \Exception("Stok gudang tidak mencukupi untuk: {$stock->product->name}");
+                    }
+
+                    // Reduce warehouse stock (only qty, qty_available is generated)
+                    $stock->qty -= $product['qty'];
+                    $stock->save();
+
+                    $harga  = (int) str_replace(',', '', $product['harga'] ?? $stock->harga_beli);
+                    $total += $harga * $product['qty'];
+
+                    StockMovement::create([
+                        'product_id'     => $product['product_id'],
+                        'user_id'        => auth()->id(),
+                        'type'           => 'retur_ke_supplier',
+                        'reference_type' => RefundPembelian::class,
+                        'reference_id'   => $refundPembelian->id,
+                        'qty_in'         => 0,
+                        'qty_out'        => $product['qty'],
+                        'balance'        => $stock->qty,
+                        'notes'          => "Retur ke supplier - {$refundPembelian->code} - SKU: {$stock->sku}",
+                    ]);
+
+                    RefundPembelianItem::create([
+                        'refund_pembelian_id' => $refundPembelian->id,
+                        'product_id'          => $product['product_id'],
+                        'stock_id'            => $stock->id,
+                        'sku'                 => $stock->sku,
+                        'qty'                 => $product['qty'],
+                        'harga'               => $harga,
+                        'alasan'              => $product['alasan'],
+                    ]);
+                } else {
+                    // ── Outlet ke Gudang ─────────────────────────────────────────
+                    $stock      = Stock::findOrFail($product['stock_id']);
+                    $ownerStock = $stock->ownerStock;
+
+                    if (! $ownerStock || $ownerStock->qty < $product['qty']) {
+                        throw new \Exception("Stok outlet tidak mencukupi untuk: {$stock->product->name}");
+                    }
+
+                    // Reduce outlet stock
+                    $ownerStock->qty -= $product['qty'];
+                    $ownerStock->save();
+
+                    // Restore warehouse stock
+                    $stock->qty += $product['qty'];
+                    $stock->save();
+
+                    StockMovement::create([
+                        'product_id'     => $product['product_id'],
+                        'user_id'        => auth()->id(),
+                        'type'           => 'retur_dari_outlet',
+                        'reference_type' => RefundPembelian::class,
+                        'reference_id'   => $refundPembelian->id,
+                        'qty_in'         => $product['qty'],
+                        'qty_out'        => 0,
+                        'balance'        => $stock->qty,
+                        'notes'          => "Retur outlet ke gudang - {$refundPembelian->code} - SKU: {$stock->sku}",
+                    ]);
+
+                    RefundPembelianItem::create([
+                        'refund_pembelian_id' => $refundPembelian->id,
+                        'product_id'          => $product['product_id'],
+                        'stock_id'            => $stock->id,
+                        'sku'                 => $stock->sku,
+                        'qty'                 => $product['qty'],
+                        'harga'               => $stock->harga_beli,
+                        'alasan'              => $product['alasan'],
+                        'resolution'          => 'barang', // default for outlet retur
+                    ]);
+                }
+            }
+
+            $refundPembelian->update(['total' => $total]);
+
+            DB::commit();
+
+            return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->withInput()->with('toast_error', 'Gagal: '.$e->getMessage());
+        }
+    }
+
+    public function show(RefundPembelian $refundPembelian)
+    {
+        return view('refundPembelians.show', [
+            'refundPembelian' => $refundPembelian->load('refundPembelianItems.product'),
         ]);
     }
 
     public function edit(RefundPembelian $refundPembelian)
     {
+        if ($refundPembelian->status === 'complete') {
+            return redirect()->route('refundPembelian.show', $refundPembelian)
+                ->with('toast_error', 'Data yang sudah complete tidak dapat diedit.');
+        }
+
         return view('refundPembelians.edit', [
-            'refundPembelian' => $refundPembelian,
-            'outlets' => Outlet::get(),
-            'customers' => User::where('role', 'customer')->get(),
-            'pembelians' => Pembelian::get(),
-            'suppliers' => Supplier::get(),
-            'products' => Product::get(),
-            'kas' => Kas::get(),
+            'refundPembelian' => $refundPembelian->load('refundPembelianItems.product'),
+            'suppliers'       => Supplier::get(),
+            'outlets'         => Outlet::get(),
         ]);
     }
 
-    public function show(RefundPembelian $refundPembelian)
+    public function update(Request $request, RefundPembelian $refundPembelian)
     {
-        // dd($refundPembelian->load(['customer', 'outlet', 'pembelian', 'refundPembelianItems', 'refundPembelianItems.product'])->toArray());
-        return view('refundPembelians.show', [
-            'refundPembelian' => $refundPembelian,
+        if ($refundPembelian->status === 'complete') {
+            return redirect()->route('refundPembelian.show', $refundPembelian)
+                ->with('toast_error', 'Data yang sudah complete tidak dapat diedit.');
+        }
+
+        $request->validate([
+            'code'    => 'required|string|unique:refund_pembelians,code,'.$refundPembelian->id,
+            'tanggal' => 'required|date',
+        ], [
+            'code.required' => 'Kode harus diisi.',
+            'code.unique'   => 'Kode sudah digunakan.',
+            'tanggal.date'  => 'Format tanggal tidak valid.',
         ]);
-    }
 
-    //Menambah pembelian Stock & Mengurangi market Stocks
-    public function store(RefundPembelianRequest $request)
-    {
-        $data = $request->validated();
+        $refundPembelian->update([
+            'code'    => $request->code,
+            'tanggal' => $request->tanggal,
+        ]);
 
-        $data['total'] = (int) str_replace(',', '', $data['total']);
-        $data['user_id'] = auth()->user()->id;
-        $refundPembelian = RefundPembelian::create($data);
-
-        foreach ($request->product as $product) {
-            RefundPembelianItem::create([
-                'refund_pembelian_id' => $refundPembelian->id,
-                'product_id' => $product['product_id'],
-                'qty' => $product['qty'],
-                'alasan' => $product['alasan'],
-            ]);
-
-            $productModel = Product::find($product['product_id']);
-
-            if ($productModel->is_serialized) {
-                StockPembelian::create([
-                    'product_id' => $product['product_id'],
-                    'serial_number' => $product['alasan'],
-                    'pembelian_id' => $refundPembelian->pembelian_id,
-                    'qty' => 1,
-                    'harga_beli' => $productModel->harga_beli,
-                    'status' => 'available',
-                ]);
-
-                // For serialized market stock
-                $marketStock = Stock::where('product_id', $product['product_id'])
-                    ->where('serial_number', $product['alasan'])
-                    ->first();
-
-                if ($marketStock) {
-                    $marketStock->qty -= 1;
-                    $marketStock->save();
-                }
-            } else {
-                $stockPembelian = StockPembelian::where('product_id', $product['product_id'])->first();
-                if ($stockPembelian) {
-                    $stockPembelian->qty += $product['qty'];
-                    $stockPembelian->save();
-                } else {
-                    StockPembelian::create([
-                        'product_id' => $product['product_id'],
-                        'pembelian_id' => $refundPembelian->pembelian_id,
-                        'qty' => $product['qty'],
-                        'harga_beli' => $productModel->harga_beli,
-                        'status' => 'available',
-                    ]);
-                }
-
-                // For non-serialized market stock
-                $marketStock = Stock::where('product_id', $product['product_id'])->first();
-                if ($marketStock) {
-                    $marketStock->qty -= $product['qty'];
-                    $marketStock->save();
-                }
-            }
-        }
-
-        $kas = Kas::find($request->kas_id);
-        $kas->nominal += $data['total'];
-        $kas->save();
-
-        return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-    }
-    public function update(RefundPembelianRequest $request, RefundPembelian $refundPembelian)
-    {
-        $oldTotal = $refundPembelian->total;
-        $data = $request->validated();
-        $data['total'] = (int) str_replace(',', '', $data['total']);
-        $data['user_id'] = auth()->user()->id;
-        $refundPembelian->update($data);
-        RefundPembelianItem::where('refund_pembelian_id', $refundPembelian->id)->delete();
-        foreach ($request->product as $product) {
-            RefundPembelianItem::create([
-                'refund_pembelian_id' => $refundPembelian->id,
-                'product_id' => $product['product_id'],
-                'qty' => $product['qty'],
-                'alasan' => $product['alasan'],
-            ]);
-        }
-
-        $kas = Kas::find($request->kas_id);
-        $kas->nominal += $oldTotal != $data['total'] ? $data['total'] : 0;
-        $kas->save();
-
-        return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        return redirect()->route('refundPembelian.show', $refundPembelian)
+            ->with('toast_success', 'Berhasil Update Data!');
     }
 
     public function destroy(RefundPembelian $refundPembelian)
     {
-        $refundPembelian->delete();
+        if ($refundPembelian->status === 'complete') {
+            return redirect()->route('refundPembelian.index')
+                ->with('toast_error', 'Data yang sudah complete tidak dapat dihapus.');
+        }
 
-        return redirect(route('refundPembelian.index'))->with('toast_success', 'Berhasil Menghapus Data!');
+        DB::beginTransaction();
+        try {
+            if ($refundPembelian->type === 'gudang_ke_supplier') {
+                // Reverse stock reduction (only for retur status)
+                foreach ($refundPembelian->refundPembelianItems as $item) {
+                    $stock = Stock::find($item->stock_id);
+                    if ($stock) {
+                        $stock->qty += $item->qty;
+                        $stock->save();
+                    }
+                }
+            }
+
+            $refundPembelian->delete();
+            DB::commit();
+
+            return redirect()->route('refundPembelian.index')->with('toast_success', 'Berhasil Menghapus Data!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('toast_error', 'Gagal: '.$e->getMessage());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Terima Retur (hanya untuk gudang_ke_supplier)
+    // -----------------------------------------------------------------------
+
+    public function terimaForm(RefundPembelian $refundPembelian)
+    {
+        if ($refundPembelian->type !== 'gudang_ke_supplier' || $refundPembelian->status !== 'retur') {
+            return redirect()->route('refundPembelian.show', $refundPembelian)
+                ->with('toast_error', 'Data tidak dapat diproses.');
+        }
+
+        return view('refundPembelians.terima', [
+            'refundPembelian' => $refundPembelian->load('refundPembelianItems.product', 'supplier'),
+            'kasList'         => Kas::get(),
+        ]);
+    }
+
+    public function terima(Request $request, RefundPembelian $refundPembelian)
+    {
+        if ($refundPembelian->type !== 'gudang_ke_supplier' || $refundPembelian->status !== 'retur') {
+            return redirect()->route('refundPembelian.show', $refundPembelian)
+                ->with('toast_error', 'Data tidak dapat diproses.');
+        }
+
+        $request->validate([
+            'items'              => 'required|array',
+            'items.*.resolution' => 'required|in:barang,uang',
+            'kas_id'             => 'nullable|exists:kas,id',
+        ], [
+            'items.required'           => 'Daftar item tidak boleh kosong.',
+            'items.*.resolution.in'    => 'Resolusi harus berupa barang atau uang.',
+            'items.*.resolution.required' => 'Resolusi setiap item wajib dipilih.',
+            'kas_id.exists'            => 'Kas yang dipilih tidak terdaftar.',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $uangTotal = 0;
+
+            foreach ($request->items as $itemId => $itemData) {
+                $item       = RefundPembelianItem::findOrFail($itemId);
+                $resolution = $itemData['resolution'];
+                $item->update(['resolution' => $resolution]);
+
+                // if ($resolution === 'barang') {
+                // Restore warehouse stock
+                $stock = Stock::find($item->stock_id);
+                if ($stock) {
+                    $stock->qty += $item->qty;
+                    $stock->save();
+                    $newBalance = $stock->qty;
+                } else {
+                    $newBalance = $item->qty;
+                }
+
+                StockMovement::create([
+                    'product_id'     => $item->product_id,
+                    'user_id'        => auth()->id(),
+                    'type'           => 'penerimaan_retur',
+                    'reference_type' => RefundPembelian::class,
+                    'reference_id'   => $refundPembelian->id,
+                    'qty_in'         => $item->qty,
+                    'qty_out'        => 0,
+                    'balance'        => $newBalance,
+                    'notes'          => "Terima retur barang - {$refundPembelian->code} - SKU: {$item->sku}",
+                ]);
+                // } else {
+                //     $uangTotal += $item->qty * $item->harga;
+                // }
+            }
+
+            // if ($uangTotal > 0 && $request->kas_id) {
+            //     $kas           = Kas::findOrFail($request->kas_id);
+            //     $kas->nominal += $uangTotal;
+            //     $kas->save();
+
+            //     $refundPembelian->update(['kas_id' => $request->kas_id]);
+            // }
+
+            $refundPembelian->update(['status' => 'complete']);
+
+            DB::commit();
+
+            return redirect()->route('refundPembelian.show', $refundPembelian)
+                ->with('toast_success', 'Penerimaan retur berhasil diselesaikan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('toast_error', 'Gagal: '.$e->getMessage());
+        }
     }
 }

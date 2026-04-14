@@ -34,7 +34,7 @@
                     <li class="{{ request()->routeIs('stock.opname') ? 'active' : '' }}"><a href="/stock-opname"><i class="fa fa-cube"></i><span>Stocks Opname</span></a></li>
                 </ul>
             </li>
-            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penerimaan*') || request()->is('penjualan*') || request()->is('refund*')
+            <li class="treeview {{ request()->is('category-pengeluaran*') || request()->is('pengeluaran*') || request()->is('pembelian*') || request()->is('penerimaan*') || request()->is('penjualan*') || request()->is('refundPembelian*')
                 || request()->is('request-orders*')
                 || request()->is('picking-lists*')
                 || request()->is('delivery-orders*')
@@ -55,7 +55,7 @@
                     {{-- <li class="{{ request()->is('penjualan') ? 'active' : '' }}"><a href="/penjualan"><i class="fa fa-shopping-cart"></i><span>Penjualan</span></a></li> --}}
                     {{-- <li class="{{ request()->is('penjualan-marketplace') ? 'active' : '' }}"><a href="/penjualan-marketplace"><i class="fa fa-shopping-cart"></i><span>Penjualan Marketplace</span></a></li> --}}
                     {{-- <li class="{{ in_array(Route::currentRouteName(), ['refund.index', 'refund.show', 'refund.create', 'refund.edit']) ? 'active' : '' }}"><a href="/refund"><i class="fa fa-refresh"></i><span>Refund/Return Order</span></a></li> --}}
-                    {{-- <li class="{{ request()->is('refundPembelian*') ? 'active' : '' }}"><a href="/refundPembelian"><i class="fa fa-refresh"></i><span>Refund/Return Pembelian</span></a></li> --}}
+                    <li class="{{ request()->is('refundPembelian*') ? 'active' : '' }}"><a href="/refundPembelian"><i class="fa fa-refresh"></i><span>Refund/Return Pembelian</span></a></li>
                 </ul>
             </li>
         @endif

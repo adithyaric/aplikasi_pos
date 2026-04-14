@@ -15,6 +15,9 @@
                         <a href="{{ route('pembelian.create') }}" class="btn btn-md bg-green">
                             <i class="fa fa-plus"></i> Buat PO Baru
                         </a>
+                        {{-- <a href="{{ route('refundPembelian.index') }}" class="btn btn-md bg-green"> --}}
+                            {{-- <i class="fa fa-refresh"></i> Refund PO --}}
+                        {{-- </a> --}}
                     </div>
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">

@@ -94,7 +94,7 @@
                     <td><input type="number" step="0.01" class="form-control stock_fisik" value="${item.qty}" /></td>
                     <td><input type="number" class="form-control stock_dikartu" value="${item.qty}" disabled /></td>
                     <td><input type="number" step="0.01" class="form-control selisih" value="0" disabled /></td>
-                    <td><input type="text" class="form-control keterangan" value="${item.keterangan}" /></td>
+                    <td><input type="text" class="form-control keterangan" value="" /></td>
                 </tr>
             `;
                     tbody.append(newRow);
@@ -201,7 +201,7 @@
                             selisih:      selisih,
                             // system_qty:   parseFloat(row.find('.stock_dikartu').val()) || 0,
                             // physical_qty: parseFloat(row.find('.stock_fisik').val()) || 0,
-                            keterangan:   keterangan
+                            // keterangan:   keterangan
                         });
                     }
                 });

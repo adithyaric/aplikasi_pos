@@ -84,19 +84,32 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/pembelian/{id}/destroy', [PembelianController::class, 'stockDestroy'])->name('pembelian.stock.destroy');
     Route::get('/supplier/{supplier}/products', [App\Http\Controllers\PembelianController::class, 'getProductsBySupplier'])->name('supplier.products');
 
-    Route::resource('/refund', RefundController::class);
-    Route::resource('/refundPembelian', RefundPembelianController::class);
-    Route::resource('/penjualan', PenjualanController::class);
-    Route::get('/penjualan/{penjualan}/print', [PenjualanController::class, 'print'])->name('penjualan.print');
-    Route::get('/penjualan-marketplace', [PenjualanController::class, 'marketplace'])->name('penjualan.marketplace');
+    // Route::resource('/refund', RefundController::class);
 
-    Route::resource('/cart', CartController::class);
-    Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
-    Route::post('/cart/remove-serial', [CartController::class, 'removeSerial']);
-    Route::delete('/cart-empty', [CartController::class, 'empty']);
-    Route::get('/wishlist-pos/{outlet_id}', [CartController::class, 'getWishlist']);
-    Route::post('/wishlist-pos', [CartController::class, 'addToWishlist']);
-    Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
+    // AJAX helpers for retur — must be BEFORE the resource
+    Route::get('/retur/supplier/{supplier}/products', [RefundPembelianController::class, 'getSupplierProducts'])->name('retur.supplier.products');
+
+    // Outlet loads DeliveryOrders, not Pembelians
+    Route::get('/retur/outlet/{outlet}/delivery-orders', [RefundPembelianController::class, 'getOutletDeliveryOrders'])->name('retur.outlet.delivery-orders');
+    Route::get('/retur/delivery-order/{deliveryOrder}/items', [RefundPembelianController::class, 'getDeliveryOrderItemsForRetur'])->name('retur.delivery-order.items');
+
+    // Terima retur (penerimaan barang retur dari supplier)
+    Route::get('/refundPembelian/{refundPembelian}/terima', [RefundPembelianController::class, 'terimaForm'])->name('refundPembelian.terima.form');
+    Route::post('/refundPembelian/{refundPembelian}/terima', [RefundPembelianController::class, 'terima'])->name('refundPembelian.terima');
+
+    Route::resource('/refundPembelian', RefundPembelianController::class);
+
+    // Route::resource('/penjualan', PenjualanController::class);
+    // Route::get('/penjualan/{penjualan}/print', [PenjualanController::class, 'print'])->name('penjualan.print');
+    // Route::get('/penjualan-marketplace', [PenjualanController::class, 'marketplace'])->name('penjualan.marketplace');
+
+    // Route::resource('/cart', CartController::class);
+    // Route::post('/cart-change-qty', [CartController::class, 'changeQty']);
+    // Route::post('/cart/remove-serial', [CartController::class, 'removeSerial']);
+    // Route::delete('/cart-empty', [CartController::class, 'empty']);
+    // Route::get('/wishlist-pos/{outlet_id}', [CartController::class, 'getWishlist']);
+    // Route::post('/wishlist-pos', [CartController::class, 'addToWishlist']);
+    // Route::post('/wishlist/move-to-cart', [CartController::class, 'moveToCart']);
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     // Route::get('/laporan/pembelian', [LaporanController::class, 'exportPembelian'])->name('laporan.pembelian');

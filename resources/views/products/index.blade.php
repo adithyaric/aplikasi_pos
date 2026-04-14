@@ -74,7 +74,7 @@
                                     <td>Stock INBOUND</td>
                                     <td>Stock Minimum</td>
                                     <td>Harga Beli</td>
-                                    <td>Harga Jual</td>
+                                    {{-- <td>Harga Jual</td> --}}
                                     <td>Notif</td>
                                     {{-- <td>Serialized</td> --}}
                                     <td>Aksi</td>
@@ -100,10 +100,10 @@
                                                 @currency($value->harga_beli)
                                             </button>
                                         </td>
-                                        <td>@currency($value->harga_jual)</td>
+                                        {{-- <td>@currency($value->harga_jual)</td> --}}
                                         <td>
                                             @if ($value->stocks()->sum('qty_available') < $value->min_stock)
-                                            hampir habis, saat ini stock tinggal {{ $value->stocks()->sum('qty_available') }}
+                                            habis, stock tinggal {{ $value->stocks()->sum('qty_available') }}
                                             @else
                                             aman
                                             @endif

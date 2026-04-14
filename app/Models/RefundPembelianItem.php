@@ -12,8 +12,13 @@ class RefundPembelianItem extends Model
     protected $fillable = [
         'refund_pembelian_id',
         'product_id',
+        'stock_pembelian_id',
+        'stock_id',
+        'sku',
         'qty',
+        'harga',
         'alasan',
+        'resolution', // barang | uang
     ];
 
     public function refundPembelian()
@@ -24,5 +29,15 @@ class RefundPembelianItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function stockPembelian()
+    {
+        return $this->belongsTo(StockPembelian::class);
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class);
     }
 }

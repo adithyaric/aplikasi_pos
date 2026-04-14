@@ -11,25 +11,20 @@ class RefundPembelian extends Model
 
     protected $fillable = [
         'code',
+        'tanggal',
+        'type',             // gudang_ke_supplier | outlet_ke_gudang
+        'status',           // retur | complete
         'kas_id',
-        'customer_id',
         'supplier_id',
-        'pembelian_id',
+        'delivery_order_id', // [NEW] for outlet_ke_gudang, replaces pembelian_id
         'outlet_id',
         'user_id',
-        'tanggal',
         'total',
     ];
 
-    public function customer()
-    {
-        return $this->belongsTo(User::class, 'customer_id');
-    }
-
-    public function kas()
-    {
-        return $this->belongsTo(Kas::class);
-    }
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
 
     public function user()
     {
@@ -46,17 +41,18 @@ class RefundPembelian extends Model
         return $this->belongsTo(Outlet::class);
     }
 
-    public function pembelian()
+    public function deliveryOrder()
     {
-        return $this->belongsTo(Pembelian::class);
+        return $this->belongsTo(DeliveryOrder::class);
+    }
+
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class);
     }
 
     public function refundPembelianItems()
     {
         return $this->hasMany(RefundPembelianItem::class);
     }
-
-    protected $casts = [
-        'tanggal' => 'datetime',
-    ];
 }
