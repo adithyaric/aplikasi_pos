@@ -108,21 +108,10 @@
         let currentProducts = null;
         let productIndex = 0;
 
-        $('select[name="supplier_id"]').on('change', function() {
-            let supplierId = $(this).val();
-            if (!supplierId) {
-                // If no supplier selected, clear all product selects
-                $('.product').empty().append('<option value="" disabled selected>Pilih Produk</option>').trigger(
-                    'change.select2');
-                currentProducts = null;
-                return;
-            }
-
-            // Fetch products for this supplier
-            $.get('/supplier/' + supplierId + '/products', function(products) {
-                currentProducts = products;
-                populateProductSelects(products);
-            });
+        // Load all products on page load (no supplier filter)
+        $.get('{{ route("pembelian.all-products") }}', function(products) {
+            currentProducts = products;
+            populateProductSelects(products);
         });
 
         function populateProductSelects(products, target = '.product') {
