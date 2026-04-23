@@ -52,6 +52,21 @@ class PembelianController extends Controller
         return response()->json($products);
     }
 
+    public function getAllProducts()
+    {
+        $products = Product::select('id', 'code', 'name', 'is_serialized', 'harga_beli', 'min_stock')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($product) {
+                $currentStock = $product->stocks()->sum('qty_available');
+                $product->stock_count = $currentStock;
+                $product->is_under_minimum = $currentStock <= $product->min_stock;
+                return $product;
+            });
+
+        return response()->json($products);
+    }
+
     public function index()
     {
         return view('pembelians.index', [

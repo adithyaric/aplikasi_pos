@@ -69,6 +69,7 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::resource('/slider', SliderController::class);
 
     Route::resource('/pengeluaran', PengeluaranController::class);
+    Route::get('/pembelian/cek-stok-produk', [PembelianController::class, 'getAllProducts'])->name('pembelian.all-products');
     Route::resource('/pembelian', PembelianController::class);
     Route::get('/pembelian/{pembelian}/pembayaran/edit', [PembelianController::class, 'editPembayaran'])->name('pembelian.pembayaran.edit');
     Route::put('/pembelian/{pembelian}/pembayaran', [PembelianController::class, 'updatePembayaran'])->name('pembelian.pembayaran.update');
