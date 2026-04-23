@@ -331,10 +331,11 @@
         // ---- Cek Barang Modal ----
         let cekBarangTable = null;
 
-        $('#modalCekBarang').on('show.bs.modal', function () {
+        $('#modalCekBarang').on('show.bs.modal', function (e) {
             if (!currentProducts || currentProducts.length === 0) {
+                e.preventDefault();
                 alert('Data produk belum dimuat. Coba muat ulang halaman.');
-                return false;
+                return;
             }
 
             const sorted = [...currentProducts].sort((a, b) => {
@@ -350,27 +351,30 @@
             sorted.forEach(function (p) {
                 const isUnder = p.is_under_minimum;
                 const suggestedQty = Math.max(1, (p.min_stock || 0) - (p.stock_count || 0));
-                const statusBadge = isUnder
-                    ? '<span class="label label-danger">OUT OF STOCK</span>'
-                    : '<span class="label label-success">Normal</span>';
 
-                tbody.append(`
-                    <tr class="${isUnder ? 'danger' : ''}">
-                        <td class="text-center">
-                            <input type="checkbox" class="cek-product-check" value="${p.id}"
-                                data-name="${p.name}" data-harga="${p.harga_beli || 0}">
-                        </td>
-                        <td>${p.code}</td>
-                        <td>${p.name}</td>
-                        <td class="text-center">${p.stock_count || 0}</td>
-                        <td class="text-center">${p.min_stock || 0}</td>
-                        <td class="text-center">${statusBadge}</td>
-                        <td>
-                            <input type="number" class="form-control input-sm cek-qty"
-                                value="${isUnder ? suggestedQty : 1}" min="1" style="width:70px">
-                        </td>
-                    </tr>
-                `);
+                const $tr = $('<tr>').addClass(isUnder ? 'danger' : '');
+
+                const $checkTd = $('<td>').addClass('text-center').append(
+                    $('<input>').attr({ type: 'checkbox', class: 'cek-product-check', value: p.id })
+                        .data('name', p.name).data('harga', p.harga_beli || 0)
+                );
+                const $statusBadge = $('<span>').addClass('label')
+                    .addClass(isUnder ? 'label-danger' : 'label-success')
+                    .text(isUnder ? 'OUT OF STOCK' : 'Normal');
+                const $qtyInput = $('<input>').attr({ type: 'number', class: 'form-control input-sm cek-qty', min: 1 })
+                    .css('width', '70px').val(isUnder ? suggestedQty : 1);
+
+                $tr.append(
+                    $checkTd,
+                    $('<td>').text(p.code),
+                    $('<td>').text(p.name),
+                    $('<td>').addClass('text-center').text(p.stock_count || 0),
+                    $('<td>').addClass('text-center').text(p.min_stock || 0),
+                    $('<td>').addClass('text-center').append($statusBadge),
+                    $('<td>').append($qtyInput)
+                );
+
+                tbody.append($tr);
             });
 
             if (cekBarangTable) {
@@ -394,21 +398,44 @@
             });
         });
 
-        $('#checkAll').on('change', function () {
-            $('.cek-product-check').prop('checked', $(this).prop('checked'));
+        $(document).on('change', '#checkAll', function () {
+            const checked = $(this).prop('checked');
+            // Check/uncheck all rows (including non-visible DataTable pages)
+            if (cekBarangTable) {
+                cekBarangTable.rows().nodes().each(function (node) {
+                    $(node).find('.cek-product-check').prop('checked', checked);
+                });
+            } else {
+                $('.cek-product-check').prop('checked', checked);
+            }
         });
 
         $('#btnTambahkanPO').on('click', function () {
             const selected = [];
-            $('#cekBarangBody .cek-product-check:checked').each(function () {
-                const $row = $(this).closest('tr');
-                selected.push({
-                    product_id: $(this).val(),
-                    name: $(this).data('name'),
-                    harga: $(this).data('harga'),
-                    qty: parseInt($row.find('.cek-qty').val()) || 1
+            if (cekBarangTable) {
+                cekBarangTable.rows().nodes().each(function (node) {
+                    const $check = $(node).find('.cek-product-check:checked');
+                    if ($check.length) {
+                        const $row = $(node);
+                        selected.push({
+                            product_id: $check.val(),
+                            name: $check.data('name'),
+                            harga: $check.data('harga'),
+                            qty: parseInt($row.find('.cek-qty').val()) || 1
+                        });
+                    }
                 });
-            });
+            } else {
+                $('#cekBarangBody .cek-product-check:checked').each(function () {
+                    const $row = $(this).closest('tr');
+                    selected.push({
+                        product_id: $(this).val(),
+                        name: $(this).data('name'),
+                        harga: $(this).data('harga'),
+                        qty: parseInt($row.find('.cek-qty').val()) || 1
+                    });
+                });
+            }
 
             if (selected.length === 0) {
                 alert('Pilih minimal satu produk.');
@@ -419,7 +446,6 @@
             const $firstRow = $('#product-repeater tr:first');
             if ($firstRow.find('.product').val() === null || $firstRow.find('.product').val() === '') {
                 $firstRow.remove();
-                productIndex = -1;
             }
 
             selected.forEach(function (item) {

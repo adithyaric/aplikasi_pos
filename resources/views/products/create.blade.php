@@ -15,8 +15,8 @@
                     <!-- form start -->
                     <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="box-body">
-                            <div class="form-group">
+                        <div class="row box-body">
+                            <div class="col-md-6 form-group">
                                 <label for="">Nama</label>
                                 <input type="text" class="form-control" name="name" value="{{ old('name') }}"
                                     placeholder="Masukkan Nama">
@@ -26,7 +26,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Kode Produk</label>
                                 <input type="text" class="form-control" name="code" value="{{ old('code') }}"
                                     placeholder="Masukkan Code">
@@ -36,7 +36,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Warna</label>
                                 <input type="text" class="form-control" name="warna" value="{{ old('warna') }}"
                                     placeholder="Masukkan Warna">
@@ -46,7 +46,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Ukuran</label>
                                 <input type="text" class="form-control" name="ukuran" value="{{ old('ukuran') }}"
                                     placeholder="Masukkan Ukuran">
@@ -56,7 +56,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Brand</label>
                                 <input type="text" class="form-control" name="brand" value="{{ old('brand') }}"
                                     placeholder="Masukkan Brand">
@@ -66,7 +66,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Model</label>
                                 <input type="text" class="form-control" name="model" value="{{ old('model') }}"
                                     placeholder="Masukkan Model">
@@ -76,7 +76,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Harga Beli</label>
                                 <input type="text" class="form-control" name="harga_beli" value="{{ old('harga_beli') }}"
                                     placeholder="Masukkan Harga Beli">
@@ -86,7 +86,18 @@
                                     </div>
                                 @enderror
                             </div>
-                            {{-- <div class="form-group"> --}}
+                            <!-- Satuan -->
+                            <div class="col-md-6 form-group">
+                                <label for="">Satuan</label>
+                                <input type="text" class="form-control" name="satuan"
+                                    value="{{ old('satuan', $product->satuan ?? '') }}" placeholder="Contoh: Pcs, Box, Kg">
+                                @error('satuan')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            {{-- <div class="col-md-6 form-group"> --}}
                                 {{-- <label for="">Harga Jual</label> --}}
                                 {{-- <input type="text" class="form-control" name="harga_jual" --}}
                                     {{-- value="{{ old('harga_jual') }}" placeholder="Masukkan Harga Jual"> --}}
@@ -96,7 +107,7 @@
                                     {{-- </div> --}}
                                 {{-- @enderror --}}
                             {{-- </div> --}}
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label>Category</label>
                                 <select class="form-control select2" name="category_id" data-placeholder="Pilih Category"
                                     style="width: 100%;">
@@ -114,20 +125,9 @@
                                     </div>
                                 @enderror
                             </div>
-                            <!-- Satuan -->
-                            <div class="form-group">
-                                <label for="">Satuan</label>
-                                <input type="text" class="form-control" name="satuan"
-                                    value="{{ old('satuan', $product->satuan ?? '') }}" placeholder="Contoh: Pcs, Box, Kg">
-                                @error('satuan')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
 
                             <!-- Minimum Stock -->
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Minimum Stock</label>
                                 <input type="number" class="form-control" name="min_stock"
                                     value="{{ old('min_stock', $product->min_stock ?? 0) }}" min="0"
@@ -140,7 +140,7 @@
                             </div>
 
                             <!-- Lokasi -->
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label for="">Lokasi</label>
                                 <input type="text" class="form-control" name="lokasi"
                                     value="{{ old('lokasi', $product->lokasi ?? '') }}"
@@ -153,7 +153,7 @@
                             </div>
 
                             <!-- Multiple Select Supplier -->
-                            <div class="form-group">
+                            <div class="col-md-6 form-group">
                                 <label>Supplier</label>
                                 <select class="form-control select2" name="supplier_ids[]" multiple
                                     data-placeholder="Pilih Supplier" style="width: 100%;">
