@@ -83,8 +83,14 @@
                                 </tbody>
                             </table>
 
-                            {{-- //TODO add Product pop-up (nanti bisa lanjut di select²) --}}
-                            <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">Add</button>
+                            <div class="d-flex gap-2 mb-2">
+                                <button class="btn btn-sm btn-warning" type="button" data-toggle="modal" data-target="#modalCekBarang">
+                                    <i class="fa fa-search"></i> Cek Barang
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">
+                                    <i class="fa fa-plus"></i> Add Row
+                                </button>
+                            </div>
                             <hr>
                             <div class="form-group">
                                 <label>Total</label>
@@ -95,6 +101,45 @@
                         <div class="box-footer">
                             <a href="{{ route('pembelian.index') }}" class="btn btn-default">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+
+                        <!-- Modal Cek Barang -->
+                        <div class="modal fade" id="modalCekBarang" tabindex="-1" role="dialog" aria-labelledby="modalCekBarangLabel">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title" id="modalCekBarangLabel">
+                                            <i class="fa fa-search"></i> Pilih Produk untuk PO
+                                            <small class="text-warning">— diurutkan dari stok paling kritis</small>
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table id="tableCekBarang" class="table table-bordered table-striped table-hover" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30"><input type="checkbox" id="checkAll"></th>
+                                                    <th>Kode</th>
+                                                    <th>Nama Produk</th>
+                                                    <th>Stok Saat Ini</th>
+                                                    <th>Min Stok</th>
+                                                    <th>Status</th>
+                                                    <th width="90">Qty Order</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cekBarangBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-primary" id="btnTambahkanPO">
+                                            <i class="fa fa-check"></i> Tambahkan ke PO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div><!-- /.box -->
@@ -189,11 +234,15 @@
 
         function updateSubtotalAndTotal() {
             let total = 0;
-            $('tbody tr').each(function() {
+            $('#product-repeater tr').each(function() {
                 let $row = $(this);
                 let qty = $row.find('.qty').val();
-                let harga_beli = $row.find('.harga_beli').cleanVal(); // numeric value from masked input
-                let subtotal = qty * harga_beli;
+                let $hargaInput = $row.find('.harga_beli');
+                // Use cleanVal() only when mask is initialized (has data from plugin)
+                let harga_beli = ($hargaInput.data('mask') !== undefined)
+                    ? ($hargaInput.cleanVal() || 0)
+                    : (parseFloat($hargaInput.val()) || 0);
+                let subtotal = (qty || 0) * harga_beli;
                 // Set formatted subtotal (readonly)
                 $row.find('.subtotal').val(formatRupiah(subtotal));
                 total += subtotal;
@@ -277,6 +326,124 @@
                 $('#kas').trigger('change.select2');
             });
             $('#kas').prop('disabled', false);
+        });
+
+        // ---- Cek Barang Modal ----
+        let cekBarangTable = null;
+
+        $('#modalCekBarang').on('show.bs.modal', function () {
+            if (!currentProducts || currentProducts.length === 0) {
+                alert('Data produk belum dimuat. Coba muat ulang halaman.');
+                return false;
+            }
+
+            const sorted = [...currentProducts].sort((a, b) => {
+                const aUnder = a.is_under_minimum ? 0 : 1;
+                const bUnder = b.is_under_minimum ? 0 : 1;
+                if (aUnder !== bUnder) return aUnder - bUnder;
+                return a.stock_count - b.stock_count;
+            });
+
+            const tbody = $('#cekBarangBody');
+            tbody.empty();
+
+            sorted.forEach(function (p) {
+                const isUnder = p.is_under_minimum;
+                const suggestedQty = Math.max(1, (p.min_stock || 0) - (p.stock_count || 0));
+                const statusBadge = isUnder
+                    ? '<span class="label label-danger">OUT OF STOCK</span>'
+                    : '<span class="label label-success">Normal</span>';
+
+                tbody.append(`
+                    <tr class="${isUnder ? 'danger' : ''}">
+                        <td class="text-center">
+                            <input type="checkbox" class="cek-product-check" value="${p.id}"
+                                data-name="${p.name}" data-harga="${p.harga_beli || 0}">
+                        </td>
+                        <td>${p.code}</td>
+                        <td>${p.name}</td>
+                        <td class="text-center">${p.stock_count || 0}</td>
+                        <td class="text-center">${p.min_stock || 0}</td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td>
+                            <input type="number" class="form-control input-sm cek-qty"
+                                value="${isUnder ? suggestedQty : 1}" min="1" style="width:70px">
+                        </td>
+                    </tr>
+                `);
+            });
+
+            if (cekBarangTable) {
+                cekBarangTable.destroy();
+            }
+            cekBarangTable = $('#tableCekBarang').DataTable({
+                retrieve: false,
+                destroy: true,
+                pageLength: 10,
+                order: [],
+                columnDefs: [
+                    { orderable: false, targets: [0, 6] }
+                ],
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ baris",
+                    info: "Menampilkan _START_-_END_ dari _TOTAL_ produk",
+                    paginate: { previous: "Prev", next: "Next" },
+                    zeroRecords: "Tidak ada produk ditemukan"
+                }
+            });
+        });
+
+        $('#checkAll').on('change', function () {
+            $('.cek-product-check').prop('checked', $(this).prop('checked'));
+        });
+
+        $('#btnTambahkanPO').on('click', function () {
+            const selected = [];
+            $('#cekBarangBody .cek-product-check:checked').each(function () {
+                const $row = $(this).closest('tr');
+                selected.push({
+                    product_id: $(this).val(),
+                    name: $(this).data('name'),
+                    harga: $(this).data('harga'),
+                    qty: parseInt($row.find('.cek-qty').val()) || 1
+                });
+            });
+
+            if (selected.length === 0) {
+                alert('Pilih minimal satu produk.');
+                return;
+            }
+
+            // Remove the first empty row if it has no product selected
+            const $firstRow = $('#product-repeater tr:first');
+            if ($firstRow.find('.product').val() === null || $firstRow.find('.product').val() === '') {
+                $firstRow.remove();
+                productIndex = -1;
+            }
+
+            selected.forEach(function (item) {
+                addBahanBaku();
+
+                const $newRow = $('#product-repeater tr:last');
+                const $productSelect = $newRow.find('.product');
+                const $hargaInput = $newRow.find('.harga_beli');
+                const $qtyInput = $newRow.find('.qty');
+
+                // Set product selection without firing the change handler
+                // (which would make an AJAX call before options are ready)
+                $productSelect.val(item.product_id).trigger('change.select2');
+
+                // Populate harga_beli directly from cached data to avoid /product/null
+                $hargaInput.val(item.harga).trigger('input');
+
+                // Set qty
+                $qtyInput.val(item.qty);
+
+                updateSubtotalAndTotal();
+            });
+
+            $('#modalCekBarang').modal('hide');
         });
     </script>
 @endsection
