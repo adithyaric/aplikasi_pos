@@ -55,12 +55,13 @@ class PembelianController extends Controller
     public function getAllProducts()
     {
         $products = Product::select('id', 'code', 'name', 'is_serialized', 'harga_beli', 'min_stock')
+            ->withSum('stocks', 'qty_available')
             ->orderBy('name')
             ->get()
             ->map(function ($product) {
-                $currentStock = $product->stocks()->sum('qty_available');
+                $currentStock = (int) ($product->stocks_sum_qty_available ?? 0);
                 $product->stock_count = $currentStock;
-                $product->is_under_minimum = $currentStock <= $product->min_stock;
+                $product->is_under_minimum = $currentStock <= ($product->min_stock ?? 0);
                 return $product;
             });
 
