@@ -108,11 +108,6 @@
         let currentProducts = null;
         let productIndex = 0;
 
-        // Load all products on page load (no supplier filter)
-        $.get('{{ route("pembelian.all-products") }}', function(products) {
-            currentProducts = products;
-            populateProductSelects(products);
-        });
 
         function populateProductSelects(products, target = '.product') {
             $(target).each(function() {
@@ -249,6 +244,16 @@
 
         // Handle product change on page load for existing rows
         $(document).ready(function() {
+            // Load all products on page load (no supplier filter)
+            $.get('{{ route("pembelian.all-products") }}')
+                .done(function(products) {
+                    currentProducts = products;
+                    populateProductSelects(products);
+                })
+                .fail(function() {
+                    alert('Gagal memuat daftar produk. Silakan refresh halaman.');
+                });
+
             $('.product').each(function() {
                 $(this).trigger('change');
             });
