@@ -150,7 +150,7 @@ class PembelianController extends Controller
 
     public function penerimaanIndex()
     {
-        $pembelians = Pembelian::with(['supplier', 'pembelianProducts.product'])
+        $pembelians = Pembelian::with(['supplier', 'pembelianProducts.product', 'stocks'])
             ->latest()
             ->get();
 

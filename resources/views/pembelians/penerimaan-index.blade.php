@@ -82,7 +82,7 @@
                                                 <i class="fa fa-{{ $receiptStatus === 'completed' ? 'eye' : 'edit' }}"></i>
                                                 {{ $receiptStatus === 'completed' ? 'Detail' : 'Input GR' }}
                                             </a>
-                                            @if($value->stocks->count())
+                                            {{-- @if($value->stocks->count()) --}}
                                                 <a href="{{ route('laporan.penerimaan', [$value->id, 'po']) }}"
                                                    class="btn btn-xs btn-success" title="Export GR">
                                                     <i class="fa fa-file-excel-o"></i> GR
@@ -90,7 +90,7 @@
                                                 <a href="{{ route('laporan.pdf.penerimaan-single', $value->id) }}" target="_blank" class="btn btn-xs btn-danger" title="Export PDF GR">
                                                     <i class="fa fa-file-pdf-o"></i> GR
                                                 </a>
-                                            @endif
+                                            {{-- @endif --}}
                                         </td>
                                     </tr>
                                 @endforeach

@@ -11,8 +11,8 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'type',
-        'outlet_id', //unsued, currently just for experiment
+        // 'type', //unsued, currently just for experiment
+        // 'outlet_id', //unsued, currently just for experiment
     ];
 
     // public function outlet()

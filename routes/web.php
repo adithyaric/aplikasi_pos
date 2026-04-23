@@ -59,9 +59,9 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     Route::get('/category-product-create', [CategoryController::class, 'createProduct'])->name('category.product.create');
     Route::get('/category-product/{category}/edit', [CategoryController::class, 'editProduct'])->name('category.product.edit');
 
-    Route::get('/category-pengeluaran', [CategoryController::class, 'indexPengeluaran'])->name('category.pengeluaran.index');
-    Route::get('/category-pengeluaran-create', [CategoryController::class, 'createPengeluaran'])->name('category.pengeluaran.create');
-    Route::get('/category-pengeluaran/{category}/edit', [CategoryController::class, 'editPengeluaran'])->name('category.pengeluaran.edit');
+    // Route::get('/category-pengeluaran', [CategoryController::class, 'indexPengeluaran'])->name('category.pengeluaran.index');
+    // Route::get('/category-pengeluaran-create', [CategoryController::class, 'createPengeluaran'])->name('category.pengeluaran.create');
+    // Route::get('/category-pengeluaran/{category}/edit', [CategoryController::class, 'editPengeluaran'])->name('category.pengeluaran.edit');
     Route::resource('/product', ProductController::class);
 
     Route::resource('/stock', StockController::class);

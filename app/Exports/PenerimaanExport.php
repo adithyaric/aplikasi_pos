@@ -104,7 +104,9 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
             $sheet->setCellValue('B10', 'No Penerimaan :');
             $sheet->setCellValue('D10', $this->pembelian->code_gr ?? '-');
             $sheet->setCellValue('B11', 'Tanggal :');
-            $sheet->setCellValue('D11', Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY HH:mm'));
+            $sheet->setCellValue('D11', $this->pembelian->receipt_date
+                ? Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY HH:mm')
+                : '-');
             $sheet->setCellValue('B12', 'Kode Request :');
             $sheet->setCellValue('D12', $this->pembelian->code ?? '-');
             $sheet->setCellValue('B13', 'Request By :');
@@ -112,12 +114,16 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
             $sheet->setCellValue('B14', 'Kode DO :');
             $sheet->setCellValue('D14', $this->pembelian->code_gr ?? '-');
             $sheet->setCellValue('B15', 'Tanggal DO :');
-            $sheet->setCellValue('D15', Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY'));
+            $sheet->setCellValue('D15', $this->pembelian->receipt_date
+                ? Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY')
+                : '-');
         } else {
             $sheet->setCellValue('B10', 'Goods Receipt :');
             $sheet->setCellValue('D10', $this->pembelian->code_gr ?? '-');
             $sheet->setCellValue('B11', 'Tanggal :');
-            $sheet->setCellValue('D11', Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY HH:mm'));
+            $sheet->setCellValue('D11', $this->pembelian->receipt_date
+                ? Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY HH:mm')
+                : '-');
             $sheet->setCellValue('B12', 'Kode PO :');
             $sheet->setCellValue('D12', $this->pembelian->code ?? '-');
             $sheet->setCellValue('B13', 'Supplier :');
@@ -125,7 +131,9 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
             $sheet->setCellValue('B14', 'No Invoice :');
             $sheet->setCellValue('D14', $this->pembelian->code_gr ?? '-');
             $sheet->setCellValue('B15', 'Tanggal Invoice :');
-            $sheet->setCellValue('D15', Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY'));
+            $sheet->setCellValue('D15', $this->pembelian->receipt_date
+                ? Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY')
+                : '-');
         }
 
         $sheet->getStyle('B10:B15')->getFont()->setBold(true);

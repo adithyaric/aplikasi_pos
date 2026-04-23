@@ -21,17 +21,17 @@ class CategoryController extends Controller
 
     public function indexProduct()
     {
-        $categories = Category::where('type', 'product')->get();
+        $categories = Category::get();
 
         return view('categories.index', ['categories' => $categories, 'type' => 'product']);
     }
 
-    public function indexPengeluaran()
-    {
-        $categories = Category::where('type', 'pengeluaran')->get();
+    // public function indexPengeluaran()
+    // {
+    //     $categories = Category::where('type', 'pengeluaran')->get();
 
-        return view('categories.index', ['categories' => $categories, 'type' => 'pengeluaran']);
-    }
+    //     return view('categories.index', ['categories' => $categories, 'type' => 'pengeluaran']);
+    // }
 
     // public function create()
     // {
