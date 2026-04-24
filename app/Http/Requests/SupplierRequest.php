@@ -14,11 +14,14 @@ class SupplierRequest extends FormRequest
     public function rules()
     {
         return [
-            'kode_supplier' => 'nullable|string',
-            'pic_supplier' => 'nullable|string',
-            'name' => 'required',
-            'alamat' => 'required',
-            'no_telp' => 'required',
+            'kode_supplier'            => 'nullable|string',
+            'name'                     => 'required|string',
+            'alamat'                   => 'required|string',
+            'no_telp'                  => 'required|string',
+            'deadline_days'            => 'nullable|array',
+            'deadline_days.*'          => 'integer|between:1,7',
+            'deadline_interval_weeks'  => 'nullable|integer|in:1,2,3',
+            'deadline_reference_date'  => 'nullable|date',
         ];
     }
 }
