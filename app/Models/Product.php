@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\ProductMinimumAdjustment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -127,9 +128,27 @@ class Product extends Model
         return $this->hasMany(StockMovement::class);
     }
 
-    public function isLowStock()
+    public function isLowStock(): bool
     {
-        return $this->total_available_stock <= $this->min_stock;
+        return $this->total_available_stock <= $this->effective_min_stock;
+    }
+
+    /**
+     * Returns min_stock raised by the active adjustment percentage, if any.
+     * Falls back to bare min_stock when no active adjustment exists.
+     */
+    public function getEffectiveMinStockAttribute(): int
+    {
+        $adjustment = ProductMinimumAdjustment::where('product_id', $this->id)
+            ->activeOn()
+            ->orderByDesc('active_from')
+            ->first();
+
+        if (!$adjustment) {
+            return (int) $this->min_stock;
+        }
+
+        return (int) ceil($this->min_stock * (1 + $adjustment->adjustment_percentage / 100));
     }
 
     public function getActivitylogOptions(): LogOptions
