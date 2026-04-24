@@ -85,6 +85,36 @@ class DashboardController extends Controller
             ->orderBy('expired_at')
             ->get(['id', 'product_id', 'qty_available', 'expired_at', 'batch_number', 'sku']);
 
+        $salesVelocity = PenjualanItem::select(
+                'product_id',
+                DB::raw('COALESCE(SUM(qty), 0) as total_sold_30d')
+            )
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('product_id')
+            ->get()
+            ->keyBy('product_id');
+
+        $lowVelocityProducts = Product::select('id', 'code', 'name', 'min_stock')
+            ->withSum('stocks', 'qty_available')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($product) use ($salesVelocity) {
+                $totalSold30d  = (int) ($salesVelocity->get($product->id)?->total_sold_30d ?? 0);
+                $avgDailySales = $totalSold30d / 30;
+                $safetyStock   = (int) ceil($avgDailySales * 7);
+                $currentStock  = (int) ($product->stocks_sum_qty_available ?? 0);
+
+                $product->avg_daily_sales = round($avgDailySales, 2);
+                $product->safety_stock    = $safetyStock;
+                $product->current_stock   = $currentStock;
+                $product->deficit         = max(0, $safetyStock - $currentStock);
+
+                return $product;
+            })
+            ->filter(fn ($p) => $p->safety_stock > 0 && $p->current_stock < $p->safety_stock)
+            ->sortByDesc('deficit')
+            ->values();
+
         $bestBuyProducts = [];
         $bestBuySuppliers = [];
         $salesGraph = [];
@@ -131,7 +161,7 @@ class DashboardController extends Controller
             'totalRevenue'       => 0,
             'urgentSuppliers'    => $urgentSuppliers,
             'nearExpiryStocks'    => $nearExpiryStocks,
-            'lowVelocityProducts' => collect(), // placeholder — filled in Task 2
+            'lowVelocityProducts' => $lowVelocityProducts,
             'adjustmentProducts' => $adjustmentProducts,
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
