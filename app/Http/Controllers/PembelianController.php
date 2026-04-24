@@ -61,7 +61,7 @@ class PembelianController extends Controller
             ->map(function ($product) {
                 $currentStock = (int) ($product->stocks_sum_qty_available ?? 0);
                 $product->stock_count = $currentStock;
-                $product->is_under_minimum = $currentStock <= ($product->min_stock ?? 0);
+                $product->is_under_minimum = $currentStock <= $product->effective_min_stock;
                 return $product;
             });
 
