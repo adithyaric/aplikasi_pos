@@ -61,35 +61,50 @@
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <td>No</td>
-                                    <td>Kode</td>
-                                    <td>PIC</td>
-                                    <td>Nama</td>
-                                    <td>Alamat</td>
-                                    <td>Nomor Telp</td>
-                                    <td>Aksi</td>
+                                    <th>No</th>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Alamat</th>
+                                    <th>Nomor Telp</th>
+                                    <th>Deadline Order</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
+                            <tbody>
                             @foreach ($suppliers as $value)
+                                @php
+                                    $nextDeadline = $value->nextDeadlineDate();
+                                    $daysUntil    = $nextDeadline ? \Carbon\Carbon::today()->diffInDays($nextDeadline, false) : null;
+                                @endphp
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->kode_supplier }}</td>
-                                    <td>{{ $value->pic_supplier }}</td>
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->alamat }}</td>
                                     <td>{{ $value->no_telp }}</td>
                                     <td>
-                                        <a class="btn btn-warning" href="{{ route('supplier.edit', $value->id) }}">Edit</a>
-                                        <form action="{{ route('supplier.destroy', $value->id) }}" method="post"
-                                            style="display: inline;">
+                                        @if($nextDeadline)
+                                            {{ $nextDeadline->isoFormat('DD MMM YYYY') }}
+                                            @if($daysUntil !== null && $daysUntil <= 3 && $daysUntil >= 0)
+                                                <span class="label label-danger">H-{{ $daysUntil }}</span>
+                                            @elseif($daysUntil !== null && $daysUntil <= 7)
+                                                <span class="label label-warning">{{ $daysUntil }} hari lagi</span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-warning btn-xs" href="{{ route('supplier.edit', $value->id) }}">Edit</a>
+                                        <form action="{{ route('supplier.destroy', $value->id) }}" method="post" style="display:inline">
                                             @method('delete')
                                             @csrf
-                                            <button class="border-0 btn btn-danger"
-                                                onclick="return confirm('Are you sure?')">Hapus</button>
+                                            <button class="btn btn-danger btn-xs" onclick="return confirm('Hapus supplier ini?')">Hapus</button>
                                         </form>
                                     </td>
                                 </tr>
                             @endforeach
+                            </tbody>
                         </table>
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->
