@@ -350,7 +350,7 @@
 
             sorted.forEach(function (p) {
                 const isUnder = p.is_under_minimum;
-                const suggestedQty = Math.max(1, (p.min_stock || 0) - (p.stock_count || 0));
+                const suggestedQty = Math.max(1, (p.effective_min || p.min_stock || 0) - (p.stock_count || 0));
 
                 const $tr = $('<tr>').addClass(isUnder ? 'danger' : '');
 
@@ -369,7 +369,7 @@
                     $('<td>').text(p.code),
                     $('<td>').text(p.name),
                     $('<td>').addClass('text-center').text(p.stock_count || 0),
-                    $('<td>').addClass('text-center').text(p.min_stock || 0),
+                    $('<td>').addClass('text-center').text(p.effective_min || p.min_stock || 0),
                     $('<td>').addClass('text-center').append($statusBadge),
                     $('<td>').append($qtyInput)
                 );
