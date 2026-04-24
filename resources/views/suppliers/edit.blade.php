@@ -104,7 +104,7 @@
         var day = d.getDay();
         var diff = day === 0 ? -6 : 1 - day;
         d.setDate(d.getDate() + diff);
-        ref.value = d.toISOString().slice(0, 10);
+        ref.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 })();
 </script>

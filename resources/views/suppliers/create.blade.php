@@ -49,9 +49,9 @@
                                         <label class="control-label" style="font-weight:normal">Jangka Waktu</label>
                                         <select class="form-control" name="deadline_interval_weeks">
                                             <option value="">— Tidak ada deadline —</option>
-                                            <option value="1" {{ old('deadline_interval_weeks') == 1 ? 'selected' : '' }}>1 Minggu Sekali</option>
-                                            <option value="2" {{ old('deadline_interval_weeks') == 2 ? 'selected' : '' }}>2 Minggu Sekali</option>
-                                            <option value="3" {{ old('deadline_interval_weeks') == 3 ? 'selected' : '' }}>3 Minggu Sekali</option>
+                                            @foreach([1=>'1 Minggu Sekali',2=>'2 Minggu Sekali',3=>'3 Minggu Sekali'] as $val => $lbl)
+                                                <option value="{{ $val }}" {{ old('deadline_interval_weeks') == $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-sm-8">
@@ -101,7 +101,7 @@
         var day = d.getDay(); // 0=Sun, 1=Mon...
         var diff = day === 0 ? -6 : 1 - day; // offset to Monday
         d.setDate(d.getDate() + diff);
-        ref.value = d.toISOString().slice(0, 10);
+        ref.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 })();
 </script>
