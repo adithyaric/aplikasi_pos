@@ -4,15 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Pembelian;
 use App\Models\Penjualan;
-use App\Models\PenjualanItem;
 use App\Models\Product;
-use App\Models\Slider;
 use App\Models\Stock;
 use App\Models\Supplier;
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -38,39 +33,35 @@ class DashboardController extends Controller
             ->orderBy('expired_at')
             ->get(['id', 'product_id', 'qty_available', 'expired_at', 'batch_number', 'sku']);
 
-        //TODO Models Penjialan & PenjualanItem are not used (it's old codes)
-        //the lowVelocityProducts it should show the product that has ProductMinimumAdjustment
-        //so it show the data :
-        // @if($p->effective_min > $p->min_stock)
-        //     <span class="label label-info">+{{ $p->effective_min - $p->min_stock }}</span>
-        // @endif
-        $salesVelocity = PenjualanItem::select(
-                'product_id',
-                DB::raw('COALESCE(SUM(qty), 0) as total_sold_30d')
-            )
-            ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('product_id')
+        $activeAdjustments = \App\Models\ProductMinimumAdjustment::query()
+            ->activeOn()
+            ->orderByDesc('active_from')
+            ->orderByDesc('id')
             ->get()
-            ->keyBy('product_id');
+            ->groupBy('product_id');
+
+        $adjustedProductIds = $activeAdjustments->keys();
 
         $lowVelocityProducts = Product::select('id', 'code', 'name', 'min_stock')
             ->withSum('stocks', 'qty_available')
+            ->whereIn('id', $adjustedProductIds)
             ->orderBy('name')
             ->get()
-            ->map(function ($product) use ($salesVelocity) {
-                $totalSold30d  = (int) ($salesVelocity->get($product->id)?->total_sold_30d ?? 0);
-                $avgDailySales = $totalSold30d / 30;
-                $safetyStock   = (int) ceil($avgDailySales * 7);
-                $currentStock  = (int) ($product->stocks_sum_qty_available ?? 0);
+            ->map(function ($product) use ($activeAdjustments) {
+                $adj          = $activeAdjustments->get($product->id)?->first();
+                $effectiveMin = $adj
+                    ? (int) ceil($product->min_stock * (1 + $adj->adjustment_percentage / 100))
+                    : (int) $product->min_stock;
+                $currentStock = (int) ($product->stocks_sum_qty_available ?? 0);
 
-                $product->avg_daily_sales = round($avgDailySales, 2);
-                $product->safety_stock    = $safetyStock;
-                $product->current_stock   = $currentStock;
-                $product->deficit         = max(0, $safetyStock - $currentStock);
+                $product->effective_min         = $effectiveMin;
+                $product->current_stock         = $currentStock;
+                $product->adjustment_percentage = $adj?->adjustment_percentage ?? 0;
+                $product->deficit               = max(0, $effectiveMin - $currentStock);
 
                 return $product;
             })
-            ->filter(fn ($p) => $p->safety_stock > 0 && $p->current_stock < $p->safety_stock)
+            ->filter(fn ($p) => $p->current_stock < $p->effective_min)
             ->sortByDesc('deficit')
             ->values();
 
@@ -91,21 +82,15 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Batch-load products for the min-stock adjustment modal (avoids N+1)
-        $activeAdjustments = \App\Models\ProductMinimumAdjustment::query()
-            ->activeOn()
-            ->orderByDesc('active_from')
-            ->get()
-            ->groupBy('product_id');
-
+        // $activeAdjustments is defined above and reused here for the adjustment modal
         $adjustmentProducts = Product::select('id', 'code', 'name', 'min_stock')
             ->withSum('stocks', 'qty_available')
             ->orderBy('name')
             ->get()
             ->map(function ($p) use ($activeAdjustments) {
                 $adj = $activeAdjustments->get($p->id)?->first();
-                $p->active_from = $adj->active_from ?? null;
-                $p->active_until = $adj->active_until ?? null;
+                $p->active_from  = $adj?->active_from;
+                $p->active_until = $adj?->active_until;
                 $p->current_stock = (int) ($p->stocks_sum_qty_available ?? 0);
                 $p->effective_min = $adj
                     ? (int) ceil($p->min_stock * (1 + $adj->adjustment_percentage / 100))

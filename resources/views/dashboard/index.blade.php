@@ -140,11 +140,10 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">
                             <i class="fa fa-bar-chart"></i>
-                            Produk Stok di Bawah Kebutuhan (Berdasarkan Rata-rata Penjualan)
+                            Produk di Bawah Min Stok Penyesuaian Aktif
                             <span class="badge bg-blue">{{ $lowVelocityProducts->count() }}</span>
                         </h3>
                         <div class="box-tools pull-right">
-                            <small class="text-muted">Safety stock = rata-rata penjualan harian × 7 hari</small>
                             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                                 <i class="fa fa-minus"></i>
                             </button>
@@ -157,8 +156,8 @@
                                     <th>Kode</th>
                                     <th>Produk</th>
                                     <th>Stok Saat Ini</th>
-                                    <th>Safety Stock (7 hari)</th>
-                                    <th>Rata² Jual/Hari (30 hari)</th>
+                                    <th>Min Stok Efektif</th>
+                                    <th>Penyesuaian (%)</th>
                                     <th>Kekurangan</th>
                                 </tr>
                             </thead>
@@ -169,8 +168,13 @@
                                         <td>{{ $p->code }}</td>
                                         <td>{{ $p->name }}</td>
                                         <td class="text-center">{{ $p->current_stock }}</td>
-                                        <td class="text-center">{{ $p->safety_stock }}</td>
-                                        <td class="text-center">{{ $p->avg_daily_sales }}</td>
+                                        <td class="text-center">
+                                            {{ $p->effective_min }}
+                                            @if($p->effective_min > $p->min_stock)
+                                                <span class="label label-info">+{{ $p->effective_min - $p->min_stock }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">{{ $p->adjustment_percentage }}%</td>
                                         <td class="text-center">
                                             <span class="label label-danger">-{{ $p->deficit }}</span>
                                         </td>
@@ -187,8 +191,8 @@
                     <div class="box-footer text-muted">
                         <small>
                             <i class="fa fa-info-circle"></i>
-                            Hanya produk dengan penjualan dalam 30 hari terakhir yang ditampilkan.
-                            Gunakan <strong>Pengaturan Min Stok Produk</strong> untuk menyesuaikan threshold secara manual.
+                            Hanya produk dengan penyesuaian min stok aktif yang ditampilkan.
+                            Gunakan <strong>Pengaturan Min Stok Produk</strong> untuk mengatur penyesuaian.
                         </small>
                     </div>
                 </div>
