@@ -21,8 +21,9 @@ class Supplier extends Model
     ];
 
     protected $casts = [
-        'deadline_days'           => 'array',
-        'deadline_reference_date' => 'date',
+        'deadline_days'              => 'array',
+        'deadline_reference_date'    => 'date',
+        'deadline_interval_weeks'    => 'integer',
     ];
 
     public function products()
@@ -43,7 +44,7 @@ class Supplier extends Model
             return null;
         }
 
-        $days     = array_map('intval', (array) $this->deadline_days);
+        $days     = array_map('intval', $this->deadline_days);
         $interval = (int) $this->deadline_interval_weeks;
         $ref      = Carbon::parse($this->deadline_reference_date ?? $this->created_at)->startOfWeek();
         $today    = Carbon::today();
@@ -69,7 +70,7 @@ class Supplier extends Model
         if (!$next) {
             return false;
         }
-        $daysUntil = Carbon::today()->diffInDays($next, false);
-        return $daysUntil >= 0 && $daysUntil <= 3;
+        // nextDeadlineDate() always returns today or later, so daysUntil is always >= 0
+        return Carbon::today()->diffInDays($next, false) <= 3;
     }
 }
