@@ -19,53 +19,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // $bestBuyProducts = PenjualanItem::select('product_id', DB::raw('SUM(qty) as total_qty'))
-        //     ->with('product')
-        //     ->groupBy('product_id')
-        //     ->orderBy('total_qty', 'desc')
-        //     ->take(10)
-        //     ->get();
-
-        // $bestBuySuppliers = PenjualanItem::select('supplier_id', DB::raw('SUM(qty) as total_qty'), 'suppliers.name as supplier_name')
-        //     ->join('products', 'penjualan_items.product_id', '=', 'products.id')
-        //     ->join('suppliers', 'products.supplier_id', '=', 'suppliers.id')
-        //     ->groupBy('supplier_id')
-        //     ->orderBy('total_qty', 'desc')
-        //     ->take(10)
-        //     ->get();
-
-        // $salesGraph = Penjualan::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total) as total_sales'))
-        //     ->groupBy('date')
-        //     ->orderBy('date')
-        //     ->get()
-        //     ->map(function ($item) {
-        //         $item->date = Carbon::parse($item->date)->format('d-M-Y');
-
-        //         return $item;
-        //     });
-
-        // $productGraph = PenjualanItem::select(DB::raw('DATE(penjualan_items.created_at) as date'), 'products.name as product_name', DB::raw('SUM(qty) as total_qty'))
-        //     ->join('penjualans', 'penjualan_items.penjualan_id', '=', 'penjualans.id')
-        //     ->join('products', 'penjualan_items.product_id', '=', 'products.id')
-        //     ->groupBy('date', 'product_name')
-        //     ->orderBy('date')
-        //     ->get()
-        //     ->map(function ($item) {
-        //         $item->date = Carbon::parse($item->date)->format('d-M-Y');
-
-        //         return $item;
-        //     });
-
-        // $monthlyRevenue = Penjualan::select(
-        //     DB::raw('YEAR(created_at) as year'),
-        //     DB::raw("DATE_FORMAT(created_at, '%M') as month"),
-        //     DB::raw('SUM(total) as total')
-        // )
-        //     ->groupBy('year', 'month')
-        //     ->orderBy('year', 'asc')
-        //     ->orderByRaw("FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')")
-        //     ->get();
-
         $urgentSuppliers = Supplier::whereNotNull('deadline_days')
             ->whereNotNull('deadline_interval_weeks')
             ->get()
@@ -85,6 +38,12 @@ class DashboardController extends Controller
             ->orderBy('expired_at')
             ->get(['id', 'product_id', 'qty_available', 'expired_at', 'batch_number', 'sku']);
 
+        //TODO Models Penjialan & PenjualanItem are not used (it's old codes)
+        //the lowVelocityProducts it should show the product that has ProductMinimumAdjustment
+        //so it show the data :
+        // @if($p->effective_min > $p->min_stock)
+        //     <span class="label label-info">+{{ $p->effective_min - $p->min_stock }}</span>
+        // @endif
         $salesVelocity = PenjualanItem::select(
                 'product_id',
                 DB::raw('COALESCE(SUM(qty), 0) as total_sold_30d')
@@ -145,6 +104,8 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($p) use ($activeAdjustments) {
                 $adj = $activeAdjustments->get($p->id)?->first();
+                $p->active_from = $adj->active_from ?? null;
+                $p->active_until = $adj->active_until ?? null;
                 $p->current_stock = (int) ($p->stocks_sum_qty_available ?? 0);
                 $p->effective_min = $adj
                     ? (int) ceil($p->min_stock * (1 + $adj->adjustment_percentage / 100))

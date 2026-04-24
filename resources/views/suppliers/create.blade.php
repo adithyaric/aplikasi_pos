@@ -49,7 +49,7 @@
                                         <label class="control-label" style="font-weight:normal">Jangka Waktu</label>
                                         <select class="form-control" name="deadline_interval_weeks">
                                             <option value="">— Tidak ada deadline —</option>
-                                            @foreach([1=>'1 Minggu Sekali',2=>'2 Minggu Sekali',3=>'3 Minggu Sekali'] as $val => $lbl)
+                                            @foreach([1=>'1 Minggu Sekali',2=>'2 Minggu Sekali',3=>'3 Minggu Sekali',4=>'4 Minggu Sekali'] as $val => $lbl)
                                                 <option value="{{ $val }}" {{ old('deadline_interval_weeks') == $val ? 'selected' : '' }}>{{ $lbl }}</option>
                                             @endforeach
                                         </select>

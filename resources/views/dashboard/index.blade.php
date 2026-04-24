@@ -18,7 +18,6 @@
 
     <section class="content">
         <!-- WIDGET: SUPPLIER-DEADLINE -->
-        @if($urgentSuppliers->isNotEmpty())
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-danger">
@@ -39,6 +38,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                            @if($urgentSuppliers->isNotEmpty())
                                 @foreach($urgentSuppliers as $s)
                                     @php $days = \Carbon\Carbon::today()->diffInDays($s->next_deadline, false); @endphp
                                     <tr class="{{ $days === 0 ? 'danger' : ($days <= 1 ? 'warning' : '') }}">
@@ -58,16 +58,19 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                            @else
+                                <tr>
+                                    <th colspan="4">Kosong</th>
+                                </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        @endif
         <!-- END WIDGET: SUPPLIER-DEADLINE -->
         <!-- WIDGET: NEAR-EXPIRY -->
-        @if($nearExpiryStocks->isNotEmpty())
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-warning">
@@ -96,6 +99,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                            @if($nearExpiryStocks->isNotEmpty())
                                 @foreach($nearExpiryStocks as $stock)
                                     @php
                                         $daysLeft = (int) \Carbon\Carbon::today()->diffInDays($stock->expired_at, false);
@@ -117,16 +121,19 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                            @else
+                                <tr>
+                                    <th colspan="6">Kosong</th>
+                                </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        @endif
         <!-- END WIDGET: NEAR-EXPIRY -->
         <!-- WIDGET: LOW-VELOCITY-STOCK -->
-        @if($lowVelocityProducts->isNotEmpty())
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-info">
@@ -156,6 +163,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                            @if($lowVelocityProducts->isNotEmpty())
                                 @foreach($lowVelocityProducts as $p)
                                     <tr class="{{ $p->current_stock === 0 ? 'danger' : 'warning' }}">
                                         <td>{{ $p->code }}</td>
@@ -168,6 +176,11 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                            @else
+                                <tr>
+                                    <th colspan="6">Kosong</th>
+                                </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>
@@ -181,95 +194,7 @@
                 </div>
             </div>
         </div>
-        @endif
         <!-- END WIDGET: LOW-VELOCITY-STOCK -->
-        <div class="row">
-            <div class="col-lg-2 col-xs-2">
-                <div class="small-box bg-yellow-gradient">
-                    <div class="inner">
-                        <p style="font-size:20px;">{{ $products }}</p>
-                        <p>Jumlah Total products</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-archive"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-xs-2">
-                <div class="small-box bg-yellow-gradient">
-                    <div class="inner">
-                        <p style="font-size:20px;">{{ $stocks }}</p>
-                        <p>Jumlah Total stocks</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-cubes"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-xs-3">
-                <div class="small-box bg-yellow-gradient">
-                    <div class="inner">
-                        <p style="font-size:20px;">{{ $pembelianTerkirim }}</p>
-                        <p>Jumlah Total Pembelian Terkirim</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-rocket"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-xs-2">
-                <div class="small-box bg-yellow-gradient">
-                    <div class="inner">
-                        <p style="font-size:20px;">{{ $penjualans }}</p>
-                        <p>Jumlah Total Penjualan</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-shopping-cart"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-xs-3">
-                <div class="small-box bg-yellow-gradient">
-                    <div class="inner">
-                        <p style="font-size:20px;">@currency($totalRevenue)</p>
-                        <p>Jumlah Total Pendapatan</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-dollar"></i>
-                    </div>
-                </div>
-            </div>
-            {{-- <div class="col-lg-6 col-xs-6"> --}}
-            {{-- <div id="bestOutlets"></div> --}}
-            {{-- </div> --}}
-            {{-- <div class="col-lg-12 col-xs-12"> --}}
-            {{-- <h1 for="check-sliders">Sliders</h1> --}}
-            {{-- @foreach ($sliders as $slider) --}}
-            {{-- <img class="img-thumbnail" src="{{ asset($slider->pic) }}" alt=""> --}}
-            {{-- @endforeach --}}
-            {{-- </div> --}}
-        </div>
-        <div class="row">
-            <div class="col-lg-6 col-xs-6">
-                <div id="bestBuyProducts"></div>
-            </div>
-            <div class="col-lg-6 col-xs-6">
-                <div id="bestBuySuppliers"></div>
-                <hr />
-            </div>
-            <div class="col-lg-6 col-xs-6">
-                <div id="salesGraph"></div>
-                <hr />
-            </div>
-            <div class="col-lg-6 col-xs-6">
-                <div id="monthlyRevenue"></div>
-                <hr />
-            </div>
-            <div class="col-lg-12 col-xs-12">
-                <div id="productGraph"></div>
-                <hr />
-            </div>
-        </div>
     </section>
 
 <!-- WIDGET: STOCK-ADJUSTMENT-MODAL -->
@@ -314,6 +239,7 @@
                             <th>Stok Saat Ini</th>
                             <th>Min Stok</th>
                             <th>Min Efektif (sekarang)</th>
+                            <th>Min Efektif (tanggal)</th>
                         </tr>
                     </thead>
                     <tbody id="adjProductBody">
@@ -331,6 +257,9 @@
                                     @if($p->effective_min > $p->min_stock)
                                         <span class="label label-info">+{{ $p->effective_min - $p->min_stock }}</span>
                                     @endif
+                                </td>
+                                <td>
+                                    {{ $p->active_from?->format('d M Y') }} - {{ $p->active_until?->format('d M Y') }}
                                 </td>
                             </tr>
                         @endforeach
