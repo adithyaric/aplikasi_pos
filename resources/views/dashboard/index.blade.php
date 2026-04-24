@@ -125,6 +125,64 @@
         </div>
         @endif
         <!-- END WIDGET: NEAR-EXPIRY -->
+        <!-- WIDGET: LOW-VELOCITY-STOCK -->
+        @if($lowVelocityProducts->isNotEmpty())
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">
+                            <i class="fa fa-bar-chart"></i>
+                            Produk Stok di Bawah Kebutuhan (Berdasarkan Rata-rata Penjualan)
+                            <span class="badge bg-blue">{{ $lowVelocityProducts->count() }}</span>
+                        </h3>
+                        <div class="box-tools pull-right">
+                            <small class="text-muted">Safety stock = rata-rata penjualan harian × 7 hari</small>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive" style="max-height:350px;overflow-y:auto">
+                        <table class="table table-bordered table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Produk</th>
+                                    <th>Stok Saat Ini</th>
+                                    <th>Safety Stock (7 hari)</th>
+                                    <th>Rata² Jual/Hari (30 hari)</th>
+                                    <th>Kekurangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($lowVelocityProducts as $p)
+                                    <tr class="{{ $p->current_stock === 0 ? 'danger' : 'warning' }}">
+                                        <td>{{ $p->code }}</td>
+                                        <td>{{ $p->name }}</td>
+                                        <td class="text-center">{{ $p->current_stock }}</td>
+                                        <td class="text-center">{{ $p->safety_stock }}</td>
+                                        <td class="text-center">{{ $p->avg_daily_sales }}</td>
+                                        <td class="text-center">
+                                            <span class="label label-danger">-{{ $p->deficit }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box-footer text-muted">
+                        <small>
+                            <i class="fa fa-info-circle"></i>
+                            Hanya produk dengan penjualan dalam 30 hari terakhir yang ditampilkan.
+                            Gunakan <strong>Pengaturan Min Stok Produk</strong> untuk menyesuaikan threshold secara manual.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END WIDGET: LOW-VELOCITY-STOCK -->
         <div class="row">
             <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">
