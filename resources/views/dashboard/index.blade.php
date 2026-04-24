@@ -6,6 +6,11 @@
     <section class="content-header">
         <h1>
             Dashboard
+            <small>
+                <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#modalMinStockAdj">
+                    <i class="fa fa-sliders"></i> Pengaturan Min Stok Produk
+                </button>
+            </small>
         </h1>
     </section>
 
@@ -147,6 +152,87 @@
             </div>
         </div>
     </section>
+
+<!-- WIDGET: STOCK-ADJUSTMENT-MODAL -->
+<div class="modal fade" id="modalMinStockAdj" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <i class="fa fa-sliders"></i> Pengaturan Perubahan Minimal Stok Produk
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Persentase Kenaikan (%)</label>
+                            <input type="number" class="form-control" id="adjPercentage"
+                                min="1" max="500" placeholder="Contoh: 20 untuk +20%">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Aktif Dari</label>
+                            <input type="date" class="form-control" id="adjActiveFrom"
+                                value="{{ now()->toDateString() }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Aktif Sampai <small class="text-muted">(kosongkan = selamanya)</small></label>
+                            <input type="date" class="form-control" id="adjActiveUntil">
+                        </div>
+                    </div>
+                </div>
+                <table id="tableAdjProducts" class="table table-bordered table-striped table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th width="30"><input type="checkbox" id="adjCheckAll"></th>
+                            <th>Kode</th>
+                            <th>Nama Produk</th>
+                            <th>Stok Saat Ini</th>
+                            <th>Min Stok</th>
+                            <th>Min Efektif (sekarang)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adjProductBody">
+                        @foreach(\App\Models\Product::select('id','code','name','min_stock')
+                            ->orderBy('name')->get() as $p)
+                            @php
+                                $currentStock   = $p->stocks()->sum('qty_available');
+                                $effectiveMin   = $p->effective_min_stock;
+                            @endphp
+                            <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" class="adj-product-check" value="{{ $p->id }}">
+                                </td>
+                                <td>{{ $p->code }}</td>
+                                <td>{{ $p->name }}</td>
+                                <td class="text-center">{{ $currentStock }}</td>
+                                <td class="text-center">{{ $p->min_stock }}</td>
+                                <td class="text-center">
+                                    {{ $effectiveMin }}
+                                    @if($effectiveMin > $p->min_stock)
+                                        <span class="label label-info">+{{ $effectiveMin - $p->min_stock }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnSimpanAdj">
+                    <i class="fa fa-save"></i> Simpan Adjustment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END WIDGET: STOCK-ADJUSTMENT-MODAL -->
 @endsection
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/highcharts.js"></script>
@@ -355,6 +441,80 @@
             error: function(jqXHR, textStatus, errorThrown) {
                 // Handle any errors that occur
             }
+        });
+    </script>
+    <script>
+        // ---- Min Stock Adjustment Modal ----
+        let adjTable = null;
+
+        $('#modalMinStockAdj').on('shown.bs.modal', function () {
+            if (!adjTable) {
+                adjTable = $('#tableAdjProducts').DataTable({
+                    pageLength: 10,
+                    order: [[2, 'asc']],
+                    columnDefs: [{ orderable: false, targets: [0] }],
+                    language: {
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ baris",
+                        info: "Menampilkan _START_-_END_ dari _TOTAL_ produk",
+                        paginate: { previous: "Prev", next: "Next" },
+                        zeroRecords: "Tidak ada produk"
+                    }
+                });
+            }
+        });
+
+        $(document).on('change', '#adjCheckAll', function () {
+            const checked = $(this).prop('checked');
+            if (adjTable) {
+                adjTable.rows().nodes().each(function (node) {
+                    $(node).find('.adj-product-check').prop('checked', checked);
+                });
+            }
+        });
+
+        $('#btnSimpanAdj').on('click', function () {
+            const productIds = [];
+            if (adjTable) {
+                adjTable.rows().nodes().each(function (node) {
+                    const $cb = $(node).find('.adj-product-check:checked');
+                    if ($cb.length) productIds.push($cb.val());
+                });
+            }
+
+            const pct        = parseInt($('#adjPercentage').val()) || 0;
+            const activeFrom = $('#adjActiveFrom').val();
+            const activeUntil = $('#adjActiveUntil').val();
+
+            if (productIds.length === 0) { alert('Pilih minimal satu produk.'); return; }
+            if (pct < 1)                  { alert('Persentase kenaikan minimal 1%.'); return; }
+            if (!activeFrom)              { alert('Isi tanggal aktif dari.'); return; }
+
+            $('#btnSimpanAdj').prop('disabled', true).text('Menyimpan...');
+
+            $.ajax({
+                url: '{{ route("product.minimum-adjustment.store") }}',
+                method: 'POST',
+                data: {
+                    _token:                 '{{ csrf_token() }}',
+                    product_ids:            productIds,
+                    adjustment_percentage:  pct,
+                    active_from:            activeFrom,
+                    active_until:           activeUntil || null,
+                },
+                success: function (res) {
+                    alert(res.message);
+                    $('#modalMinStockAdj').modal('hide');
+                    location.reload();
+                },
+                error: function (xhr) {
+                    const msg = xhr.responseJSON?.message || 'Terjadi kesalahan.';
+                    alert('Gagal: ' + msg);
+                },
+                complete: function () {
+                    $('#btnSimpanAdj').prop('disabled', false).text('Simpan Adjustment');
+                }
+            });
         });
     </script>
 @endsection
