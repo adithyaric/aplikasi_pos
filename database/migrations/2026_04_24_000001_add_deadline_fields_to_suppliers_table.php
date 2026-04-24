@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('suppliers', function (Blueprint $table) {
             $table->json('deadline_days')->nullable()->after('no_telp');
-            $table->tinyInteger('deadline_interval_weeks')->unsigned()->nullable()->after('deadline_days');
+            $table->unsignedTinyInteger('deadline_interval_weeks')->nullable()->after('deadline_days');
             $table->date('deadline_reference_date')->nullable()->after('deadline_interval_weeks');
         });
     }
