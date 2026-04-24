@@ -66,6 +66,65 @@
         </div>
         @endif
         <!-- END WIDGET: SUPPLIER-DEADLINE -->
+        <!-- WIDGET: NEAR-EXPIRY -->
+        @if($nearExpiryStocks->isNotEmpty())
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">
+                            <i class="fa fa-clock-o"></i>
+                            Stok Mendekati Expired
+                            <span class="badge bg-red">{{ $nearExpiryStocks->count() }}</span>
+                        </h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive" style="max-height:300px;overflow-y:auto">
+                        <table class="table table-bordered table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Kode</th>
+                                    <th>Batch / SKU</th>
+                                    <th>Qty Tersedia</th>
+                                    <th>Tanggal Expired</th>
+                                    <th>Sisa Hari</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($nearExpiryStocks as $stock)
+                                    @php
+                                        $daysLeft = (int) \Carbon\Carbon::today()->diffInDays($stock->expired_at, false);
+                                    @endphp
+                                    <tr class="{{ $daysLeft <= 7 ? 'danger' : ($daysLeft <= 14 ? 'warning' : '') }}">
+                                        <td>{{ $stock->product?->name ?? '—' }}</td>
+                                        <td>{{ $stock->product?->code ?? '—' }}</td>
+                                        <td>{{ $stock->batch_number ?? $stock->sku ?? '—' }}</td>
+                                        <td class="text-center">{{ $stock->qty_available }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($stock->expired_at)->format('d M Y') }}</td>
+                                        <td class="text-center">
+                                            @if($daysLeft <= 7)
+                                                <span class="label label-danger">{{ $daysLeft }} hari</span>
+                                            @elseif($daysLeft <= 14)
+                                                <span class="label label-warning">{{ $daysLeft }} hari</span>
+                                            @else
+                                                <span class="label label-default">{{ $daysLeft }} hari</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END WIDGET: NEAR-EXPIRY -->
         <div class="row">
             <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">
