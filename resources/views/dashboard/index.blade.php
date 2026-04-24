@@ -271,7 +271,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
                 <button type="button" class="btn btn-primary" id="btnSimpanAdj">
                     <i class="fa fa-save"></i> Simpan Adjustment
                 </button>
