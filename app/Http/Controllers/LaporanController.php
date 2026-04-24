@@ -32,6 +32,7 @@ use App\Exports\StockOpnameExport;
 use App\Models\DeliveryOrder;
 use App\Models\Outlet;
 use App\Models\Pembelian;
+use App\Models\ProductMinimumAdjustment;
 use App\Models\PickingList;
 use App\Models\RequestOrder;
 use App\Models\Stock;
@@ -605,16 +606,27 @@ class LaporanController extends Controller
     {
         $settings = $this->getSettings();
 
+        $today = now()->toDateString();
+        $activeAdjs = ProductMinimumAdjustment::activeOn($today)
+            ->orderByDesc('active_from')
+            ->orderByDesc('id')
+            ->get()
+            ->keyBy('product_id');
+
         $movementStats = StockMovement::selectRaw('product_id, SUM(qty_out) as total_out, MIN(created_at) as first_date, MAX(created_at) as last_date')
             ->groupBy('product_id')->get()->keyBy('product_id');
 
-        $rows = Stock::with(['product.category'])->get()->map(function ($s) use ($movementStats) {
+        $rows = Stock::with(['product.category'])->get()->map(function ($s) use ($movementStats, $activeAdjs) {
             $stat       = $movementStats[$s->product_id] ?? null;
             $totalOut   = (int) ($stat?->total_out ?? 0);
             $months     = max(1, (int) \Carbon\Carbon::parse($stat?->first_date ?? now())->diffInMonths(now()) + 1);
             $avgKeluar  = round($totalOut / $months, 1);
             $hariTanpa  = $stat ? now()->diffInDays(\Carbon\Carbon::parse($stat->last_date)) : 0;
-            $minStok    = $s->product?->min_stock ?? 0;
+            $baseMin    = $s->product?->min_stock ?? 0;
+            $adj        = $activeAdjs->get($s->product_id);
+            $minStok    = $adj
+                ? (int) ceil($baseMin * (1 + $adj->adjustment_percentage / 100))
+                : (int) $baseMin;
 
             return [
                 'kode_barang'   => $s->product?->code ?? '-',

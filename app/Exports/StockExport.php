@@ -43,11 +43,22 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             ->orderBy('product_id')
             ->get();
 
+        $today = now()->toDateString();
+        $activeAdjs = \App\Models\ProductMinimumAdjustment::activeOn($today)
+            ->orderByDesc('active_from')
+            ->orderByDesc('id')
+            ->get()
+            ->keyBy('product_id');
+
         $rows = collect();
         $no = 1;
 
         foreach ($stocks as $s) {
-            $minStok = $s->product?->min_stock ?? 0;
+            $baseMin = $s->product?->min_stock ?? 0;
+            $adj = $activeAdjs->get($s->product_id);
+            $minStok = $adj
+                ? (int) ceil($baseMin * (1 + $adj->adjustment_percentage / 100))
+                : (int) $baseMin;
             $selisih = ($s->qty ?? 0) - $minStok;
             $statusStok = ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis');
             $statusExp = $s->expired_at && Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';

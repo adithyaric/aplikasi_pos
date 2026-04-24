@@ -27,10 +27,22 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.master', function ($view) {
             if (Auth::check()) {
-                $lowStockProducts = Product::with('stocks')
+                $today = now()->toDateString();
+                $activeAdjs = \App\Models\ProductMinimumAdjustment::activeOn($today)
+                    ->orderByDesc('active_from')
+                    ->orderByDesc('id')
                     ->get()
-                    ->filter(function ($product) {
-                        return $product->stocks()->sum('qty_available') < $product->min_stock;
+                    ->keyBy('product_id');
+
+                $lowStockProducts = Product::withSum('stocks', 'qty_available')
+                    ->get()
+                    ->filter(function ($product) use ($activeAdjs) {
+                        $current = (int) ($product->stocks_sum_qty_available ?? 0);
+                        $adj = $activeAdjs->get($product->id);
+                        $effectiveMin = $adj
+                            ? (int) ceil($product->min_stock * (1 + $adj->adjustment_percentage / 100))
+                            : (int) $product->min_stock;
+                        return $current <= $effectiveMin;
                     });
                 $view->with('lowStockProducts', $lowStockProducts);
             }
