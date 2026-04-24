@@ -85,7 +85,10 @@ class RequestOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('request-orders.verify', $requestOrder)
+            // return redirect()->route('request-orders.verify', $requestOrder)
+            //     ->with('toast_success', 'Request created successfully. Please assign stocks.');
+
+            return redirect()->route('request-orders.index')
                 ->with('toast_success', 'Request created successfully. Please assign stocks.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -232,7 +235,9 @@ class RequestOrderController extends Controller
                 ? 'Request verified successfully'
                 : 'Request verification updated successfully';
 
-            return redirect()->route('request-orders.verify', $requestOrder)
+            // return redirect()->route('request-orders.verify', $requestOrder)
+            //     ->with('toast_success', $message);
+            return redirect()->route('request-orders.index')
                 ->with('toast_success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -288,7 +293,10 @@ class RequestOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('request-orders.verify', $requestOrder)
+            // return redirect()->route('request-orders.verify', $requestOrder)
+            //     ->with('toast_success', 'Stocks assigned successfully. Now you can approve.');
+
+            return redirect()->route('request-orders.index')
                 ->with('toast_success', 'Stocks assigned successfully. Now you can approve.');
         } catch (\Exception $e) {
             DB::rollBack();
