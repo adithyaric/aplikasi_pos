@@ -13,7 +13,7 @@ class ProductMinimumAdjustmentController extends Controller
         $data = $request->validate([
             'product_ids'           => 'required|array|min:1',
             'product_ids.*'         => 'integer|exists:products,id',
-            'adjustment_percentage' => 'required|integer|min:1|max:500',
+            'adjustment_percentage' => 'required|integer|min:1|max:255',
             'active_from'           => 'required|date',
             'active_until'          => 'nullable|date|after_or_equal:active_from',
         ]);

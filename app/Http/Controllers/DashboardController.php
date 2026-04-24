@@ -94,14 +94,35 @@ class DashboardController extends Controller
             ]);
         }
 
+        // Batch-load products for the min-stock adjustment modal (avoids N+1)
+        $activeAdjustments = \App\Models\ProductMinimumAdjustment::query()
+            ->activeOn()
+            ->orderByDesc('active_from')
+            ->get()
+            ->groupBy('product_id');
+
+        $adjustmentProducts = Product::select('id', 'code', 'name', 'min_stock')
+            ->withSum('stocks', 'qty_available')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($p) use ($activeAdjustments) {
+                $adj = $activeAdjustments->get($p->id)?->first();
+                $p->current_stock = (int) ($p->stocks_sum_qty_available ?? 0);
+                $p->effective_min = $adj
+                    ? (int) ceil($p->min_stock * (1 + $adj->adjustment_percentage / 100))
+                    : (int) $p->min_stock;
+                return $p;
+            });
+
         return view('dashboard.index', [
             // 'users' => User::count(),
-            'products'          => Product::count(),
-            'stocks'            => Stock::sum('qty'),
-            'penjualans'        => Penjualan::count(),
-            'pembelianTerkirim' => Pembelian::where('is_published', true)->count(),
-            'totalRevenue'      => 0,
-            'urgentSuppliers'   => $urgentSuppliers,
+            'products'           => Product::count(),
+            'stocks'             => Stock::sum('qty'),
+            'penjualans'         => Penjualan::count(),
+            'pembelianTerkirim'  => Pembelian::where('is_published', true)->count(),
+            'totalRevenue'       => 0,
+            'urgentSuppliers'    => $urgentSuppliers,
+            'adjustmentProducts' => $adjustmentProducts,
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
     }

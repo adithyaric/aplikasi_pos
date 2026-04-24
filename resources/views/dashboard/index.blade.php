@@ -6,11 +6,13 @@
     <section class="content-header">
         <h1>
             Dashboard
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
             <small>
                 <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#modalMinStockAdj">
                     <i class="fa fa-sliders"></i> Pengaturan Min Stok Produk
                 </button>
             </small>
+            @endif
         </h1>
     </section>
 
@@ -198,24 +200,19 @@
                         </tr>
                     </thead>
                     <tbody id="adjProductBody">
-                        @foreach(\App\Models\Product::select('id','code','name','min_stock')
-                            ->orderBy('name')->get() as $p)
-                            @php
-                                $currentStock   = $p->stocks()->sum('qty_available');
-                                $effectiveMin   = $p->effective_min_stock;
-                            @endphp
+                        @foreach($adjustmentProducts as $p)
                             <tr>
                                 <td class="text-center">
                                     <input type="checkbox" class="adj-product-check" value="{{ $p->id }}">
                                 </td>
                                 <td>{{ $p->code }}</td>
                                 <td>{{ $p->name }}</td>
-                                <td class="text-center">{{ $currentStock }}</td>
+                                <td class="text-center">{{ $p->current_stock }}</td>
                                 <td class="text-center">{{ $p->min_stock }}</td>
                                 <td class="text-center">
-                                    {{ $effectiveMin }}
-                                    @if($effectiveMin > $p->min_stock)
-                                        <span class="label label-info">+{{ $effectiveMin - $p->min_stock }}</span>
+                                    {{ $p->effective_min }}
+                                    @if($p->effective_min > $p->min_stock)
+                                        <span class="label label-info">+{{ $p->effective_min - $p->min_stock }}</span>
                                     @endif
                                 </td>
                             </tr>
