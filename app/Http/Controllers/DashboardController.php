@@ -77,6 +77,14 @@ class DashboardController extends Controller
             ->sortBy('next_deadline')
             ->values();
 
+        $nearExpiryStocks = Stock::with('product:id,name,code')
+            ->where('qty_available', '>', 0)
+            ->whereNotNull('expired_at')
+            ->whereDate('expired_at', '>=', now()->toDateString())
+            ->whereDate('expired_at', '<=', now()->addDays(30)->toDateString())
+            ->orderBy('expired_at')
+            ->get(['id', 'product_id', 'qty_available', 'expired_at', 'batch_number', 'sku']);
+
         $bestBuyProducts = [];
         $bestBuySuppliers = [];
         $salesGraph = [];
@@ -122,6 +130,8 @@ class DashboardController extends Controller
             'pembelianTerkirim'  => Pembelian::where('is_published', true)->count(),
             'totalRevenue'       => 0,
             'urgentSuppliers'    => $urgentSuppliers,
+            'nearExpiryStocks'    => $nearExpiryStocks,
+            'lowVelocityProducts' => collect(), // placeholder — filled in Task 2
             'adjustmentProducts' => $adjustmentProducts,
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
