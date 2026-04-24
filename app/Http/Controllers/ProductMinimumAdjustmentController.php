@@ -23,8 +23,31 @@ class ProductMinimumAdjustmentController extends Controller
             'active_until'          => 'nullable|date|after_or_equal:active_from',
         ]);
 
+        $activeUntilBound = $data['active_until'] ?? '9999-12-31';
+
+        // Collect product IDs that already have an overlapping adjustment.
+        $skippedIds = [];
+        foreach ($data['product_ids'] as $productId) {
+            $overlap = ProductMinimumAdjustment::where('product_id', $productId)
+                ->where('active_from', '<=', $activeUntilBound)
+                ->where(function ($q) use ($data) {
+                    $q->whereNull('active_until')
+                      ->orWhere('active_until', '>=', $data['active_from']);
+                })
+                ->exists();
+
+            if ($overlap) {
+                $skippedIds[] = $productId;
+            }
+        }
+
+        $skippedSet = array_flip($skippedIds);
         $saved = 0;
         foreach ($data['product_ids'] as $productId) {
+            if (isset($skippedSet[$productId])) {
+                continue;
+            }
+
             ProductMinimumAdjustment::create([
                 'product_id'            => $productId,
                 'adjustment_percentage' => $data['adjustment_percentage'],
@@ -36,8 +59,10 @@ class ProductMinimumAdjustmentController extends Controller
         }
 
         return response()->json([
-            'success' => true,
-            'message' => "Adjustment disimpan untuk {$saved} produk.",
+            'success'     => true,
+            'message'     => "Adjustment disimpan untuk {$saved} produk.",
+            'skipped'     => count($skippedIds),
+            'skipped_ids' => $skippedIds,
         ]);
     }
 }

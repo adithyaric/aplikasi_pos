@@ -142,6 +142,7 @@ class Product extends Model
         $adjustment = ProductMinimumAdjustment::where('product_id', $this->id)
             ->activeOn()
             ->orderByDesc('active_from')
+            ->orderByDesc('id')
             ->first();
 
         if (!$adjustment) {
