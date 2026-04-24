@@ -15,6 +15,7 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductMinimumAdjustmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RefundPembelianController;
@@ -62,6 +63,8 @@ Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
     // Route::get('/category-pengeluaran', [CategoryController::class, 'indexPengeluaran'])->name('category.pengeluaran.index');
     // Route::get('/category-pengeluaran-create', [CategoryController::class, 'createPengeluaran'])->name('category.pengeluaran.create');
     // Route::get('/category-pengeluaran/{category}/edit', [CategoryController::class, 'editPengeluaran'])->name('category.pengeluaran.edit');
+    Route::post('/product/minimum-adjustment', [ProductMinimumAdjustmentController::class, 'store'])
+        ->name('product.minimum-adjustment.store');
     Route::resource('/product', ProductController::class);
 
     Route::resource('/stock', StockController::class);
