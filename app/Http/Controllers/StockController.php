@@ -142,6 +142,14 @@ class StockController extends Controller
             $stokAkhir = $stokAwal + $masuk - $keluar;
             $nilai = $stokAkhir * $currentPrice;
 
+            $keterangan = $movement->notes ?? '-';
+            if ($movement->type === 'adjustment') {
+                $adj = StockAdjustment::find($movement->reference_id);
+                if ($adj && $adj->stock_id === $stock->id && !empty($adj->keterangan)) {
+                    $keterangan = $adj->keterangan;
+                }
+            }
+
             $result[] = [
                 'tanggal' => $date,
                 'stok_awal' => $stokAwal,
@@ -150,7 +158,7 @@ class StockController extends Controller
                 'stok_akhir' => $stokAkhir,
                 'harga' => $currentPrice,
                 'nilai' => $nilai,
-                'keterangan' => $movement->notes ?? '-'
+                'keterangan' => $keterangan,
             ];
 
             $runningStock = $stokAkhir;
@@ -221,7 +229,7 @@ class StockController extends Controller
                     $stock = Stock::find($item['stock_id']);
 
                     // Create adjustment record
-                    StockAdjustment::create([
+                    $savedAdj = StockAdjustment::create([
                         'adjustment_date' => $request->adjustment_date,
                         'product_id'      => $stock->product_id,
                         'stock_id'        => $stock->id,
@@ -243,7 +251,7 @@ class StockController extends Controller
                         'user_id'        => auth()->id(),
                         'type'           => 'adjustment',
                         'reference_type' => StockAdjustment::class,
-                        'reference_id'   => $stock->id,
+                        'reference_id'   => $savedAdj->id,
                         'qty_in'         => $item['selisih'] > 0 ? $item['selisih'] : 0,
                         'qty_out'        => $item['selisih'] < 0 ? abs($item['selisih']) : 0,
                         'balance'        => $newQty,

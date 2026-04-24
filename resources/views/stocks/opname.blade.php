@@ -197,11 +197,9 @@
 
                     if (stockId && selisih !== 0) {
                         items.push({
-                            stock_id:     stockId,
-                            selisih:      selisih,
-                            // system_qty:   parseFloat(row.find('.stock_dikartu').val()) || 0,
-                            // physical_qty: parseFloat(row.find('.stock_fisik').val()) || 0,
-                            // keterangan:   keterangan
+                            stock_id:   stockId,
+                            selisih:    selisih,
+                            keterangan: keterangan,
                         });
                     }
                 });
