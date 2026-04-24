@@ -10,11 +10,6 @@ class ProductMinimumAdjustmentController extends Controller
 {
     public function store(Request $request)
     {
-        //TODO fix validation, if the data product_ids & active_from, active_until already created or near the date don't created again.
-        //it allowed untul the data ProductMinimumAdjustment done or more than active_until.
-
-        //TODO: implement the ProductMinimumAdjustment to change the product->min_stock on all pages (except dashboard & manage products) & exports (excel & pdf)
-        //if the product doesn't have ProductMinimumAdjustment at the date range or when ProductMinimumAdjustment not active then use the min_stock
         $data = $request->validate([
             'product_ids'           => 'required|array|min:1',
             'product_ids.*'         => 'integer|exists:products,id',

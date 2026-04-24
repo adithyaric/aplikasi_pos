@@ -61,7 +61,7 @@ class DashboardController extends Controller
 
                 return $product;
             })
-            ->filter(fn ($p) => $p->current_stock < $p->effective_min)
+            ->filter(fn ($p) => $p->current_stock <= $p->effective_min)
             ->sortByDesc('deficit')
             ->values();
 

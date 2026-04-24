@@ -358,10 +358,13 @@ class LaporanController extends Controller
 
     public function pdfStok(Request $request)
     {
-        $settings = $this->getSettings();
-        $stocks   = Stock::with(['product.category', 'pembelian'])->orderBy('product_id')->get();
+        $settings  = $this->getSettings();
+        $stocks    = Stock::with(['product.category', 'pembelian'])->orderBy('product_id')->get();
+        $activeAdjs = ProductMinimumAdjustment::activeOn(now()->toDateString())
+            ->orderByDesc('active_from')->orderByDesc('id')
+            ->get()->keyBy('product_id');
 
-        return Pdf::loadView('exports.pdf.laporan-stok', compact('stocks', 'settings'))
+        return Pdf::loadView('exports.pdf.laporan-stok', compact('stocks', 'settings', 'activeAdjs'))
             ->setPaper('a4', 'landscape')->stream('Laporan_Stok_Barang.pdf');
     }
 

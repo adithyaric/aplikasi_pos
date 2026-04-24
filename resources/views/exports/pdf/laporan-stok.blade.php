@@ -30,8 +30,10 @@
         <tbody>
             @forelse($stocks as $i => $s)
                 @php
-                    $minStok = $s->product?->min_stock ?? 0;
-                    $selisih = ($s->qty ?? 0) - $minStok;
+                    $baseMin    = $s->product?->min_stock ?? 0;
+                    $adj        = $activeAdjs->get($s->product_id);
+                    $minStok    = $adj ? (int) ceil($baseMin * (1 + $adj->adjustment_percentage / 100)) : (int) $baseMin;
+                    $selisih    = ($s->qty ?? 0) - $minStok;
                     $statusStok = ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis');
                     $statusExp =
                         $s->expired_at && \Carbon\Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';
