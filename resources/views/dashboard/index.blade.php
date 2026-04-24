@@ -10,6 +10,55 @@
     </section>
 
     <section class="content">
+        <!-- WIDGET: SUPPLIER-DEADLINE -->
+        @if($urgentSuppliers->isNotEmpty())
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">
+                            <i class="fa fa-bell"></i>
+                            Deadline PO Supplier Mendekat
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th>Deadline</th>
+                                    <th>Sisa Hari</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($urgentSuppliers as $s)
+                                    @php $days = \Carbon\Carbon::today()->diffInDays($s->next_deadline, false); @endphp
+                                    <tr class="{{ $days === 0 ? 'danger' : ($days <= 1 ? 'warning' : '') }}">
+                                        <td><strong>{{ $s->name }}</strong></td>
+                                        <td>{{ $s->next_deadline->isoFormat('dddd, DD MMM YYYY') }}</td>
+                                        <td>
+                                            @if($days === 0)
+                                                <span class="label label-danger">HARI INI</span>
+                                            @else
+                                                <span class="label label-warning">H-{{ $days }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('pembelian.create') }}" class="btn btn-xs btn-primary">
+                                                <i class="fa fa-plus"></i> Buat PO
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END WIDGET: SUPPLIER-DEADLINE -->
         <div class="row">
             <div class="col-lg-2 col-xs-2">
                 <div class="small-box bg-yellow-gradient">

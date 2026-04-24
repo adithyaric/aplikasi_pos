@@ -8,6 +8,7 @@ use App\Models\PenjualanItem;
 use App\Models\Product;
 use App\Models\Slider;
 use App\Models\Stock;
+use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -65,6 +66,17 @@ class DashboardController extends Controller
         //     ->orderByRaw("FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')")
         //     ->get();
 
+        $urgentSuppliers = Supplier::whereNotNull('deadline_days')
+            ->whereNotNull('deadline_interval_weeks')
+            ->get()
+            ->filter(fn ($s) => $s->isDeadlineUrgent())
+            ->map(function ($s) {
+                $s->next_deadline = $s->nextDeadlineDate();
+                return $s;
+            })
+            ->sortBy('next_deadline')
+            ->values();
+
         $bestBuyProducts = [];
         $bestBuySuppliers = [];
         $salesGraph = [];
@@ -84,11 +96,12 @@ class DashboardController extends Controller
 
         return view('dashboard.index', [
             // 'users' => User::count(),
-            'products' => Product::count(),
-            'stocks' => Stock::sum('qty'),
-            'penjualans' => Penjualan::count(),
+            'products'          => Product::count(),
+            'stocks'            => Stock::sum('qty'),
+            'penjualans'        => Penjualan::count(),
             'pembelianTerkirim' => Pembelian::where('is_published', true)->count(),
-            'totalRevenue' => 0,
+            'totalRevenue'      => 0,
+            'urgentSuppliers'   => $urgentSuppliers,
             // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
     }
