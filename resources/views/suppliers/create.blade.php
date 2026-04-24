@@ -17,54 +17,66 @@
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="">Kode</label>
+                                <label>Kode</label>
                                 <input type="text" class="form-control" name="kode_supplier"
                                     value="{{ old('kode_supplier') }}" placeholder="Masukkan Kode Supplier">
-                                @error('kode_supplier')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
+                                @error('kode_supplier')<div class="invalid-feedback text-danger">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group">
-                                <label for="">PIC</label>
-                                <input type="text" class="form-control" name="pic_supplier"
-                                    value="{{ old('pic_supplier') }}" placeholder="Masukkan PIC Supplier">
-                                @error('pic_supplier')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="">Nama Supplier</label>
+                                <label>Nama Supplier <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="name" value="{{ old('name') }}"
                                     placeholder="Masukkan Nama Supplier">
-                                @error('name')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
+                                @error('name')<div class="invalid-feedback text-danger">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Alamat</label>
+                                <label>Alamat <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="alamat" value="{{ old('alamat') }}"
                                     placeholder="Masukkan Alamat">
-                                @error('alamat')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
+                                @error('alamat')<div class="invalid-feedback text-danger">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Nomor Telp</label>
+                                <label>Nomor Telp <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="no_telp" value="{{ old('no_telp') }}"
                                     placeholder="Masukkan Nomor Telp">
-                                @error('no_telp')
-                                    <div class="invalid-feedback text-danger">
-                                        {{ $message }}
+                                @error('no_telp')<div class="invalid-feedback text-danger">{{ $message }}</div>@enderror
+                            </div>
+
+                            {{-- Deadline Order --}}
+                            <div class="form-group">
+                                <label>Jadwal Deadline Order</label>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label class="control-label" style="font-weight:normal">Jangka Waktu</label>
+                                        <select class="form-control" name="deadline_interval_weeks">
+                                            <option value="">— Tidak ada deadline —</option>
+                                            <option value="1" {{ old('deadline_interval_weeks') == 1 ? 'selected' : '' }}>1 Minggu Sekali</option>
+                                            <option value="2" {{ old('deadline_interval_weeks') == 2 ? 'selected' : '' }}>2 Minggu Sekali</option>
+                                            <option value="3" {{ old('deadline_interval_weeks') == 3 ? 'selected' : '' }}>3 Minggu Sekali</option>
+                                        </select>
                                     </div>
-                                @enderror
+                                    <div class="col-sm-8">
+                                        <label class="control-label" style="font-weight:normal">Hari Deadline</label>
+                                        <div class="deadline-days-checkboxes">
+                                            @php
+                                                $dayLabels = [1=>'Senin',2=>'Selasa',3=>'Rabu',4=>'Kamis',5=>'Jumat',6=>'Sabtu',7=>'Minggu'];
+                                                $oldDays   = (array) old('deadline_days', []);
+                                            @endphp
+                                            @foreach($dayLabels as $num => $label)
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" name="deadline_days[]" value="{{ $num }}"
+                                                        {{ in_array($num, $oldDays) ? 'checked' : '' }}>
+                                                    {{ $label }}
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="deadline_reference_date" id="deadlineReferenceDate"
+                                    value="{{ old('deadline_reference_date') }}">
+                                <p class="help-block text-muted" style="margin-top:6px">
+                                    <i class="fa fa-info-circle"></i>
+                                    Notifikasi akan muncul H-3 sebelum deadline di dashboard.
+                                </p>
                             </div>
                         </div><!-- /.box-body -->
 
@@ -77,4 +89,20 @@
             </div>
         </div>
     </section>
+@endsection
+
+@section('page-script')
+<script>
+// Auto-set reference date to nearest past Monday on page load
+(function() {
+    var ref = document.getElementById('deadlineReferenceDate');
+    if (ref && !ref.value) {
+        var d = new Date();
+        var day = d.getDay(); // 0=Sun, 1=Mon...
+        var diff = day === 0 ? -6 : 1 - day; // offset to Monday
+        d.setDate(d.getDate() + diff);
+        ref.value = d.toISOString().slice(0, 10);
+    }
+})();
+</script>
 @endsection
