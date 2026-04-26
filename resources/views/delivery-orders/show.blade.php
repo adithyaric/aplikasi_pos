@@ -86,7 +86,8 @@
                                     <th>Product</th>
                                     <th>SKU</th>
                                     <th>Expired</th>
-                                    <th>Qty</th>
+                                    <th class="text-center">Qty Pick</th>
+                                    <th class="text-center">Qty Kirim</th>
                                     <th>Harga Beli</th>
                                     <th>Subtotal</th>
                                 </tr>
@@ -95,15 +96,26 @@
                                 @php $total = 0; @endphp
                                 @foreach ($deliveryOrder->items as $item)
                                     @php
-                                        $subtotal = $item->qty * $item->harga_beli;
-                                        $total += $subtotal;
+                                        $qtyBilling = $item->qty_sent ?? $item->qty;
+                                        $subtotal   = $qtyBilling * $item->harga_beli;
+                                        $total      += $subtotal;
                                     @endphp
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->product->name }}</td>
                                         <td>{{ $item->sku ?? '-' }}</td>
                                         <td>{{ $item->expired_at ? $item->expired_at->format('d-m-Y') : '-' }}</td>
-                                        <td>{{ $item->qty }}</td>
+                                        <td class="text-center">{{ $item->qty }}</td>
+                                        <td class="text-center">
+                                            @if($item->qty_sent !== null)
+                                                <strong>{{ $item->qty_sent }}</strong>
+                                                @if($item->qty_sent < $item->qty)
+                                                    <span class="label label-warning">-{{ $item->qty - $item->qty_sent }}</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
                                         <td>Rp {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                                         <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                                     </tr>
@@ -111,7 +123,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-right">TOTAL</th>
+                                    <th colspan="7" class="text-right">TOTAL</th>
                                     <th>Rp {{ number_format($total, 0, ',', '.') }}</th>
                                 </tr>
                             </tfoot>
@@ -125,34 +137,7 @@
                                 <i class="fa fa-truck"></i> Delivery Completed
                             </button>
 
-                            <!-- Send Modal -->
-                            <div class="modal fade" id="sendModal{{ $deliveryOrder->id }}" tabindex="-1" role="dialog">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <form action="{{ route('delivery-orders.send', $deliveryOrder->id) }}"
-                                            method="post" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                <h4 class="modal-title">Send Delivery Order</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label>Upload Dispatch Photo (Optional)</label>
-                                                    <input type="file" name="photo" class="form-control"
-                                                        accept="image/*">
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default"
-                                                    data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-success"
-                                                    onclick="return confirm('Send this delivery order?')">Confirm Send</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('delivery-orders._send-modal', ['do' => $deliveryOrder])
                         @endif
                     </div>
                 </div>

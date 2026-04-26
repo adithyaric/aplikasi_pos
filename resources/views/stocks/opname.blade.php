@@ -12,11 +12,20 @@
                         <h3 class="box-title"><strong>STOCK OPNAME</strong></h3>
                     </div>
                     <div class="box-body">
-                        <table class="table table-borderless mb-2" style="width: 40%">
+                        <table class="table table-borderless mb-2" style="width: 70%">
                             <tr>
-                                <td>Tanggal Stock Opname</td>
+                                <td style="white-space:nowrap">Tanggal Stock Opname</td>
                                 <td>
                                     <input type="date" id="tglStockOpname" class="form-control" value="{{ date('Y-m-d') }}" />
+                                </td>
+                                <td style="white-space:nowrap;padding-left:16px">Lokasi</td>
+                                <td>
+                                    <select id="filterLokasi" class="form-control select2">
+                                        <option value="">-- Semua Lokasi --</option>
+                                        @foreach($lokasiOptions as $lok)
+                                            <option value="{{ $lok }}">{{ $lok }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                             </tr>
                         </table>
@@ -52,6 +61,7 @@
                             </button>
                             <form method="GET" action="{{ route('laporan.stock-opname') }}" style="display:inline;">
                                 <input type="hidden" name="tanggal" id="exportTanggal" value="{{ date('Y-m-d') }}" />
+                                <input type="hidden" name="lokasi" id="exportLokasi" value="" />
                                 <button type="submit" class="btn btn-success">
                                     <i class="fa fa-file-excel-o"></i> Export Excel
                                 </button>
@@ -72,7 +82,8 @@
             loadStockData();
 
             function loadStockData() {
-                $.get('{{ route('stock.opname.data') }}', function(data) {
+                const lokasi = $('#filterLokasi').val();
+                $.get('{{ route('stock.opname.data') }}', { lokasi: lokasi }, function(data) {
                     allStockData = data.stocks;
                     renderInitialRows();
                 }).fail(function() {
@@ -173,6 +184,11 @@
 
             $('#tglStockOpname').on('change', function() {
                 $('#exportTanggal').val($(this).val());
+            });
+
+            $('#filterLokasi').on('change', function() {
+                $('#exportLokasi').val($(this).val());
+                loadStockData();
             });
 
             $('#btnSaveOpname').on('click', function() {

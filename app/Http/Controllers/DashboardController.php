@@ -16,11 +16,22 @@ class DashboardController extends Controller
     {
         $urgentSuppliers = Supplier::whereNotNull('deadline_days')
             ->whereNotNull('deadline_interval_weeks')
+            ->with(['pembelians' => fn ($q) => $q->where('created_at', '>=', now()->subWeeks(4))])
             ->get()
-            ->filter(fn ($s) => $s->isDeadlineUrgent())
-            ->map(function ($s) {
-                $s->next_deadline = $s->nextDeadlineDate();
-                return $s;
+            ->filter(function ($s) {
+                $next = $s->nextDeadlineDate();
+                if (! $next) {
+                    return false;
+                }
+                if (\Carbon\Carbon::today()->diffInDays($next, false) > 3) {
+                    return false;
+                }
+                if ($s->hasPembelianInCurrentInterval($next)) {
+                    return false;
+                }
+                $s->next_deadline = $next;
+
+                return true;
             })
             ->sortBy('next_deadline')
             ->values();
@@ -29,7 +40,7 @@ class DashboardController extends Controller
             ->where('qty_available', '>', 0)
             ->whereNotNull('expired_at')
             ->whereDate('expired_at', '>=', now()->toDateString())
-            ->whereDate('expired_at', '<=', now()->addDays(30)->toDateString())
+            ->whereDate('expired_at', '<=', now()->addDays(60)->toDateString())
             ->orderBy('expired_at')
             ->get(['id', 'product_id', 'qty_available', 'expired_at', 'batch_number', 'sku']);
 
@@ -44,7 +55,7 @@ class DashboardController extends Controller
 
         $lowVelocityProducts = Product::select('id', 'code', 'name', 'min_stock')
             ->withSum('stocks', 'qty_available')
-            ->whereIn('id', $adjustedProductIds)
+            ->where('min_stock', '>', 0)
             ->orderBy('name')
             ->get()
             ->map(function ($product) use ($activeAdjustments) {
@@ -95,6 +106,7 @@ class DashboardController extends Controller
                 $p->effective_min = $adj
                     ? (int) ceil($p->min_stock * (1 + $adj->adjustment_percentage / 100))
                     : (int) $p->min_stock;
+
                 return $p;
             });
 

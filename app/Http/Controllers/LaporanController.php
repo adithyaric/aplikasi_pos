@@ -32,8 +32,8 @@ use App\Exports\StockOpnameExport;
 use App\Models\DeliveryOrder;
 use App\Models\Outlet;
 use App\Models\Pembelian;
-use App\Models\ProductMinimumAdjustment;
 use App\Models\PickingList;
+use App\Models\ProductMinimumAdjustment;
 use App\Models\RequestOrder;
 use App\Models\Stock;
 use App\Models\StockAdjustment;
@@ -87,7 +87,7 @@ class LaporanController extends Controller
         $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
 
         if ($id) {
-            $requestOrder = RequestOrder::with(['owner', 'items.product'])->findOrFail($id);
+            $requestOrder = RequestOrder::with(['owner', 'requestedBy', 'items.product', 'additionalNotes'])->findOrFail($id);
 
             return Excel::download(new RequestOrderSingleExport($requestOrder, $settings), 'Dokumen_Surat_Permintaan_Barang_(SPB)-'.$requestOrder->code.'.xlsx');
         }
@@ -135,13 +135,33 @@ class LaporanController extends Controller
     {
         $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
 
-        $mulai   = $request->input('tanggal_mulai', $request->input('tanggal', date('Y-m-d')));
-        $selesai = $request->input('tanggal_selesai', $mulai);
+        $today   = date('Y-m-d');
+        $mulai   = $request->input('tanggal_mulai', $request->input('tanggal', $today)) ?: $today;
+        $selesai = $request->input('tanggal_selesai', $mulai) ?: $mulai;
+        $lokasi  = $request->input('lokasi');
 
-        $adjustments = StockAdjustment::with(['product', 'stock'])
+        $lokasiFilter = $lokasi ? fn ($q) => $q->where('lokasi', $lokasi) : null;
+
+        $query = StockAdjustment::with(['product', 'stock'])
             ->whereDate('adjustment_date', '>=', $mulai)
-            ->whereDate('adjustment_date', '<=', $selesai)
-            ->get();
+            ->whereDate('adjustment_date', '<=', $selesai);
+
+        if ($lokasiFilter) {
+            $query->whereHas('product', $lokasiFilter);
+        }
+
+        $adjustments = $query->get();
+
+        // No data for the selected date — fall back to all adjustments (no date limit)
+        if ($adjustments->isEmpty()) {
+            $fallback = StockAdjustment::with(['product', 'stock'])
+                ->orderByDesc('adjustment_date')
+                ->limit(500);
+            if ($lokasiFilter) {
+                $fallback->whereHas('product', $lokasiFilter);
+            }
+            $adjustments = $fallback->get();
+        }
 
         return Excel::download(new StockOpnameExport($adjustments, $mulai, $settings), 'Stock_Opname-'.$mulai.'.xlsx');
     }

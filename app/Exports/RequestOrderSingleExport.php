@@ -145,7 +145,39 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         $sheet->setCellValue('D'.$notesRow, $this->requestOrder->notes ?? '');
         $sheet->getStyle('B'.$notesRow)->getFont()->setBold(false);
 
-        $row = $notesRow + 3;
+        // Catatan Tambahan (extra notes)
+        $extraNotes = $this->requestOrder->additionalNotes ?? collect();
+        $afterNotesRow = $notesRow + 2;
+        if ($extraNotes->isNotEmpty()) {
+            $sheet->setCellValue('B'.$afterNotesRow, 'Catatan Tambahan');
+            $sheet->getStyle('B'.$afterNotesRow)->getFont()->setBold(true);
+
+            $enHeader = $afterNotesRow + 1;
+            $sheet->setCellValue('B'.$enHeader, 'No');
+            $sheet->setCellValue('C'.$enHeader, 'Kategori');
+            $sheet->setCellValue('D'.$enHeader, 'Qty');
+            $sheet->setCellValue('E'.$enHeader, 'Nama PJ');
+            $sheet->getStyle('B'.$enHeader.':E'.$enHeader)->applyFromArray([
+                'font'      => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
+            ]);
+
+            $enRow = $enHeader + 1;
+            foreach ($extraNotes as $i => $note) {
+                $sheet->setCellValue('B'.$enRow, $i + 1);
+                $sheet->setCellValue('C'.$enRow, $note->kategori);
+                $sheet->setCellValue('D'.$enRow, $note->qty);
+                $sheet->setCellValue('E'.$enRow, $note->nama_pj ?? '-');
+                $sheet->getStyle('B'.$enRow.':E'.$enRow)
+                    ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $enRow++;
+            }
+            $afterNotesRow = $enRow + 1;
+        }
+
+        $row = $afterNotesRow + 1;
         $sheet->mergeCells('B'.$row.':C'.$row);
         $sheet->mergeCells('D'.$row.':F'.$row);
         $sheet->mergeCells('G'.$row.':H'.$row);

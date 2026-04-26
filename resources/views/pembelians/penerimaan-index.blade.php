@@ -17,7 +17,7 @@
                             Pilih PO untuk melakukan input penerimaan barang dari supplier.
                         </p>
                     </div>
-                    <div class="box-body table-responsive">
+                    <div class="box-body table-responsive text-nowrap">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>

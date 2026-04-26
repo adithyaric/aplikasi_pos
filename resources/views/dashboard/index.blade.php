@@ -52,7 +52,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('pembelian.create') }}" class="btn btn-xs btn-primary">
+                                            <a href="{{ route('pembelian.create', ['supplier_id' => $s->id]) }}" class="btn btn-xs btn-primary">
                                                 <i class="fa fa-plus"></i> Buat PO
                                             </a>
                                         </td>
@@ -140,7 +140,7 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">
                             <i class="fa fa-bar-chart"></i>
-                            Produk di Bawah Min Stok Penyesuaian Aktif
+                            Produk di Bawah Min Stok
                             <span class="badge bg-blue">{{ $lowVelocityProducts->count() }}</span>
                         </h3>
                         <div class="box-tools pull-right">
@@ -191,7 +191,8 @@
                     <div class="box-footer text-muted">
                         <small>
                             <i class="fa fa-info-circle"></i>
-                            Hanya produk dengan penyesuaian min stok aktif yang ditampilkan.
+                            Semua produk dengan min stok &gt; 0 yang berada di bawah batas minimum ditampilkan.
+                            Produk dengan penyesuaian aktif menggunakan min stok efektif.
                             Gunakan <strong>Pengaturan Min Stok Produk</strong> untuk mengatur penyesuaian.
                         </small>
                     </div>

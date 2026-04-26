@@ -28,6 +28,7 @@ class ProductMinimumAdjustment extends Model
     public function scopeActiveOn($query, $date = null)
     {
         $date = $date ?? now()->toDateString();
+
         return $query
             ->where('active_from', '<=', $date)
             ->where(function ($q) use ($date) {

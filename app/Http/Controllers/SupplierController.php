@@ -62,6 +62,9 @@ class SupplierController extends Controller
 
     ///-----------------------------------------------------------------------------------------------
 
+    //TODO add the input Deadline Order on import, export template, example input:
+    //jangka-waktu = 1 minggu
+    //hari = senin, selasa
     public function export()
     {
         return Excel::download(new SuppliersExport(), 'suppliers.xlsx');

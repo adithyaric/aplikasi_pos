@@ -213,6 +213,30 @@
                                 @endif
                             </form>
                         @endif
+                        @if($requestOrder->additionalNotes->isNotEmpty())
+                            <hr>
+                            <h4>Catatan Tambahan</h4>
+                            <table class="table table-bordered table-condensed" style="max-width:600px">
+                                <thead>
+                                    <tr>
+                                        <th width="40">No</th>
+                                        <th>Kategori</th>
+                                        <th width="80" class="text-center">Qty</th>
+                                        <th>Nama PJ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($requestOrder->additionalNotes as $i => $note)
+                                    <tr>
+                                        <td>{{ $i + 1 }}</td>
+                                        <td>{{ $note->kategori }}</td>
+                                        <td class="text-center">{{ $note->qty }}</td>
+                                        <td>{{ $note->nama_pj ?? '—' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                     </div>
 
                     <div class="box-footer">

@@ -15,6 +15,7 @@ class DeliveryOrderItem extends Model
         'product_id',
         'stock_id',
         'qty',
+        'qty_sent',
         'sku',
         'expired_at',
         'harga_beli',

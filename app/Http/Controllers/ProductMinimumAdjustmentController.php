@@ -27,7 +27,7 @@ class ProductMinimumAdjustmentController extends Controller
                 ->where('active_from', '<=', $activeUntilBound)
                 ->where(function ($q) use ($data) {
                     $q->whereNull('active_until')
-                      ->orWhere('active_until', '>=', $data['active_from']);
+                        ->orWhere('active_until', '>=', $data['active_from']);
                 })
                 ->exists();
 

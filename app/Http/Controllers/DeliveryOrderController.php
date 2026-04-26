@@ -14,7 +14,7 @@ class DeliveryOrderController extends Controller
 {
     public function index()
     {
-        $deliveryOrders = DeliveryOrder::with(['requestOrder', 'owner'])
+        $deliveryOrders = DeliveryOrder::with(['requestOrder', 'owner', 'items.product'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -81,41 +81,47 @@ class DeliveryOrderController extends Controller
     {
         $request->validate([
             'photo' => 'nullable|image|max:2048',
+            'items' => 'required|array',
         ]);
+
+        $itemData = $request->input('items', []);
 
         DB::beginTransaction();
         try {
             foreach ($deliveryOrder->items as $item) {
-                $stock = $item->stock;
+                $qtySent = max(0, (int) ($itemData[$item->id]['qty_sent'] ?? $item->qty));
+                $stock   = $item->stock;
 
-                // Allocate stock (reduces qty and qty_reserved)
-                $stock->allocate($item->qty);
+                $item->update(['qty_sent' => $qtySent]);
 
-                // Create/update owner stock with SKU
+                // Allocate the admin-confirmed qty (reduces warehouse qty and qty_reserved)
+                $stock->allocate($qtySent);
+
+                // Create/update owner stock using admin-confirmed qty
                 OwnerStock::updateOrCreate(
                     [
-                        'owner_id' => $deliveryOrder->owner_id,
+                        'owner_id'   => $deliveryOrder->owner_id,
                         'product_id' => $item->product_id,
-                        'stock_id' => $stock->id,
-                        'sku' => $stock->sku,
+                        'stock_id'   => $stock->id,
+                        'sku'        => $stock->sku,
                     ],
                     [
-                        'qty' => DB::raw('qty + '.$item->qty),
+                        'qty'        => DB::raw('qty + '.$qtySent),
                         'expired_at' => $item->expired_at,
                         'harga_beli' => $item->harga_beli,
                     ]
                 );
 
-                // Log movement
+                // Log movement with confirmed qty
                 StockMovement::create([
-                    'product_id' => $item->product_id,
-                    'user_id' => auth()->id(),
-                    'type' => 'out',
+                    'product_id'     => $item->product_id,
+                    'user_id'        => auth()->id(),
+                    'type'           => 'out',
                     'reference_type' => DeliveryOrder::class,
-                    'reference_id' => $deliveryOrder->id,
-                    'qty_out' => $item->qty,
-                    'balance' => $item->product->stocks()->sum('qty'),
-                    'notes' => "Delivery to {$deliveryOrder->owner->name} - SKU: {$stock->sku}",
+                    'reference_id'   => $deliveryOrder->id,
+                    'qty_out'        => $qtySent,
+                    'balance'        => $item->product->stocks()->sum('qty'),
+                    'notes'          => "Delivery to {$deliveryOrder->owner->name} - SKU: {$stock->sku}",
                 ]);
             }
 

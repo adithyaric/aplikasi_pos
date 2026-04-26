@@ -133,8 +133,8 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
         $sheet->setCellValue('D11', Carbon::parse($this->date)->isoFormat('DD MMMM YYYY'));
         $sheet->getStyle('B11')->getFont()->setBold(true);
 
-        $sheet->setCellValue('B12', 'Dibuat Oleh :');
-        $sheet->setCellValue('D12', auth()->user()->name ?? '-');
+        $sheet->setCellValue('B12', 'Nama :');
+        $sheet->setCellValue('D12', ' ');
         $sheet->getStyle('B12')->getFont()->setBold(true);
 
         $sheet->setCellValue('B13', 'Referensi :');

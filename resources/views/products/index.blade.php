@@ -28,6 +28,9 @@
                         <button class="btn btn-sm bg-yellow" data-toggle="modal" data-target="#modalImport">
                             <i class="fa fa-upload"></i> Import
                         </button>
+
+                        //TODO add import export update min_stock only
+                        //barcode, nama, min_stock
                     </div><!-- /.box-header -->
 
                     {{-- Modal Import --}}

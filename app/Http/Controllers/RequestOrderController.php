@@ -6,6 +6,7 @@ use App\Models\Outlet;
 use App\Models\Product;
 use App\Models\RequestOrder;
 use App\Models\RequestOrderItem;
+use App\Models\RequestOrderNote;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -51,11 +52,15 @@ class RequestOrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'owner_id' => 'required|exists:outlets,id',
-            'request_date' => 'required|date',
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.qty_requested' => 'required|integer|min:1',
+            'owner_id'                   => 'required|exists:outlets,id',
+            'request_date'               => 'required|date',
+            'items'                      => 'required|array',
+            'items.*.product_id'         => 'required|exists:products,id',
+            'items.*.qty_requested'      => 'required|integer|min:1',
+            'extra_notes'                => 'nullable|array',
+            'extra_notes.*.kategori'     => 'required_with:extra_notes|string|max:255',
+            'extra_notes.*.qty'          => 'required_with:extra_notes|integer|min:0',
+            'extra_notes.*.nama_pj'      => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -76,11 +81,22 @@ class RequestOrderController extends Controller
             foreach ($request->items as $item) {
                 RequestOrderItem::create([
                     'request_order_id' => $requestOrder->id,
-                    'product_id' => $item['product_id'],
-                    'stock_id' => null, // No stock assigned yet
-                    'qty_requested' => $item['qty_requested'],
-                    'notes' => $item['notes'] ?? null,
+                    'product_id'       => $item['product_id'],
+                    'stock_id'         => null,
+                    'qty_requested'    => $item['qty_requested'],
+                    'notes'            => $item['notes'] ?? null,
                 ]);
+            }
+
+            foreach ($request->input('extra_notes', []) as $note) {
+                if (! empty($note['kategori'])) {
+                    RequestOrderNote::create([
+                        'request_order_id' => $requestOrder->id,
+                        'kategori'         => $note['kategori'],
+                        'qty'              => (int) ($note['qty'] ?? 0),
+                        'nama_pj'          => $note['nama_pj'] ?? null,
+                    ]);
+                }
             }
 
             DB::commit();
@@ -99,9 +115,7 @@ class RequestOrderController extends Controller
 
     public function verify(RequestOrder $requestOrder)
     {
-        $requestOrder->load(['items.product.stocks']);
-
-        // dd($requestOrder?->toArray());
+        $requestOrder->load(['items.product.stocks', 'additionalNotes']);
 
         return view('request-orders.verify', compact('requestOrder'));
     }

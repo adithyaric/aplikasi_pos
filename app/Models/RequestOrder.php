@@ -55,4 +55,9 @@ class RequestOrder extends Model
     {
         return $this->hasOne(DeliveryOrder::class);
     }
+
+    public function additionalNotes()
+    {
+        return $this->hasMany(RequestOrderNote::class);
+    }
 }

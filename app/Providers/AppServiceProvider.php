@@ -42,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
                         $effectiveMin = $adj
                             ? (int) ceil($product->min_stock * (1 + $adj->adjustment_percentage / 100))
                             : (int) $product->min_stock;
+
                         return $current <= $effectiveMin;
                     });
                 $view->with('lowStockProducts', $lowStockProducts);

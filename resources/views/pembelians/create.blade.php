@@ -33,7 +33,7 @@
                                     <option value="" selected disabled>Pilih Supplier</option>
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}"
-                                            {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                            {{ old('supplier_id', request('supplier_id')) == $supplier->id ? 'selected' : '' }}>
                                             {{ $supplier->name }}
                                         </option>
                                     @endforeach
@@ -163,7 +163,6 @@
                 $.each(products, function(i, product) {
                     // Include stock count if your API returns it; otherwise omit.
                     let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
-                    //TODO add rekomendasi kekurangan stock ($product->min_stock - $product->stocks()->sum('qty_available'))
                     $select.append($('<option>', {
                         value: product.id,
                         text: product.code + ' ' + product.name + stockText,

@@ -31,6 +31,28 @@ class Supplier extends Model
         return $this->belongsToMany(Product::class, 'product_supplier');
     }
 
+    public function pembelians()
+    {
+        return $this->hasMany(Pembelian::class);
+    }
+
+    /**
+     * True if a pembelian already exists within the current ordering interval window.
+     * Pass the pre-computed next deadline to avoid a redundant nextDeadlineDate() call.
+     */
+    public function hasPembelianInCurrentInterval(Carbon $nextDeadline): bool
+    {
+        $intervalStart = $nextDeadline->copy()->subWeeks($this->deadline_interval_weeks);
+
+        if ($this->relationLoaded('pembelians')) {
+            return $this->pembelians->contains(fn ($p) => $p->created_at >= $intervalStart);
+        }
+
+        return Pembelian::where('supplier_id', $this->id)
+            ->where('created_at', '>=', $intervalStart)
+            ->exists();
+    }
+
     /**
      * Returns the next deadline date >= today, or null if no deadline configured.
      *
@@ -40,7 +62,7 @@ class Supplier extends Model
      */
     public function nextDeadlineDate(): ?Carbon
     {
-        if (empty($this->deadline_days) || !$this->deadline_interval_weeks) {
+        if (empty($this->deadline_days) || ! $this->deadline_interval_weeks) {
             return null;
         }
 
@@ -51,7 +73,7 @@ class Supplier extends Model
         $limit    = $today->copy()->addDays($interval * 7 + 14);
 
         for ($d = $today->copy(); $d->lte($limit); $d->addDay()) {
-            if (!in_array($d->dayOfWeekIso, $days)) {
+            if (! in_array($d->dayOfWeekIso, $days)) {
                 continue;
             }
             $weeksSinceRef = (int) abs($ref->diffInWeeks($d->copy()->startOfWeek()));
@@ -67,7 +89,7 @@ class Supplier extends Model
     public function isDeadlineUrgent(): bool
     {
         $next = $this->nextDeadlineDate();
-        if (!$next) {
+        if (! $next) {
             return false;
         }
         // nextDeadlineDate() always returns today or later, so daysUntil is always >= 0

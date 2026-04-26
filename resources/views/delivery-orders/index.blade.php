@@ -45,37 +45,7 @@
                                             <button class="btn-xs btn btn-success" data-toggle="modal"
                                                 data-target="#sendModal{{ $value->id }}">Send</button>
 
-                                            <!-- Send Modal -->
-                                            <div class="modal fade" id="sendModal{{ $value->id }}" tabindex="-1"
-                                                role="dialog">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <form action="{{ route('delivery-orders.send', $value->id) }}"
-                                                            method="post" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-header">
-                                                                <button type="button" class="close"
-                                                                    data-dismiss="modal">&times;</button>
-                                                                <h4 class="modal-title">Send Delivery Order</h4>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="form-group">
-                                                                    <label>Upload Dispatch Photo (Optional)</label>
-                                                                    <input type="file" name="photo"
-                                                                        class="form-control" accept="image/*">
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-default"
-                                                                    data-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-success"
-                                                                    onclick="return confirm('Send this delivery order?')">Confirm
-                                                                    Send</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            @include('delivery-orders._send-modal', ['do' => $value])
                                         @endif
                                         <a class=" btn-xs btn btn-success" href="{{ route('laporan.delivery-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                     </td>

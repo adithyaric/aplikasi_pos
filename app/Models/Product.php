@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ProductMinimumAdjustment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -34,6 +33,11 @@ class Product extends Model
         'diskon',
         'berat',
     ];
+
+    //TODO add Konversi (contoh pcs karton box dll)
+    //Product A satuan pcs konversi 15 pcs = 1 karton
+    //Product B satuan pcs konversi 25 pcs = 1 karton
+    //Product C satuan pcs konversi 35 pcs = 1 box
 
     protected $casts = [
         'is_serialized' => 'boolean',
@@ -145,7 +149,7 @@ class Product extends Model
             ->orderByDesc('id')
             ->first();
 
-        if (!$adjustment) {
+        if (! $adjustment) {
             return (int) $this->min_stock;
         }
 

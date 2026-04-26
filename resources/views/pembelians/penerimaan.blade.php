@@ -39,7 +39,7 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="box-body table-responsive" style="padding:0">
+                        <div class="box-body table-responsive text-nowrap" style="padding:0">
                             <table class="table table-bordered table-striped" style="margin:0">
                                 <thead>
                                     <tr>

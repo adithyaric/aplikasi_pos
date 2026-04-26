@@ -81,7 +81,6 @@
                                                     <i class="fa fa-list"></i> Generate Picking List
                                                 </button>
                                             </form>
-                                            <br>
                                         @endif
                                         <a class="btn-xs btn btn-default" href="{{ route('request-orders.verify', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         <a class=" btn-xs btn btn-success" href="{{ route('laporan.request-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>

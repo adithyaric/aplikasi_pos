@@ -145,7 +145,7 @@ class StockController extends Controller
             $keterangan = $movement->notes ?? '-';
             if ($movement->type === 'adjustment') {
                 $adj = StockAdjustment::find($movement->reference_id);
-                if ($adj && $adj->stock_id === $stock->id && !empty($adj->keterangan)) {
+                if ($adj && $adj->stock_id === $stock->id && ! empty($adj->keterangan)) {
                     $keterangan = $adj->keterangan;
                 }
             }
@@ -179,35 +179,43 @@ class StockController extends Controller
     //opname
     public function opname(Request $request)
     {
-        $products = Product::with('stocks')->orderBy('name')->get();
+        $lokasiOptions = Product::whereNotNull('lokasi')
+            ->where('lokasi', '!=', '')
+            ->distinct()
+            ->orderBy('lokasi')
+            ->pluck('lokasi');
 
         return view('stocks.opname', [
-            'products' => $products,
+            'lokasiOptions' => $lokasiOptions,
         ]);
     }
 
     public function getOpnameData(Request $request)
     {
-        $stocks = Stock::with('product')
+        $query = Stock::with('product')
             ->where('qty', '>', 0)
             ->whereNotNull('sku')
             ->orderBy('product_id')
-            ->orderBy('sku')
-            ->get()
-            ->map(function ($stock) {
-                return [
-                    'id' => $stock->id,
-                    'product_id' => $stock->product_id,
-                    'product_name' => $stock->product->name,
-                    'product_code' => $stock->product->code,
-                    'sku' => $stock->sku,
-                    'satuan' => $stock->product->satuan ?? 'pcs',
-                    'qty' => $stock->qty,
-                    'qty_reserved' => $stock->qty_reserved,
-                    'qty_available' => $stock->qty_available,
-                    'keterangan' => $stock->adjustment?->keterangan ?? '',
-                ];
-            });
+            ->orderBy('sku');
+
+        if ($lokasi = $request->input('lokasi')) {
+            $query->whereHas('product', fn ($q) => $q->where('lokasi', $lokasi));
+        }
+
+        $stocks = $query->get()->map(function ($stock) {
+            return [
+                'id'             => $stock->id,
+                'product_id'     => $stock->product_id,
+                'product_name'   => $stock->product->name,
+                'product_code'   => $stock->product->code,
+                'sku'            => $stock->sku,
+                'satuan'         => $stock->product->satuan ?? 'pcs',
+                'qty'            => $stock->qty,
+                'qty_reserved'   => $stock->qty_reserved,
+                'qty_available'  => $stock->qty_available,
+                'keterangan'     => $stock->adjustment?->keterangan ?? '',
+            ];
+        });
 
         return response()->json(['stocks' => $stocks->values()]);
     }
