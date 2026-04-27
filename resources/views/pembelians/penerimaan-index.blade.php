@@ -54,6 +54,9 @@
                                                     <li>
                                                         <small>{{ $item->product->name }}</small>
                                                         <span class="label label-default">{{ $item->qty }}</span>
+                                                        @if($item->product->konversi_string !== '-')
+                                                            <small class="text-muted">({{ $item->product->konversi_string }})</small>
+                                                        @endif
                                                         @if($value->stocks->where('product_id', $item->product_id)->count())
                                                             <span class="label label-success">
                                                                 {{-- ✓ {{ $value->stocks->where('product_id', $item->product_id)->sum('qty') }} diterima --}}

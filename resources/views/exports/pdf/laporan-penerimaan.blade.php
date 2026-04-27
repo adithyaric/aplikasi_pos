@@ -25,6 +25,7 @@
                 <th style="width:5%">Qty</th>
                 <th style="width:5%">Qty Diterima</th>
                 <th style="width:5%">Satuan</th>
+                <th style="width:8%">Konversi</th>
                 <th style="width:6%">Kondisi</th>
                 <th style="width:8%">Keterangan</th>
             </tr>
@@ -46,12 +47,20 @@
                     <td class="tc">{{ $s->qty ?? 0 }}</td>
                     <td class="tc">{{ $s->qty_diterima ?? 0 }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
+                    <td class="tc">
+                        @php
+                            $kQty = $s->product?->konversi_qty;
+                            $kUnit = $s->product?->satuan_besar;
+                            $sQty = $s->qty ?? 0;
+                        @endphp
+                        {{ ($kQty > 0 && $kUnit) ? round($sQty / $kQty).' '.$kUnit : '-' }}
+                    </td>
                     <td class="tc">Baik</td>
                     <td>{{ $s->pembelian?->notes ?? 'Pembelian' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="13" class="tc">Tidak ada data</td>
+                    <td colspan="15" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

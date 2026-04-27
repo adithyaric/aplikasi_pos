@@ -28,6 +28,7 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             'Expired Date',
             'Kategori',
             'Satuan',
+            'Konversi',
             'Stok',
             'Min Stok',
             'Selisih',
@@ -63,6 +64,11 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             $statusStok = ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis');
             $statusExp = $s->expired_at && Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';
 
+            $qty         = $s->qty ?? 0;
+            $konvQty     = $s->product?->konversi_qty;
+            $satuanBesar = $s->product?->satuan_besar;
+            $konvDisplay = ($konvQty > 0 && $satuanBesar) ? round($qty / $konvQty).' '.$satuanBesar : '-';
+
             $rows->push([
                 $no++,
                 $s->product?->code ?? '-',
@@ -71,7 +77,8 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
                 $s->expired_at ? Carbon::parse($s->expired_at)->format('d/m/Y') : '-',
                 $s->product?->category?->name ?? '-',
                 $s->product?->satuan ?? 'PCS',
-                $s->qty ?? 0,
+                $konvDisplay,
+                $qty,
                 $minStok,
                 ($selisih >= 0 ? '+' : '').$selisih,
                 $statusStok,

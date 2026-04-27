@@ -16,6 +16,7 @@
                                     <td>SKU</td>
                                     <td>Code</td>
                                     <td>Product</td>
+                                    <td>Konversi</td>
                                     <td>Harga Beli</td>
                                     <td>Stock Owner</td>
                                     <td>Qty Reserved</td>
@@ -33,6 +34,7 @@
                                         <td>{{ $stock->sku }}</td>
                                         <td>{{ $stock->serial_number ?? $stock->product->code }}</td>
                                         <td>{{ $stock->product->name }}</td>
+                                        <td>{{ $stock->product->konversi_string }}</td>
                                         <td>
                                             <button type="button" class="btn btn-xs btn-info btn-price-history"
                                                 data-toggle="modal" data-target="#priceHistoryModal"

@@ -29,6 +29,8 @@ class ProductRequest extends FormRequest
             'diskon' => 'nullable',
             'berat' => 'nullable',
             'satuan' => 'nullable|string',
+            'satuan_besar' => 'nullable|string|max:255',
+            'konversi_qty' => 'nullable|numeric|min:0.01',
             'min_stock' => 'nullable|integer|min:0',
             'lokasi' => 'nullable|string',
             'supplier_ids' => 'nullable|array',

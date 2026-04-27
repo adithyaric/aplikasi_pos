@@ -22,7 +22,8 @@
                 <th style="width:12%">Batch</th>
                 <th style="width:6%">Qty Masuk</th>
                 <th style="width:6%">Satuan</th>
-                <th style="width:14%">Keterangan</th>
+                <th style="width:9%">Konversi</th>
+                <th style="width:10%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -37,11 +38,19 @@
                     <td>{{ $m->batch }}</td>
                     <td class="tc">{{ $m->qty_in }}</td>
                     <td class="tc">{{ $m->product?->satuan ?? 'PCS' }}</td>
+                    <td class="tc">
+                        @php
+                            $kQty = $m->product?->konversi_qty;
+                            $kUnit = $m->product?->satuan_besar;
+                            $mQty = $m->qty_in ?? 0;
+                        @endphp
+                        {{ ($kQty > 0 && $kUnit) ? round($mQty / $kQty).' '.$kUnit : '-' }}
+                    </td>
                     <td>{{ $m->notes }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="tc">Tidak ada data</td>
+                    <td colspan="11" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

@@ -45,6 +45,8 @@
                                     <tr>
                                         <th class="text-center">No</th>
                                         <th>Product</th>
+                                        <th>Satuan</th>
+                                        <th>Konversi</th>
                                         <th class="text-center">Qty PO</th>
                                         <th>SKU</th>
                                         <th>Expired</th>
@@ -81,6 +83,8 @@
                                                         @endif
                                                     @endif
                                                 </td>
+                                                <td>{{ $item->product->satuan ?? '-' }}</td>
+                                                <td>{{ $item->product->konversi_string }}</td>
                                                 <td class="text-center">{{ $item->qty }}</td>
                                                 <td>
                                                     @if($isLocked)

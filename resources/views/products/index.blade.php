@@ -76,6 +76,9 @@
                                     <td>Stock Warehouse</td>
                                     <td>Stock INBOUND</td>
                                     <td>Stock Minimum</td>
+                                    <td>Satuan</td>
+                                    <td>Satuan Besar</td>
+                                    <td>Konversi</td>
                                     <td>Harga Beli</td>
                                     {{-- <td>Harga Jual</td> --}}
                                     <td>Notif</td>
@@ -91,11 +94,34 @@
                                         {{-- <td>{{ $value->outlet?->name }}</td> --}}
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->category->name }}</td>
-                                        <td>{{ $value->ownerStocks()->sum('qty') }}</td>
-                                        <td>{{ $value->stocks()->sum('qty_reserved') }}</td>
-                                        <td>{{ $value->stocks()->sum('qty_available') }}</td>
-                                        <td>{{ $value->stockPembelians()->sum('qty') }}</td>
+                                        @php
+                                            $ownerQty       = $value->ownerStocks()->sum('qty');
+                                            $reservedQty    = $value->stocks()->sum('qty_reserved');
+                                            $availableQty   = $value->stocks()->sum('qty_available');
+                                            $pembelianQty   = $value->stockPembelians()->sum('qty');
+                                            $konversi       = $value->konversi_qty;
+                                        @endphp
+
+                                        <td>
+                                            {{ $ownerQty }} {{ $value->satuan ?? '-' }} /
+                                            {{ $ownerQty > 0 && $konversi > 0 ? round($ownerQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $reservedQty }} {{ $value->satuan ?? '-' }} /
+                                            {{ $reservedQty > 0 && $konversi > 0 ? round($reservedQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $availableQty }} {{ $value->satuan ?? '-' }} /
+                                            {{ $availableQty > 0 && $konversi > 0 ? round($availableQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $pembelianQty }} {{ $value->satuan ?? '-' }} /
+                                            {{ $pembelianQty > 0 && $konversi > 0 ? round($pembelianQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                        </td>
                                         <td>{{ $value->min_stock }}</td>
+                                        <td>{{ $value->satuan ?? '-' }}</td>
+                                        <td>{{ $value->satuan_besar ?? '-' }}</td>
+                                        <td>{{ $value->konversi_string }}</td>
                                         <td>
                                             <button type="button" class="btn btn-xs btn-info btn-price-history"
                                                 data-toggle="modal" data-target="#priceHistoryModal"

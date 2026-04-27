@@ -32,12 +32,9 @@ class Product extends Model
         'harga_jual',
         'diskon',
         'berat',
+        'satuan_besar',
+        'konversi_qty',
     ];
-
-    //TODO add Konversi (contoh pcs karton box dll)
-    //Product A satuan pcs konversi 15 pcs = 1 karton
-    //Product B satuan pcs konversi 25 pcs = 1 karton
-    //Product C satuan pcs konversi 35 pcs = 1 box
 
     protected $casts = [
         'is_serialized' => 'boolean',
@@ -154,6 +151,15 @@ class Product extends Model
         }
 
         return (int) ceil($this->min_stock * (1 + $adjustment->adjustment_percentage / 100));
+    }
+
+    public function getKonversiStringAttribute(): string
+    {
+        if (! $this->satuan_besar || ! $this->konversi_qty) {
+            return '-';
+        }
+
+        return "1 {$this->satuan_besar} = {$this->konversi_qty} {$this->satuan}";
     }
 
     public function getActivitylogOptions(): LogOptions

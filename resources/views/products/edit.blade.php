@@ -98,6 +98,26 @@
                                     </div>
                                 @enderror
                             </div>
+
+                            <!-- Satuan Besar (Konversi) -->
+                            <div class="col-md-6 form-group">
+                                <label for="">Satuan Besar <small class="text-muted">(Opsional)</small></label>
+                                <input type="text" class="form-control" name="satuan_besar"
+                                    value="{{ old('satuan_besar', $product->satuan_besar ?? '') }}" placeholder="karton / box / lusin">
+                                @error('satuan_besar')
+                                    <div class="invalid-feedback text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="">Isi Konversi <small class="text-muted">(Opsional)</small></label>
+                                <input type="number" class="form-control" name="konversi_qty"
+                                    value="{{ old('konversi_qty', $product->konversi_qty ?? '') }}" min="0.01" step="0.01" placeholder="12">
+                                <span class="help-block">Contoh: 1 karton = 12 pcs</span>
+                                @error('konversi_qty')
+                                    <div class="invalid-feedback text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             {{-- <div class="col-md-6 form-group"> --}}
                                 {{-- <label for="">Harga Jual</label> --}}
                                 {{-- <input type="text" class="form-control" name="harga_jual" --}}
