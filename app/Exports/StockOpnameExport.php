@@ -67,7 +67,7 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
         $selisih     = $physicalQty - $systemQty;
         $konvQty     = $item->product->konversi_qty;
         $satuanBesar = $item->product->satuan_besar;
-        $konvDisplay = ($konvQty > 0 && $satuanBesar) ? round($systemQty / $konvQty).' '.$satuanBesar : '-';
+        $konvDisplay = ($konvQty > 0 && $satuanBesar) ? ceil($systemQty / $konvQty).' '.$satuanBesar : '-';
 
         return [
             $no,

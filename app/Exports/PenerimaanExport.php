@@ -53,7 +53,7 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
             $item->product->name ?? '',
             $item->product->satuan ?? 'PCS',
             (($item->product->konversi_qty > 0 && $item->product->satuan_besar)
-                ? round($item->qty / $item->product->konversi_qty).' '.$item->product->satuan_besar
+                ? ceil($item->qty / $item->product->konversi_qty).' '.$item->product->satuan_besar
                 : '-'),
             $item->qty,
             $item->qty_diterima,

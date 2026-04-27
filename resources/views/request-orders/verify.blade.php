@@ -54,10 +54,12 @@
                                         <div class="panel panel-default item-panel" data-item-id="{{ $item->id }}">
                                             <div class="panel-heading">
                                                 <strong>{{ $item->product->name }}</strong>
-                                                - Requested: <span
-                                                    class="label label-info">{{ $item->qty_requested }}</span>
-                                                - Remaining: <span
-                                                    class="remaining-qty label label-warning">{{ $item->qty_requested }}</span>
+                                                - Requested: <span class="label label-info">{{ $item->qty_requested }}</span>
+                                                @php $kQty = $item->product->konversi_qty; $kUnit = $item->product->satuan_besar; @endphp
+                                                @if($kQty > 0 && $kUnit)
+                                                    <small class="text-muted">({{ ceil($item->qty_requested / $kQty) }} {{ $kUnit }})</small>
+                                                @endif
+                                                - Remaining: <span class="remaining-qty label label-warning">{{ $item->qty_requested }}</span>
                                             </div>
                                             <div class="panel-body">
                                                 <table class="table table-bordered stock-assignment-table">
@@ -156,7 +158,13 @@
                                                             {{ $item->qty_approved }})</small>
                                                     @endif
                                                 </td>
-                                                <td>{{ $item->qty_requested }}</td>
+                                                <td>
+                                                    {{ $item->qty_requested }}
+                                                    @php $kQty = $item->product->konversi_qty; $kUnit = $item->product->satuan_besar; @endphp
+                                                    @if($kQty > 0 && $kUnit)
+                                                        <br><small class="text-muted">{{ ceil($item->qty_requested / $kQty) }} {{ $kUnit }}</small>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     <input type="number" class="form-control qty-approved"
                                                         name="items[{{ $index }}][qty_approved]"

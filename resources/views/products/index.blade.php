@@ -104,19 +104,19 @@
 
                                         <td>
                                             {{ $ownerQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $ownerQty > 0 && $konversi > 0 ? round($ownerQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                            {{ $ownerQty > 0 && $konversi > 0 ? ceil($ownerQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
                                         </td>
                                         <td>
                                             {{ $reservedQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $reservedQty > 0 && $konversi > 0 ? round($reservedQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                            {{ $reservedQty > 0 && $konversi > 0 ? ceil($reservedQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
                                         </td>
                                         <td>
                                             {{ $availableQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $availableQty > 0 && $konversi > 0 ? round($availableQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                            {{ $availableQty > 0 && $konversi > 0 ? ceil($availableQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
                                         </td>
                                         <td>
                                             {{ $pembelianQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $pembelianQty > 0 && $konversi > 0 ? round($pembelianQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
+                                            {{ $pembelianQty > 0 && $konversi > 0 ? ceil($pembelianQty / $konversi) : '-' }}{{ $value->satuan_besar ?? '-' }}
                                         </td>
                                         <td>{{ $value->min_stock }}</td>
                                         <td>{{ $value->satuan ?? '-' }}</td>

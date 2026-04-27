@@ -53,7 +53,7 @@
                             $kUnit = $s->product?->satuan_besar;
                             $sQty = $s->qty ?? 0;
                         @endphp
-                        {{ ($kQty > 0 && $kUnit) ? round($sQty / $kQty).' '.$kUnit : '-' }}
+                        {{ ($kQty > 0 && $kUnit) ? ceil($sQty / $kQty).' '.$kUnit : '-' }}
                     </td>
                     <td class="tc">Baik</td>
                     <td>{{ $s->pembelian?->notes ?? 'Pembelian' }}</td>

@@ -67,7 +67,7 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             $qty         = $s->qty ?? 0;
             $konvQty     = $s->product?->konversi_qty;
             $satuanBesar = $s->product?->satuan_besar;
-            $konvDisplay = ($konvQty > 0 && $satuanBesar) ? round($qty / $konvQty).' '.$satuanBesar : '-';
+            $konvDisplay = ($konvQty > 0 && $satuanBesar) ? ceil($qty / $konvQty).' '.$satuanBesar : '-';
 
             $rows->push([
                 $no++,

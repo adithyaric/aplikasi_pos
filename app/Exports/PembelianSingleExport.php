@@ -62,7 +62,7 @@ class PembelianSingleExport implements FromCollection, WithHeadings, WithMapping
             $item->qty,
             $item->product->satuan ?? 'PCS',
             (($item->product->konversi_qty > 0 && $item->product->satuan_besar)
-                ? round($item->qty / $item->product->konversi_qty).' '.$item->product->satuan_besar
+                ? ceil($item->qty / $item->product->konversi_qty).' '.$item->product->satuan_besar
                 : '-'),
             'Rp '.number_format($item->harga_beli, 0, ',', '.'),
             'Rp '.number_format($item->subtotal, 0, ',', '.'),

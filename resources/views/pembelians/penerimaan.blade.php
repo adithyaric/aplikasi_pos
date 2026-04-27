@@ -84,7 +84,13 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->product->satuan ?? '-' }}</td>
-                                                <td>{{ $item->product->konversi_string }}</td>
+                                                <td>
+                                                    @php
+                                                        $kQty = $item->product->konversi_qty;
+                                                        $kUnit = $item->product->satuan_besar;
+                                                    @endphp
+                                                    {{ ($kQty > 0 && $kUnit) ? ceil($item->qty / $kQty).' '.$kUnit : '-' }}
+                                                </td>
                                                 <td class="text-center">{{ $item->qty }}</td>
                                                 <td>
                                                     @if($isLocked)

@@ -68,6 +68,7 @@
                                     <th>Location</th>
                                     <th>SKU</th>
                                     <th>Qty to Pick</th>
+                                    <th>Konversi</th>
                                     <th>Qty Picked</th>
                                     <th>Status</th>
                                 </tr>
@@ -80,6 +81,13 @@
                                         <td>{{ $item->location ?? $item->product?->lokasi }}</td>
                                         <td>{{ $item->sku ?? '-' }}</td>
                                         <td>{{ $item->qty_to_pick }}</td>
+                                        <td>
+                                            @php
+                                                $kQty = $item->product?->konversi_qty;
+                                                $kUnit = $item->product?->satuan_besar;
+                                            @endphp
+                                            {{ ($kQty > 0 && $kUnit) ? ceil($item->qty_to_pick / $kQty).' '.$kUnit : '-' }}
+                                        </td>
                                         <td>{{ $item->qty_picked }}</td>
                                         <td>
                                             @if ($item->is_picked)

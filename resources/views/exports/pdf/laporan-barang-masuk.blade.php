@@ -44,7 +44,7 @@
                             $kUnit = $m->product?->satuan_besar;
                             $mQty = $m->qty_in ?? 0;
                         @endphp
-                        {{ ($kQty > 0 && $kUnit) ? round($mQty / $kQty).' '.$kUnit : '-' }}
+                        {{ ($kQty > 0 && $kUnit) ? ceil($mQty / $kQty).' '.$kUnit : '-' }}
                     </td>
                     <td>{{ $m->notes }}</td>
                 </tr>
