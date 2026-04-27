@@ -162,6 +162,25 @@ class Product extends Model
         return "1 {$this->satuan_besar} = {$this->konversi_qty} {$this->satuan}";
     }
 
+    public function konversiDisplay(int|float $qty): string
+    {
+        if (! $this->konversi_qty || ! $this->satuan_besar) {
+            return '-';
+        }
+        $qty   = (int) $qty;
+        $boxes = (int) floor($qty / $this->konversi_qty);
+        $rem   = (int) fmod($qty, $this->konversi_qty);
+
+        if ($rem === 0) {
+            return "{$boxes} {$this->satuan_besar}";
+        }
+        if ($boxes > 0) {
+            return "{$boxes} {$this->satuan_besar} {$rem} {$this->satuan}";
+        }
+
+        return "1 {$this->satuan_besar}";
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

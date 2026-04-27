@@ -49,14 +49,7 @@
                     </td>
                     <td>{{ $s->product?->category?->name ?? '-' }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">
-                        @php
-                            $kQty = $s->product?->konversi_qty;
-                            $kUnit = $s->product?->satuan_besar;
-                            $sQty = $s->qty ?? 0;
-                        @endphp
-                        {{ ($kQty > 0 && $kUnit) ? ceil($sQty / $kQty).' '.$kUnit : '-' }}
-                    </td>
+                    <td class="tc">{{ $s->product?->konversiDisplay($s->qty ?? 0) ?? '-' }}</td>
                     <td class="tc">{{ $s->qty ?? 0 }}</td>
                     <td class="tc">{{ $minStok }}</td>
                     <td class="tc">{{ ($selisih >= 0 ? '+' : '') . $selisih }}</td>

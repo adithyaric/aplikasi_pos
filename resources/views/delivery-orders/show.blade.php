@@ -117,14 +117,7 @@
                                                 <span class="text-muted">—</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @php
-                                                $kQty = $item->product?->konversi_qty;
-                                                $kUnit = $item->product?->satuan_besar;
-                                                $kBase = $item->qty_sent ?? $item->qty;
-                                            @endphp
-                                            {{ ($kQty > 0 && $kUnit) ? ceil($kBase / $kQty).' '.$kUnit : '-' }}
-                                        </td>
+                                        <td>{{ $item->product?->konversiDisplay($item->qty_sent ?? $item->qty) ?? '-' }}</td>
                                         <td>Rp {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                                         <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                                     </tr>

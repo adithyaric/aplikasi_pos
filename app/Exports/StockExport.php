@@ -65,9 +65,7 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
             $statusExp = $s->expired_at && Carbon::parse($s->expired_at)->isPast() ? 'Expired' : 'Belum Expired';
 
             $qty         = $s->qty ?? 0;
-            $konvQty     = $s->product?->konversi_qty;
-            $satuanBesar = $s->product?->satuan_besar;
-            $konvDisplay = ($konvQty > 0 && $satuanBesar) ? ceil($qty / $konvQty).' '.$satuanBesar : '-';
+            $konvDisplay = $s->product?->konversiDisplay($qty) ?? '-';
 
             $rows->push([
                 $no++,

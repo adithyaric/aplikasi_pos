@@ -55,9 +55,8 @@
                                             <div class="panel-heading">
                                                 <strong>{{ $item->product->name }}</strong>
                                                 - Requested: <span class="label label-info">{{ $item->qty_requested }}</span>
-                                                @php $kQty = $item->product->konversi_qty; $kUnit = $item->product->satuan_besar; @endphp
-                                                @if($kQty > 0 && $kUnit)
-                                                    <small class="text-muted">({{ ceil($item->qty_requested / $kQty) }} {{ $kUnit }})</small>
+                                                @if($item->product->konversi_qty && $item->product->satuan_besar)
+                                                    <small class="text-muted">({{ $item->product->konversiDisplay($item->qty_requested) }})</small>
                                                 @endif
                                                 - Remaining: <span class="remaining-qty label label-warning">{{ $item->qty_requested }}</span>
                                             </div>
@@ -160,9 +159,8 @@
                                                 </td>
                                                 <td>
                                                     {{ $item->qty_requested }}
-                                                    @php $kQty = $item->product->konversi_qty; $kUnit = $item->product->satuan_besar; @endphp
-                                                    @if($kQty > 0 && $kUnit)
-                                                        <br><small class="text-muted">{{ ceil($item->qty_requested / $kQty) }} {{ $kUnit }}</small>
+                                                    @if($item->product->konversi_qty && $item->product->satuan_besar)
+                                                        <br><small class="text-muted">{{ $item->product->konversiDisplay($item->qty_requested) }}</small>
                                                     @endif
                                                 </td>
                                                 <td>

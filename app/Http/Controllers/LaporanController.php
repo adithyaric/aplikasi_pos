@@ -273,9 +273,7 @@ class LaporanController extends Controller
                     'nama_barang' => $pp->product?->name ?? '-',
                     'qty' => $pp->qty,
                     'satuan' => $pp->product?->satuan ?? 'PCS',
-                    'konversi' => (($pp->product?->konversi_qty > 0 && $pp->product?->satuan_besar)
-                        ? ceil($pp->qty / $pp->product->konversi_qty).' '.$pp->product->satuan_besar
-                        : '-'),
+                    'konversi' => $pp->product?->konversiDisplay($pp->qty) ?? '-',
                     'harga_total' => $pp->subtotal,
                     'qty_diterima' => $pp->qty_received ?? $pp->qty,
                     'status' => ucfirst($p->status ?? '-'),

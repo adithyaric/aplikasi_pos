@@ -38,14 +38,7 @@
                     <td>{{ $m->batch }}</td>
                     <td class="tc">{{ $m->qty_in }}</td>
                     <td class="tc">{{ $m->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">
-                        @php
-                            $kQty = $m->product?->konversi_qty;
-                            $kUnit = $m->product?->satuan_besar;
-                            $mQty = $m->qty_in ?? 0;
-                        @endphp
-                        {{ ($kQty > 0 && $kUnit) ? ceil($mQty / $kQty).' '.$kUnit : '-' }}
-                    </td>
+                    <td class="tc">{{ $m->product?->konversiDisplay($m->qty_in ?? 0) ?? '-' }}</td>
                     <td>{{ $m->notes }}</td>
                 </tr>
             @empty

@@ -47,14 +47,7 @@
                     <td class="tc">{{ $s->qty ?? 0 }}</td>
                     <td class="tc">{{ $s->qty_diterima ?? 0 }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">
-                        @php
-                            $kQty = $s->product?->konversi_qty;
-                            $kUnit = $s->product?->satuan_besar;
-                            $sQty = $s->qty ?? 0;
-                        @endphp
-                        {{ ($kQty > 0 && $kUnit) ? ceil($sQty / $kQty).' '.$kUnit : '-' }}
-                    </td>
+                    <td class="tc">{{ $s->product?->konversiDisplay($s->qty ?? 0) ?? '-' }}</td>
                     <td class="tc">Baik</td>
                     <td>{{ $s->pembelian?->notes ?? 'Pembelian' }}</td>
                 </tr>
