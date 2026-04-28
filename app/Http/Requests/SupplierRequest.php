@@ -14,7 +14,7 @@ class SupplierRequest extends FormRequest
     public function rules()
     {
         return [
-            'kode_supplier'            => 'nullable|string',
+            'kode_supplier'            => 'required|string',
             'name'                     => 'required|string',
             'alamat'                   => 'required|string',
             'no_telp'                  => 'required|string',

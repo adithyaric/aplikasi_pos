@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProductsExport;
+use App\Exports\ProductsMinStockExport;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Imports\ProductsImport;
+use App\Imports\ProductsMinStockImport;
 use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
@@ -201,5 +203,23 @@ class ProductController extends Controller
         Excel::import(new ProductsImport(), $request->file('file'));
 
         return redirect()->back()->with('toast_success', 'Berhasil Import Data!');
+    }
+
+    public function exportMinStock()
+    {
+        return Excel::download(new ProductsMinStockExport(), 'products_min_stock.xlsx');
+    }
+
+    public function exportMinStockTemplate()
+    {
+        return Excel::download(new ProductsMinStockExport(templateOnly: true), 'template_min_stock.xlsx');
+    }
+
+    public function importMinStock(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        Excel::import(new ProductsMinStockImport(), $request->file('file'));
+
+        return redirect()->back()->with('toast_success', 'Berhasil Import Min Stock!');
     }
 }
