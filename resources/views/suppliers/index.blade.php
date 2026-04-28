@@ -16,8 +16,8 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <a href="{{ route('supplier.create') }}" class="btn btn-sm bg-green">Tambah</a>
-                        <a href="{{ route('supplier.export') }}" class="btn btn-sm bg-light-blue">
+                        <a href="{{ route('supplier.create') }}" class="btn btn-sm bg-light-blue">Tambah</a>
+                        <a href="{{ route('supplier.export') }}" class="btn btn-sm bg-green">
                             <i class="fa fa-download"></i> Export
                         </a>
                         <a href="{{ route('supplier.export.template') }}" class="btn btn-sm bg-gray">
