@@ -52,10 +52,10 @@
                                             <ul class="list-unstyled" style="margin:0">
                                                 @foreach ($value->pembelianProducts as $item)
                                                     <li>
-                                                        <small>{{ $item->product->name }}</small>
+                                                        <small>{{ $item->product?->name }}</small>
                                                         <span class="label label-default">{{ $item->qty }}</span>
-                                                        @if($item->product->konversi_qty && $item->product->satuan_besar)
-                                                            <small class="text-muted">({{ $item->product->konversiDisplay($item->qty) }})</small>
+                                                        @if($item->product?->konversi_qty && $item->product?->satuan_besar)
+                                                            <small class="text-muted">({{ $item->product?->konversiDisplay($item->qty) }})</small>
                                                         @endif
                                                         @if($value->stocks->where('product_id', $item->product_id)->count())
                                                             <span class="label label-success">

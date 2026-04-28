@@ -131,7 +131,7 @@
                                         <td>{{ $value->code }}</td>
                                         {{-- <td>{{ $value->outlet?->name }}</td> --}}
                                         <td>{{ $value->name }}</td>
-                                        <td>{{ $value->category->name }}</td>
+                                        <td>{{ $value->category?->name }}</td>
                                         @php
                                             $ownerQty       = $value->ownerStocks()->sum('qty');
                                             $reservedQty    = $value->stocks()->sum('qty_reserved');

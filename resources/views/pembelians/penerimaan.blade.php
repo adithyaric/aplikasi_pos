@@ -66,7 +66,7 @@
                                         @foreach ($existingStocks as $stockIndex => $stock)
                                             <tr>
                                                 <td class="text-center text-muted">
-                                                    <small>{{ $loop->parent->iteration }}.{{ $loop->iteration }}</small>
+                                                    <small>{{ $loop->parent?->iteration }}.{{ $loop->iteration }}</small>
                                                 </td>
                                                 <td>
                                                     <strong>{{ $item->product->name }}</strong>
@@ -74,11 +74,11 @@
 
                                                     @if(!$isLocked)
                                                         <input type="hidden"
-                                                            name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][product_id]"
+                                                            name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][product_id]"
                                                             value="{{ $item->product_id }}">
                                                         @if($stock)
                                                             <input type="hidden"
-                                                                name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][stock_id]"
+                                                                name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][stock_id]"
                                                                 value="{{ $stock->id }}">
                                                         @endif
                                                     @endif
@@ -91,10 +91,10 @@
                                                         <span class="text-success"><strong>{{ $stock->sku ?? '-' }}</strong></span>
                                                     @else
                                                         <input type="text"
-                                                            name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][sku]"
+                                                            name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][sku]"
                                                             class="form-control input-sm"
                                                             placeholder="SKU"
-                                                            value="{{ old('items.' . $loop->parent->index . '_' . $stockIndex . '.sku', $stock->sku ?? '') }}"
+                                                            value="{{ old('items.' . $loop->parent?->index . '_' . $stockIndex . '.sku', $stock->sku ?? '') }}"
                                                             required>
                                                     @endif
                                                 </td>
@@ -103,9 +103,9 @@
                                                         <span class="text-muted">{{ $stock?->expired_at?->format('d/m/Y') ?? '-' }}</span>
                                                     @else
                                                         <input type="date"
-                                                            name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][expired_at]"
+                                                            name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][expired_at]"
                                                             class="form-control input-sm"
-                                                            value="{{ old('items.' . $loop->parent->index . '_' . $stockIndex . '.expired_at', $stock?->expired_at?->format('Y-m-d')) }}">
+                                                            value="{{ old('items.' . $loop->parent?->index . '_' . $stockIndex . '.expired_at', $stock?->expired_at?->format('Y-m-d')) }}">
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
@@ -113,10 +113,10 @@
                                                         <span class="label label-success">{{ $stock->qty ?? 0 }}</span>
                                                     @else
                                                         <input type="number"
-                                                            name="items[{{ $loop->parent->index }}_{{ $stockIndex }}][qty_diterima]"
+                                                            name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][qty_diterima]"
                                                             class="form-control input-sm text-center"
                                                             min="1" max="{{ $item->qty }}"
-                                                            value="{{ old('items.' . $loop->parent->index . '_' . $stockIndex . '.qty_diterima', $stock->qty ?? $item->qty) }}"
+                                                            value="{{ old('items.' . $loop->parent?->index . '_' . $stockIndex . '.qty_diterima', $stock->qty ?? $item->qty) }}"
                                                             required>
                                                     @endif
                                                 </td>

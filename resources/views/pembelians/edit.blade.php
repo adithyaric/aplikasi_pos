@@ -94,7 +94,14 @@
                                 </tbody>
                             </table>
 
-                            <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">Add</button>
+                            <div class="d-flex gap-2 mb-2">
+                                <button class="btn btn-sm btn-warning" type="button" data-toggle="modal" data-target="#modalCekBarang">
+                                    <i class="fa fa-search"></i> Cek Barang
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="addBahanBaku()" type="button">
+                                    <i class="fa fa-plus"></i> Add Row
+                                </button>
+                            </div>
                             <hr>
                             <div class="form-group">
                                 <label>Total</label>
@@ -105,6 +112,45 @@
                         <div class="box-footer">
                             <a href="{{ route('pembelian.index') }}" class="btn btn-default">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+
+                        <!-- Modal Cek Barang -->
+                        <div class="modal fade" id="modalCekBarang" tabindex="-1" role="dialog" aria-labelledby="modalCekBarangLabel">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title" id="modalCekBarangLabel">
+                                            <i class="fa fa-search"></i> Pilih Produk untuk PO
+                                            <small class="text-warning">— diurutkan dari stok paling kritis</small>
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table id="tableCekBarang" class="table table-bordered table-striped table-hover" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30"><input type="checkbox" id="checkAll"></th>
+                                                    <th>Kode</th>
+                                                    <th>Nama Produk</th>
+                                                    <th>Stok Saat Ini</th>
+                                                    <th>Min Stok</th>
+                                                    <th>Status</th>
+                                                    <th width="90">Qty Order</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cekBarangBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                                        <button type="button" class="btn btn-primary" id="btnTambahkanPO">
+                                            <i class="fa fa-check"></i> Tambahkan ke PO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div><!-- /.box -->
@@ -122,19 +168,20 @@
         function populateProductSelects(products, target = '.product') {
             $(target).each(function() {
                 let $select = $(this);
-                let currentProductId = $select.data('current-product'); // from Blade attribute
+                // Prioritaskan data-current-product (dari Blade) lalu current value
+                let currentProductId = $select.data('current-product') || $select.val();
 
                 $select.empty().append('<option value="" disabled selected>Pilih Produk</option>');
                 $.each(products, function(i, product) {
                     let stockText = product.stock_count ? ' [' + product.stock_count + ']' : '';
                     $select.append($('<option>', {
                         value: product.id,
-                        text: product.name + stockText,
+                        text: product.code + ' ' + product.name + stockText,
                         'data-serialized': product.is_serialized ? 1 : 0
                     }));
                 });
 
-                // Set selected value if it exists
+                // Set nilai yang sesuai
                 if (currentProductId && products.some(p => p.id == currentProductId)) {
                     $select.val(currentProductId);
                 }
@@ -145,36 +192,24 @@
             updateSubtotalAndTotal();
         }
 
-        // Listen for supplier change
-        $('select[name="supplier_id"]').on('change', function() {
-            let supplierId = $(this).val();
-            if (!supplierId) {
-                // Clear all product selects
-                $('.product').empty().append('<option value="" disabled selected>Pilih Produk</option>').trigger(
-                    'change.select2');
-                currentProducts = null;
-                return;
-            }
-
-            $.get('/supplier/' + supplierId + '/products', function(products) {
-                currentProducts = products;
-                populateProductSelects(products);
-            });
-        });
-
-        // On page load, trigger supplier change to load products for the pre-selected supplier
+        // Muat semua produk saat halaman selesai dimuat (tanpa filter supplier)
         $(document).ready(function() {
-            let initialSupplierId = $('select[name="supplier_id"]').val();
-            if (initialSupplierId) {
-                $.get('/supplier/' + initialSupplierId + '/products', function(products) {
+            $.get('{{ route("pembelian.all-products") }}')
+                .done(function(products) {
                     currentProducts = products;
                     populateProductSelects(products);
+                    // Trigger change untuk mengambil harga beli yang tersimpan
+                    $('.product').each(function() {
+                        $(this).trigger('change');
+                    });
+                })
+                .fail(function() {
+                    alert('Gagal memuat daftar produk. Silakan refresh halaman.');
                 });
-            }
 
-            // Also trigger product change for existing rows to load harga_beli
-            $('.product').each(function() {
-                $(this).trigger('change');
+            // Trigger input mask untuk perhitungan awal
+            $('.harga_beli').each(function() {
+                $(this).trigger('input');
             });
         });
 
@@ -214,7 +249,7 @@
             updateSubtotalAndTotal();
         });
 
-        // Handle serial number input changes
+        // Handle serial number input changes (jika kolom serial diaktifkan)
         $(document).on('input', '.serial-numbers', function() {
             let serialText = $(this).val();
             let serialLines = serialText.split('\n').filter(line => line.trim() !== '');
@@ -232,8 +267,11 @@
             $('tbody tr').each(function() {
                 let $row = $(this);
                 let qty = $row.find('.qty').val();
-                let harga_beli = $row.find('.harga_beli').cleanVal();
-                let subtotal = qty * harga_beli;
+                let $hargaInput = $row.find('.harga_beli');
+                let harga_beli = ($hargaInput.data('mask') !== undefined)
+                    ? ($hargaInput.cleanVal() || 0)
+                    : (parseFloat($hargaInput.val()) || 0);
+                let subtotal = (qty || 0) * harga_beli;
                 $row.find('.subtotal').val(formatRupiah(subtotal));
                 total += subtotal;
             });
@@ -263,35 +301,169 @@
             let serialTextarea = $row.find('.serial-numbers');
 
             if (isProductSerialized) {
-                serialContainer.show();
-                noSerialMessage.hide();
+                if (serialContainer.length) serialContainer.show();
+                if (noSerialMessage.length) noSerialMessage.hide();
                 qtyInput.prop('readonly', true);
                 if (!serialTextarea.val()) {
                     qtyInput.val(1);
                 }
             } else {
-                serialContainer.hide();
-                noSerialMessage.show();
+                if (serialContainer.length) serialContainer.hide();
+                if (noSerialMessage.length) noSerialMessage.show();
                 qtyInput.prop('readonly', false);
                 if (!qtyInput.val() || qtyInput.val() == 0) {
                     qtyInput.val(1);
                 }
             }
 
-            $.get('/product/' + product_id, function(data) {
-                harga_beli.val(data.harga_beli).trigger('input');
-                updateSubtotalAndTotal();
+            if (product_id) {
+                $.get('/product/' + product_id, function(data) {
+                    harga_beli.val(data.harga_beli).trigger('input');
+                    updateSubtotalAndTotal();
+                });
+            }
+        });
+
+        // ---- Cek Barang Modal ----
+        let cekBarangTable = null;
+
+        $('#modalCekBarang').on('show.bs.modal', function (e) {
+            if (!currentProducts || currentProducts.length === 0) {
+                e.preventDefault();
+                alert('Data produk belum dimuat. Coba muat ulang halaman.');
+                return;
+            }
+
+            const sorted = [...currentProducts].sort((a, b) => {
+                const aUnder = a.is_under_minimum ? 0 : 1;
+                const bUnder = b.is_under_minimum ? 0 : 1;
+                if (aUnder !== bUnder) return aUnder - bUnder;
+                return a.stock_count - b.stock_count;
+            });
+
+            const tbody = $('#cekBarangBody');
+            tbody.empty();
+
+            sorted.forEach(function (p) {
+                const isUnder = p.is_under_minimum;
+                const suggestedQty = Math.max(1, (p.effective_min || p.min_stock || 0) - (p.stock_count || 0));
+
+                const $tr = $('<tr>').addClass(isUnder ? 'danger' : '');
+
+                const $checkTd = $('<td>').addClass('text-center').append(
+                    $('<input>').attr({ type: 'checkbox', class: 'cek-product-check', value: p.id })
+                        .data('name', p.name).data('harga', p.harga_beli || 0)
+                );
+                const $statusBadge = $('<span>').addClass('label')
+                    .addClass(isUnder ? 'label-danger' : 'label-success')
+                    .text(isUnder ? 'OUT OF STOCK' : 'Normal');
+                const $qtyInput = $('<input>').attr({ type: 'number', class: 'form-control input-sm cek-qty', min: 1 })
+                    .css('width', '70px').val(isUnder ? suggestedQty : 1);
+
+                $tr.append(
+                    $checkTd,
+                    $('<td>').text(p.code),
+                    $('<td>').text(p.name),
+                    $('<td>').addClass('text-center').text(p.stock_count || 0),
+                    $('<td>').addClass('text-center').text(p.effective_min || p.min_stock || 0),
+                    $('<td>').addClass('text-center').append($statusBadge),
+                    $('<td>').append($qtyInput)
+                );
+
+                tbody.append($tr);
+            });
+
+            if (cekBarangTable) {
+                cekBarangTable.destroy();
+            }
+            cekBarangTable = $('#tableCekBarang').DataTable({
+                retrieve: false,
+                destroy: true,
+                pageLength: 10,
+                order: [],
+                columnDefs: [
+                    { orderable: false, targets: [0, 6] }
+                ],
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ baris",
+                    info: "Menampilkan _START_-_END_ dari _TOTAL_ produk",
+                    paginate: { previous: "Prev", next: "Next" },
+                    zeroRecords: "Tidak ada produk ditemukan"
+                }
             });
         });
 
-        // Handle product change on page load for existing rows
-        $(document).ready(function() {
-            $('.product').each(function() {
-                $(this).trigger('change');
+        $(document).on('change', '#checkAll', function () {
+            const checked = $(this).prop('checked');
+            if (cekBarangTable) {
+                cekBarangTable.rows().nodes().each(function (node) {
+                    $(node).find('.cek-product-check').prop('checked', checked);
+                });
+            } else {
+                $('.cek-product-check').prop('checked', checked);
+            }
+        });
+
+        $('#btnTambahkanPO').on('click', function () {
+            const selected = [];
+            if (cekBarangTable) {
+                cekBarangTable.rows().nodes().each(function (node) {
+                    const $check = $(node).find('.cek-product-check:checked');
+                    if ($check.length) {
+                        const $row = $(node);
+                        selected.push({
+                            product_id: $check.val(),
+                            name: $check.data('name'),
+                            harga: $check.data('harga'),
+                            qty: parseInt($row.find('.cek-qty').val()) || 1
+                        });
+                    }
+                });
+            } else {
+                $('#cekBarangBody .cek-product-check:checked').each(function () {
+                    const $row = $(this).closest('tr');
+                    selected.push({
+                        product_id: $(this).val(),
+                        name: $(this).data('name'),
+                        harga: $(this).data('harga'),
+                        qty: parseInt($row.find('.cek-qty').val()) || 1
+                    });
+                });
+            }
+
+            if (selected.length === 0) {
+                alert('Pilih minimal satu produk.');
+                return;
+            }
+
+            // Hapus baris pertama jika masih kosong (belum dipilih produk)
+            const $firstRow = $('#product-repeater tr:first');
+            if ($firstRow.find('.product').val() === null || $firstRow.find('.product').val() === '') {
+                $firstRow.remove();
+            }
+
+            selected.forEach(function (item) {
+                addBahanBaku();
+
+                const $newRow = $('#product-repeater tr:last');
+                const $productSelect = $newRow.find('.product');
+                const $hargaInput = $newRow.find('.harga_beli');
+                const $qtyInput = $newRow.find('.qty');
+
+                // Set pilihan produk tanpa trigger change (untuk hindari AJAX sebelum opsi siap)
+                $productSelect.val(item.product_id).trigger('change.select2');
+
+                // Isi harga dari data cache
+                $hargaInput.val(item.harga).trigger('input');
+
+                // Isi qty
+                $qtyInput.val(item.qty);
+
+                updateSubtotalAndTotal();
             });
-            $('.harga_beli').each(function() {
-                $(this).trigger('input');
-            });
+
+            $('#modalCekBarang').modal('hide');
         });
     </script>
 @endsection

@@ -57,4 +57,32 @@ class PembelianRequest extends FormRequest
             'product.*.serial_numbers' => 'nullable|string',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'code.required' => 'Kode pembelian wajib diisi.',
+
+            'supplier_id.required' => 'Supplier wajib dipilih.',
+            'supplier_id.exists' => 'Supplier yang dipilih tidak valid.',
+
+            'product.required' => 'Produk wajib diisi.',
+            'product.array' => 'Format produk tidak valid.',
+
+            'product.*.product_id.required' => 'ID produk wajib diisi.',
+            'product.*.product_id.exists' => 'Produk yang dipilih tidak valid.',
+
+            'product.*.qty.required' => 'Jumlah produk wajib diisi.',
+            'product.*.qty.numeric' => 'Jumlah produk harus berupa angka.',
+            'product.*.qty.min' => 'Jumlah produk minimal 1.',
+
+            'product.*.harga_beli.required' => 'Harga beli produk wajib diisi.',
+            'product.*.harga_beli.min' => 'Harga beli tidak boleh kurang dari 0.',
+
+            'product.*.subtotal.required' => 'Subtotal produk wajib diisi.',
+            'product.*.subtotal.min' => 'Subtotal tidak boleh kurang dari 0.',
+
+            'product.*.serial_numbers.string' => 'Nomor seri harus berupa teks.',
+        ];
+    }
 }

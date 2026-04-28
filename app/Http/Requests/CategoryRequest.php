@@ -15,8 +15,15 @@ class CategoryRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'type' => 'nullable',
+            // 'type' => 'nullable',
             // 'outlet_id' => 'nullable',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Nama kategori wajib diisi.',
         ];
     }
 }

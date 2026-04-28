@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('layouts.market.header', function ($view) {
-            $view->with('categories', \App\Models\Category::where('type', 'product')->get());
+            $view->with('categories', \App\Models\Category::get());
         });
 
         View::composer('layouts.master', function ($view) {

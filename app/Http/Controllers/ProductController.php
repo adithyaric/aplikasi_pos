@@ -60,7 +60,7 @@ class ProductController extends Controller
         return view('products.create', [
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'categories' => Category::where('type', 'product')->get(),
+            'categories' => Category::get(),
         ]);
     }
 
@@ -114,7 +114,7 @@ class ProductController extends Controller
             'product' => $product->load('suppliers'),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'categories' => Category::where('type', 'product')->get(),
+            'categories' => Category::get(),
             // optional: selected supplier IDs for form
             'selectedSuppliers' => $product->suppliers->pluck('id')->toArray(),
         ]);

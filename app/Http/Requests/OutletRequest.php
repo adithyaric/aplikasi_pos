@@ -24,4 +24,13 @@ class OutletRequest extends FormRequest
             // 'footer' => 'required',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Nama outlet wajib diisi.',
+            'jenis_outlet.required' => 'Jenis outlet wajib dipilih.',
+            'alamat.required' => 'Alamat outlet wajib diisi.',
+        ];
+    }
 }

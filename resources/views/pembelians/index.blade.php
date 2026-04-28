@@ -50,7 +50,7 @@
                                         <td>
                                             <ul class="list-unstyled" style="margin:0">
                                                 @foreach ($value->pembelianProducts as $item)
-                                                    <li><small>{{ $item->product->name }} × {{ $item->qty }}</small></li>
+                                                    <li><small>{{ $item->product?->name }} × {{ $item->qty }}</small></li>
                                                 @endforeach
                                             </ul>
                                         </td>
@@ -67,7 +67,7 @@
                                                 {{ strtoupper($payStatus) }}
                                             </span>
                                             @if ($value->pembelianTransaction?->amount > 0)
-                                                <br><small>@currency($value->pembelianTransaction->amount)</small>
+                                                <br><small>@currency($value->pembelianTransaction?->amount)</small>
                                             @endif
                                         </td>
                                         <td>

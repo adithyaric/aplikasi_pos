@@ -52,11 +52,13 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         Category::create($data);
-        if ($data['type'] == 'product') {
-            return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-        } else {
-            return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-        }
+
+        return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // if ($data['type'] == 'product') {
+        //     return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // } else {
+        //     return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // }
     }
 
     public function show(Category $category)
@@ -87,11 +89,13 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        if ($data['type'] == 'product') {
-            return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-        } else {
-            return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
-        }
+        return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Mengedit Data!');
+
+        // if ($data['type'] == 'product') {
+        //     return redirect(route('category.product.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // } else {
+        //     return redirect(route('category.pengeluaran.index'))->with('toast_success', 'Berhasil Menyimpan Data!');
+        // }
     }
 
     public function destroy(Category $category)
