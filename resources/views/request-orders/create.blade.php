@@ -77,15 +77,18 @@
                                 </table>
                             </div>
                             <button type="button" class="btn btn-success" id="add-row"><i class="fa fa-plus"></i> Add Product</button>
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modalCekProduk">
+                                <i class="fa fa-search"></i> Cek Produk
+                            </button>
 
                             <hr>
-                            <h4>Catatan Tambahan <small class="text-muted">(opsional — tidak berelasi ke produk, hanya catatan)</small></h4>
+                            <h4>Sample</h4>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="notes-table">
                                     <thead>
                                         <tr>
                                             <th>Kategori</th>
-                                            <th style="width:120px">Qty</th>
+                                            <th style="width:120px">Qty Sample</th>
                                             <th>Nama PJ</th>
                                             <th style="width:60px">Aksi</th>
                                         </tr>
@@ -96,7 +99,7 @@
                                 </table>
                             </div>
                             <button type="button" class="btn btn-default btn-sm" id="add-note-row">
-                                <i class="fa fa-plus"></i> Tambah Catatan
+                                <i class="fa fa-plus"></i> Tambah Sample
                             </button>
                         </div>
 
@@ -109,12 +112,45 @@
             </div>
         </div>
     </section>
+
+    {{-- Modal Cek Produk --}}
+    <div class="modal fade" id="modalCekProduk" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-search"></i> Pilih Produk</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="tableCekProduk" class="table table-bordered table-striped table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th width="30"><input type="checkbox" id="checkAllProduk"></th>
+                                <th>Kode</th>
+                                <th>Nama Produk</th>
+                                <th>Tersedia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cekProdukBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="btnTambahkanProduk">
+                        <i class="fa fa-check"></i> Tambahkan ke Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('page-script')
     <script>
         let products = @json($products);
         let rowIndex = {{ isset($requestOrder) ? count($requestOrder->items) : 1 }};
+        let categories = @json($categories);
 
 function populateProductSelect($select, selectedId = null) {
     $select.empty().append('<option value="">Select Product</option>');
@@ -184,9 +220,15 @@ function populateProductSelect($select, selectedId = null) {
         let noteIndex = 0;
 
         function addNoteRow() {
+            let options = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             const row = `
                 <tr class="note-row">
-                    <td><input type="text" name="extra_notes[${noteIndex}][kategori]" class="form-control" placeholder="Kategori" required></td>
+                    <td>
+                        <select name="extra_notes[${noteIndex}][kategori]" class="form-control kategori-select" required style="width:100%;">
+                            <option value="">Pilih Kategori</option>
+                            ${options}
+                        </select>
+                    </td>
                     <td><input type="number" name="extra_notes[${noteIndex}][qty]" class="form-control" min="0" value="0" required></td>
                     <td><input type="text" name="extra_notes[${noteIndex}][nama_pj]" class="form-control" placeholder="Nama PJ"></td>
                     <td class="text-center">
@@ -194,6 +236,7 @@ function populateProductSelect($select, selectedId = null) {
                     </td>
                 </tr>`;
             $('#notes-tbody').append(row);
+            $('#notes-tbody tr:last .kategori-select').select2({ width: '100%' });
             noteIndex++;
         }
 
@@ -201,6 +244,69 @@ function populateProductSelect($select, selectedId = null) {
 
         $(document).on('click', '.remove-note-row', function() {
             $(this).closest('tr').remove();
+        });
+
+        // ---- Modal Cek Produk ----
+        var cekProdukTable = null;
+
+        $('#modalCekProduk').on('show.bs.modal', function () {
+            if (cekProdukTable) {
+                cekProdukTable.destroy();
+                $('#cekProdukBody').empty();
+            }
+
+            var rows = products.map(function (p) {
+                var available = p.total_available || 0;
+                return '<tr data-product-id="' + p.id + '" data-available="' + available + '">'
+                    + '<td class="text-center"><input type="checkbox" class="chk-produk"></td>'
+                    + '<td>' + p.code + '</td>'
+                    + '<td>' + p.name + '</td>'
+                    + '<td>' + available + '</td>'
+                    + '</tr>';
+            });
+            $('#cekProdukBody').html(rows.join(''));
+
+            cekProdukTable = $('#tableCekProduk').DataTable({
+                order: [[2, 'asc']],
+                columnDefs: [{ orderable: false, targets: 0 }],
+                pageLength: 10,
+                language: { search: 'Cari:' }
+            });
+        });
+
+        $('#checkAllProduk').on('change', function () {
+            $('.chk-produk').prop('checked', this.checked);
+        });
+
+        $('#btnTambahkanProduk').on('click', function () {
+            var checked = [];
+            $('#tableCekProduk tbody .chk-produk:checked').each(function () {
+                var $row = $(this).closest('tr');
+                checked.push({ id: $row.data('product-id'), available: $row.data('available') });
+            });
+
+            if (checked.length === 0) {
+                alert('Pilih minimal satu produk.');
+                return;
+            }
+
+            checked.forEach(function (p) {
+                var newRow = '<tr class="item-row">'
+                    + '<td><select name="items[' + rowIndex + '][product_id]" class="form-control product-select" required style="width:100%;"></select></td>'
+                    + '<td class="available-qty">' + p.available + '</td>'
+                    + '<td><input type="number" name="items[' + rowIndex + '][qty_requested]" class="form-control" min="1" max="' + p.available + '" required></td>'
+                    + '<td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></td>'
+                    + '</tr>';
+                $('#items-table tbody').append(newRow);
+
+                var $newSelect = $('#items-table tbody tr:last .product-select');
+                populateProductSelect($newSelect, p.id);
+                $newSelect.select2({ width: '100%' });
+                rowIndex++;
+            });
+
+            $('#modalCekProduk').modal('hide');
+            $('#checkAllProduk').prop('checked', false);
         });
     </script>
 @endsection

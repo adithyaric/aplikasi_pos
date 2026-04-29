@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label for="">Harga Beli</label>
-                                <input type="text" class="form-control" name="harga_beli" value="{{ old('harga_beli') }}"
+                                <input type="text" class="form-control" name="harga_beli" value="{{ old('harga_beli', 0) }}"
                                     placeholder="Masukkan Harga Beli">
                                 @error('harga_beli')
                                     <div class="invalid-feedback text-danger">
@@ -130,7 +130,7 @@
                             <div class="col-md-6 form-group">
                                 <label>Category</label>
                                 <select class="form-control select2" name="category_id" data-placeholder="Pilih Category"
-                                    style="width: 100%;">
+                                    style="width: 100%;" required>
                                     <option value="" selected disabled>Pilih Category</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}"

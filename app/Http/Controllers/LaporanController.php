@@ -75,8 +75,9 @@ class LaporanController extends Controller
 
         if ($id) {
             $pickinglist = PickingList::with(['requestOrder', 'items.product'])->findOrFail($id);
+            $lokasi = $request->query('lokasi') ?: null;
 
-            return Excel::download(new PickingListSingleExport($pickinglist, $settings), 'Dokumen_Picking_list-'.$pickinglist->code.'.xlsx');
+            return Excel::download(new PickingListSingleExport($pickinglist, $settings, $lokasi), 'Dokumen_Picking_list-'.$pickinglist->code.'.xlsx');
         }
 
         return abort(404);

@@ -117,18 +117,21 @@ class PickingListController extends Controller
             'qty_picked' => 'required|integer|min:0|max:'.$item->qty_to_pick,
         ], [
             'qty_picked.required' => 'Jumlah yang diambil harus diisi.',
-            'qty_picked.integer' => 'Jumlah yang diambil harus berupa angka.',
-            'qty_picked.min' => 'Jumlah yang diambil minimal 0.',
-            'qty_picked.max' => 'Jumlah yang diambil tidak boleh melebihi :max.',
+            'qty_picked.integer'  => 'Jumlah yang diambil harus berupa angka.',
+            'qty_picked.min'      => 'Jumlah yang diambil minimal 0.',
+            'qty_picked.max'      => 'Jumlah yang diambil tidak boleh melebihi :max.',
         ]);
+
+        if ($request->filled('val_barcode') && $request->val_barcode !== $item->product->code) {
+            return back()->with('toast_error', 'Barcode tidak cocok untuk produk '.$item->product->name.' (expected: '.$item->product->code.')');
+        }
 
         $item->update([
             'qty_picked' => $request->qty_picked,
-            'is_picked' => $request->qty_picked == $item->qty_to_pick,
+            'is_picked'  => $request->qty_picked == $item->qty_to_pick,
         ]);
 
-        // return response()->json(['success' => true]);
-        return redirect()->back();
+        return redirect()->back()->with('toast_success', 'Item '.$item->product->name.' berhasil diperbarui.');
     }
 
     public function complete(PickingList $pickingList)

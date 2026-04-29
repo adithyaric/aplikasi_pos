@@ -23,16 +23,24 @@ class PickingListSingleExport implements FromCollection, WithHeadings, WithMappi
     use Exportable;
     protected $pickingList;
     protected $settings;
+    protected $lokasi;
 
-    public function __construct(PickingList $pickingList, array $settings = [])
+    public function __construct(PickingList $pickingList, array $settings = [], ?string $lokasi = null)
     {
         $this->pickingList = $pickingList;
-        $this->settings = $settings;
+        $this->settings    = $settings;
+        $this->lokasi      = $lokasi;
     }
 
     public function collection()
     {
-        return $this->pickingList->items;
+        $items = $this->pickingList->items;
+
+        if ($this->lokasi) {
+            $items = $items->filter(fn ($item) => ($item->location ?? $item->product?->lokasi) === $this->lokasi);
+        }
+
+        return $items->values();
     }
 
     public function headings(): array

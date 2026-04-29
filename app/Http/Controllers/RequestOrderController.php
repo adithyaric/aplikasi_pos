@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
 use App\Models\RequestOrder;
@@ -25,7 +26,8 @@ class RequestOrderController extends Controller
     public function create()
     {
         return view('request-orders.create', [
-            'outlets' => Outlet::get(),
+            'outlets'    => Outlet::get(),
+            'categories' => Category::orderBy('name')->get(),
             'products' => Product::with(['stocks' => function ($q) {
                 $q->where('qty_available', '>', 0)
                     ->where('status', 'available');
@@ -49,33 +51,34 @@ class RequestOrderController extends Controller
             'owner_id'                   => 'required|exists:outlets,id',
             'request_date'               => 'required|date',
             'items'                      => 'required|array',
-            'items.*.product_id'         => 'required|exists:products,id',
-            'items.*.qty_requested'      => 'required|integer|min:1',
+            'items.*.product_id'         => 'required|exists:products,id|distinct',
+            'items.*.qty_requested'      => 'required|numeric|min:1',            // changed to numeric
             'extra_notes'                => 'nullable|array',
             'extra_notes.*.kategori'     => 'required_with:extra_notes|string|max:255',
-            'extra_notes.*.qty'          => 'required_with:extra_notes|integer|min:0',
+            'extra_notes.*.qty'          => 'required_with:extra_notes|numeric|min:0', // changed to numeric
             'extra_notes.*.nama_pj'      => 'nullable|string|max:255',
         ], [
-            'owner_id.required' => 'Outlet harus dipilih.',
-            'owner_id.exists' => 'Outlet yang dipilih tidak ditemukan.',
-            'request_date.required' => 'Tanggal permintaan harus diisi.',
-            'request_date.date' => 'Tanggal permintaan harus berupa tanggal yang valid.',
-            'items.required' => 'Item harus diisi.',
-            'items.array' => 'Item harus berupa array.',
-            'items.*.product_id.required' => 'Produk harus dipilih.',
-            'items.*.product_id.exists' => 'Produk yang dipilih tidak ditemukan.',
-            'items.*.qty_requested.required' => 'Jumlah diminta harus diisi.',
-            'items.*.qty_requested.integer' => 'Jumlah diminta harus berupa angka.',
-            'items.*.qty_requested.min' => 'Jumlah diminta minimal 1.',
-            'extra_notes.array' => 'Catatan tambahan harus berupa array.',
-            'extra_notes.*.kategori.required_with' => 'Kategori harus diisi jika ada catatan tambahan.',
-            'extra_notes.*.kategori.string' => 'Kategori harus berupa teks.',
-            'extra_notes.*.kategori.max' => 'Kategori maksimal 255 karakter.',
-            'extra_notes.*.qty.required_with' => 'Jumlah harus diisi jika ada catatan tambahan.',
-            'extra_notes.*.qty.integer' => 'Jumlah harus berupa angka.',
-            'extra_notes.*.qty.min' => 'Jumlah minimal 0.',
-            'extra_notes.*.nama_pj.string' => 'Nama penanggung jawab harus berupa teks.',
-            'extra_notes.*.nama_pj.max' => 'Nama penanggung jawab maksimal 255 karakter.',
+            'owner_id.required'                     => 'Outlet harus dipilih.',
+            'owner_id.exists'                       => 'Outlet yang dipilih tidak ditemukan.',
+            'request_date.required'                 => 'Tanggal permintaan harus diisi.',
+            'request_date.date'                     => 'Tanggal permintaan harus berupa tanggal yang valid.',
+            'items.required'                        => 'Item harus diisi.',
+            'items.array'                           => 'Item harus berupa array.',
+            'items.*.product_id.required'           => 'Produk harus dipilih.',
+            'items.*.product_id.exists'             => 'Produk yang dipilih tidak ditemukan.',
+            'items.*.product_id.distinct'           => 'Produk tidak boleh sama di baris yang berbeda.',
+            'items.*.qty_requested.required'        => 'Jumlah diminta harus diisi.',
+            'items.*.qty_requested.numeric'         => 'Jumlah diminta harus berupa angka.',
+            'items.*.qty_requested.min'             => 'Jumlah diminta minimal 1.',
+            'extra_notes.array'                     => 'Catatan tambahan harus berupa array.',
+            'extra_notes.*.kategori.required_with'  => 'Kategori harus diisi jika ada catatan tambahan.',
+            'extra_notes.*.kategori.string'         => 'Kategori harus berupa teks.',
+            'extra_notes.*.kategori.max'            => 'Kategori maksimal 255 karakter.',
+            'extra_notes.*.qty.required_with'       => 'Jumlah harus diisi jika ada catatan tambahan.',
+            'extra_notes.*.qty.numeric'             => 'Jumlah harus berupa angka.',
+            'extra_notes.*.qty.min'                 => 'Jumlah minimal 0.',
+            'extra_notes.*.nama_pj.string'          => 'Nama penanggung jawab harus berupa teks.',
+            'extra_notes.*.nama_pj.max'             => 'Nama penanggung jawab maksimal 255 karakter.',
         ]);
 
         DB::beginTransaction();
