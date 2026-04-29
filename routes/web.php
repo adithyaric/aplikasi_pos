@@ -34,7 +34,7 @@ Route::get('/', function () {
     return redirect('/dashboard');
 });
 
-Route::middleware(['role:kasir|admin|superadmin'])->group(function () {
+Route::middleware(['role:outlet|kasir|admin|superadmin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

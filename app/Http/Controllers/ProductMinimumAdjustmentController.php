@@ -16,6 +16,20 @@ class ProductMinimumAdjustmentController extends Controller
             'adjustment_percentage' => 'required|integer|min:1|max:255',
             'active_from'           => 'required|date',
             'active_until'          => 'nullable|date|after_or_equal:active_from',
+        ], [
+            'product_ids.required' => 'Produk harus dipilih.',
+            'product_ids.array' => 'Produk harus berupa array.',
+            'product_ids.min' => 'Minimal pilih 1 produk.',
+            'product_ids.*.integer' => 'ID produk harus berupa angka.',
+            'product_ids.*.exists' => 'Produk yang dipilih tidak ditemukan.',
+            'adjustment_percentage.required' => 'Persentase penyesuaian harus diisi.',
+            'adjustment_percentage.integer' => 'Persentase penyesuaian harus berupa angka.',
+            'adjustment_percentage.min' => 'Persentase penyesuaian minimal 1.',
+            'adjustment_percentage.max' => 'Persentase penyesuaian maksimal 255.',
+            'active_from.required' => 'Tanggal mulai berlaku harus diisi.',
+            'active_from.date' => 'Tanggal mulai berlaku harus berupa tanggal yang valid.',
+            'active_until.date' => 'Tanggal berakhir harus berupa tanggal yang valid.',
+            'active_until.after_or_equal' => 'Tanggal berakhir harus sama atau setelah tanggal mulai berlaku.',
         ]);
 
         $activeUntilBound = $data['active_until'] ?? '9999-12-31';

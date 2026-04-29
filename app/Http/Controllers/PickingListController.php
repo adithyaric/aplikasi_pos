@@ -115,6 +115,11 @@ class PickingListController extends Controller
     {
         $request->validate([
             'qty_picked' => 'required|integer|min:0|max:'.$item->qty_to_pick,
+        ], [
+            'qty_picked.required' => 'Jumlah yang diambil harus diisi.',
+            'qty_picked.integer' => 'Jumlah yang diambil harus berupa angka.',
+            'qty_picked.min' => 'Jumlah yang diambil minimal 0.',
+            'qty_picked.max' => 'Jumlah yang diambil tidak boleh melebihi :max.',
         ]);
 
         $item->update([
@@ -148,6 +153,12 @@ class PickingListController extends Controller
         $request->validate([
             'items' => 'required|array',
             'items.*.qty_picked' => 'required|integer|min:0',
+        ], [
+            'items.required' => 'Item harus diisi.',
+            'items.array' => 'Item harus berupa array.',
+            'items.*.qty_picked.required' => 'Jumlah yang diambil harus diisi.',
+            'items.*.qty_picked.integer' => 'Jumlah yang diambil harus berupa angka.',
+            'items.*.qty_picked.min' => 'Jumlah yang diambil minimal 0.',
         ]);
 
         $items = $pickingList->items()->get()->keyBy('id');

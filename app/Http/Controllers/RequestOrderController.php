@@ -13,12 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class RequestOrderController extends Controller
 {
-    public function show($id)
-    {
-        $ro = RequestOrder::with(['items.product.stocks', 'pickingList', 'deliveryOrder'])->findOrFail($id);
-        dd($ro?->toArray());
-    }
-
     public function index()
     {
         $requests = RequestOrder::with(['owner', 'requestedBy'])
@@ -61,6 +55,27 @@ class RequestOrderController extends Controller
             'extra_notes.*.kategori'     => 'required_with:extra_notes|string|max:255',
             'extra_notes.*.qty'          => 'required_with:extra_notes|integer|min:0',
             'extra_notes.*.nama_pj'      => 'nullable|string|max:255',
+        ], [
+            'owner_id.required' => 'Outlet harus dipilih.',
+            'owner_id.exists' => 'Outlet yang dipilih tidak ditemukan.',
+            'request_date.required' => 'Tanggal permintaan harus diisi.',
+            'request_date.date' => 'Tanggal permintaan harus berupa tanggal yang valid.',
+            'items.required' => 'Item harus diisi.',
+            'items.array' => 'Item harus berupa array.',
+            'items.*.product_id.required' => 'Produk harus dipilih.',
+            'items.*.product_id.exists' => 'Produk yang dipilih tidak ditemukan.',
+            'items.*.qty_requested.required' => 'Jumlah diminta harus diisi.',
+            'items.*.qty_requested.integer' => 'Jumlah diminta harus berupa angka.',
+            'items.*.qty_requested.min' => 'Jumlah diminta minimal 1.',
+            'extra_notes.array' => 'Catatan tambahan harus berupa array.',
+            'extra_notes.*.kategori.required_with' => 'Kategori harus diisi jika ada catatan tambahan.',
+            'extra_notes.*.kategori.string' => 'Kategori harus berupa teks.',
+            'extra_notes.*.kategori.max' => 'Kategori maksimal 255 karakter.',
+            'extra_notes.*.qty.required_with' => 'Jumlah harus diisi jika ada catatan tambahan.',
+            'extra_notes.*.qty.integer' => 'Jumlah harus berupa angka.',
+            'extra_notes.*.qty.min' => 'Jumlah minimal 0.',
+            'extra_notes.*.nama_pj.string' => 'Nama penanggung jawab harus berupa teks.',
+            'extra_notes.*.nama_pj.max' => 'Nama penanggung jawab maksimal 255 karakter.',
         ]);
 
         DB::beginTransaction();
@@ -120,6 +135,13 @@ class RequestOrderController extends Controller
         return view('request-orders.verify', compact('requestOrder'));
     }
 
+    public function show($id)
+    {
+        $requestOrder = RequestOrder::with(['items.product.stocks', 'additionalNotes'])->findOrFail($id);
+
+        return view('request-orders.show', compact('requestOrder'));
+    }
+
     public function processVerification(Request $request, RequestOrder $requestOrder)
     {
         $request->validate([
@@ -127,6 +149,16 @@ class RequestOrderController extends Controller
             'items.*.id' => 'required|exists:request_order_items,id',
             'items.*.qty_approved' => 'required|integer|min:0',
             'items.*.item_status' => 'required|in:approved,partial,rejected',
+        ], [
+            'items.required' => 'Item harus diisi.',
+            'items.array' => 'Item harus berupa array.',
+            'items.*.id.required' => 'ID item harus diisi.',
+            'items.*.id.exists' => 'Item permintaan tidak ditemukan.',
+            'items.*.qty_approved.required' => 'Jumlah disetujui harus diisi.',
+            'items.*.qty_approved.integer' => 'Jumlah disetujui harus berupa angka.',
+            'items.*.qty_approved.min' => 'Jumlah disetujui minimal 0.',
+            'items.*.item_status.required' => 'Status item harus diisi.',
+            'items.*.item_status.in' => 'Status item harus dipilih antara approved, partial, atau rejected.',
         ]);
 
         // Validate qty_approved against specific SKU stock
@@ -268,7 +300,16 @@ class RequestOrderController extends Controller
             'stock_assignments.*.stock_id' => 'required|exists:stocks,id|distinct',
             'stock_assignments.*.qty' => 'required|integer|min:1',
         ], [
+            'stock_assignments.required' => 'Penugasan stok harus diisi.',
+            'stock_assignments.array' => 'Penugasan stok harus berupa array.',
+            'stock_assignments.*.item_id.required' => 'ID item harus diisi.',
+            'stock_assignments.*.item_id.exists' => 'Item permintaan tidak ditemukan.',
+            'stock_assignments.*.stock_id.required' => 'Stok harus dipilih.',
+            'stock_assignments.*.stock_id.exists' => 'Stok yang dipilih tidak ditemukan.',
             'stock_assignments.*.stock_id.distinct' => 'Terdapat stok yang sama (ID :input) dimasukkan lebih dari satu kali.',
+            'stock_assignments.*.qty.required' => 'Jumlah stok harus diisi.',
+            'stock_assignments.*.qty.integer' => 'Jumlah stok harus berupa angka.',
+            'stock_assignments.*.qty.min' => 'Jumlah stok minimal 1.',
         ]);
 
         DB::beginTransaction();

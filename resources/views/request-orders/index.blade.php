@@ -54,7 +54,7 @@
                                         <ul>
                                             @foreach ($value->items as $item)
                                                 <li>
-                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_approved }} pcs
+                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_requested }} pcs
                                                     @if (!empty($item->notes))
                                                         <small>({{ $item->notes }})</small>
                                                     @endif
@@ -82,7 +82,11 @@
                                                 </button>
                                             </form>
                                         @endif
+                                        @if (auth()->user()->role == 'outlet')
+                                        <a class="btn-xs btn btn-default" href="{{ route('request-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
+                                        @else
                                         <a class="btn-xs btn btn-default" href="{{ route('request-orders.verify', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
+                                        @endif
                                         <a class=" btn-xs btn btn-success" href="{{ route('laporan.request-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                     </td>
                                 </tr>

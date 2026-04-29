@@ -25,6 +25,7 @@ class AdminController extends Controller
                 'superadmin',
                 'admin',
                 'kasir',
+                'outlet',
             ],
             'outlets' => Outlet::get(),
         ]);
@@ -53,6 +54,7 @@ class AdminController extends Controller
                 'superadmin',
                 'admin',
                 'kasir',
+                'outlet',
             ],
             'outlets' => Outlet::get(),
         ]);

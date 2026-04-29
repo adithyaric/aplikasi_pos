@@ -16,24 +16,30 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Split the roles by the | character
-        $roles = collect($roles)->flatMap(function ($role) {
-            return explode('|', $role);
-        })->toArray();
+        // 1. Flatten roles from middleware parameter
+        $allowedRoles = collect($roles)->flatMap(fn ($role) => explode('|', $role))->toArray();
 
-        if (! in_array($user->role, $roles)) {
-            switch ($user->role) {
-                case 'customer':
-                    return redirect()->route('market.index');
-                case 'kasir':
-                case 'admin':
-                case 'superadmin':
-                    return redirect()->route('dashboard');
-                default:
-                    return redirect('/')->with('toast_error', 'Maaf Anda tidak punya akses');
-            }
+        // 2. Grant access if role matches
+        if (in_array($user->role, $allowedRoles)) {
+            return $next($request);
         }
 
-        return $next($request);
+        // 3. Define landing pages per role
+        $homeRoutes = [
+            'customer'   => 'market.index',
+            'kasir'      => 'dashboard',
+            'outlet'     => 'dashboard',
+            'admin'      => 'dashboard',
+            'superadmin' => 'admin.index', // Adjust to your actual route name
+        ];
+
+        $target = $homeRoutes[$user->role] ?? 'login';
+
+        // 4. Loop Prevention: If already on target route but still failing middleware
+        if ($request->routeIs($target)) {
+            abort(403, 'Unauthorized access to role home.');
+        }
+
+        return redirect()->route($target)->with('toast_error', 'Akses ditolak.');
     }
 }

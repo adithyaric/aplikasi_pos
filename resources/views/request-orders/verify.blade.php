@@ -221,7 +221,7 @@
                         @endif
                         @if($requestOrder->additionalNotes->isNotEmpty())
                             <hr>
-                            <h4>Catatan Tambahan</h4>
+                            <h4>Sample</h4>
                             <table class="table table-bordered table-condensed" style="max-width:600px">
                                 <thead>
                                     <tr>

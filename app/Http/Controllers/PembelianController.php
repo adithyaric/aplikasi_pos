@@ -185,21 +185,6 @@ class PembelianController extends Controller
 
     public function storePenerimaan(Request $request, Pembelian $pembelian)
     {
-        // $request->validate([
-        //     'receipt_date' => 'required|date',
-        //     'receipt_pic' => 'required|string',
-        //     'receipt_status' => 'required|in:draft,validated,completed',
-        //     'receipt_photo' => 'nullable|image|max:2048',
-        //     'items' => 'required|array',
-        //     'items.*.stock_id' => 'nullable|exists:stocks,id',
-        //     'items.*.product_id' => 'required|exists:products,id',
-        //     'items.*.sku' => 'required|string|unique:stocks,sku',
-        //     'items.*.qty_diterima' => 'required|integer|min:1',
-        //     'items.*.expired_at' => 'nullable|date',
-        // ], [
-        //     'items.*.sku.unique' => 'The SKU ":input" is already taken.',
-        // ]);
-
         $request->validate([
             'receipt_date' => 'nullable|date',
             'receipt_pic' => 'nullable|string',
@@ -212,7 +197,23 @@ class PembelianController extends Controller
             'items.*.qty_diterima' => 'required|integer|min:1',
             'items.*.expired_at' => 'nullable|date',
         ], [
-            'items.*.sku.unique' => 'The SKU ":input" is already taken.',
+            'receipt_date.date' => 'Tanggal penerimaan harus berupa tanggal yang valid.',
+            'receipt_pic.string' => 'PIC penerimaan harus berupa teks.',
+            'receipt_status.in' => 'Status penerimaan harus dipilih antara draft, validated, atau completed.',
+            'receipt_photo.image' => 'Foto penerimaan harus berupa gambar.',
+            'receipt_photo.max' => 'Ukuran foto penerimaan maksimal 2MB.',
+            'items.required' => 'Item barang harus diisi.',
+            'items.array' => 'Item barang harus berupa array.',
+            'items.*.stock_id.exists' => 'Stock ID yang dipilih tidak valid.',
+            'items.*.product_id.required' => 'Produk harus dipilih.',
+            'items.*.product_id.exists' => 'Produk yang dipilih tidak ditemukan.',
+            'items.*.sku.required' => 'SKU harus diisi.',
+            'items.*.sku.string' => 'SKU harus berupa teks.',
+            'items.*.sku.unique' => 'SKU ":input" sudah digunakan.',
+            'items.*.qty_diterima.required' => 'Jumlah diterima harus diisi.',
+            'items.*.qty_diterima.integer' => 'Jumlah diterima harus berupa angka.',
+            'items.*.qty_diterima.min' => 'Jumlah diterima minimal 1.',
+            'items.*.expired_at.date' => 'Tanggal kadaluarsa harus berupa tanggal yang valid.',
         ]);
 
         DB::beginTransaction();
@@ -352,6 +353,13 @@ class PembelianController extends Controller
             'receipt_pic' => 'nullable|string',
             'receipt_status' => 'nullable|in:draft,validated,completed',
             'receipt_photo' => 'nullable|image|max:2048',
+        ], [
+            'code_gr.string' => 'Kode GR harus berupa teks.',
+            'receipt_date.date' => 'Tanggal penerimaan harus berupa tanggal yang valid.',
+            'receipt_pic.string' => 'PIC penerimaan harus berupa teks.',
+            'receipt_status.in' => 'Status penerimaan harus dipilih antara draft, validated, atau completed.',
+            'receipt_photo.image' => 'Foto penerimaan harus berupa gambar.',
+            'receipt_photo.max' => 'Ukuran foto penerimaan maksimal 2MB.',
         ]);
 
         DB::beginTransaction();
@@ -551,6 +559,22 @@ class PembelianController extends Controller
             'notes'             => 'nullable|string',
             'status'            => 'required|in:unpaid,paid,partial',
             'bukti_transfer'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ], [
+            'payment_date.required' => 'Tanggal pembayaran harus diisi.',
+            'payment_date.date' => 'Tanggal pembayaran harus berupa tanggal yang valid.',
+            'payment_method.required' => 'Metode pembayaran harus dipilih.',
+            'payment_method.in' => 'Metode pembayaran harus dipilih antara cash, bank transfer, giro/cek, atau lainnya.',
+            'payment_reference.string' => 'Referensi pembayaran harus berupa teks.',
+            'amount.required' => 'Jumlah pembayaran harus diisi.',
+            'amount.numeric' => 'Jumlah pembayaran harus berupa angka.',
+            'amount.min' => 'Jumlah pembayaran minimal 0.',
+            'amount.max' => 'Jumlah pembayaran maksimal :max.',
+            'notes.string' => 'Catatan harus berupa teks.',
+            'status.required' => 'Status pembayaran harus diisi.',
+            'status.in' => 'Status pembayaran harus dipilih antara unpaid, paid, atau partial.',
+            'bukti_transfer.file' => 'Bukti transfer harus berupa file.',
+            'bukti_transfer.mimes' => 'Bukti transfer harus berupa file dengan format jpg, jpeg, png, atau pdf.',
+            'bukti_transfer.max' => 'Ukuran bukti transfer maksimal 2MB.',
         ]);
 
         DB::beginTransaction();
