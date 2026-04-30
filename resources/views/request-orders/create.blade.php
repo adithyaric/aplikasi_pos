@@ -152,6 +152,17 @@
         let rowIndex = {{ isset($requestOrder) ? count($requestOrder->items) : 1 }};
         let categories = @json($categories);
 
+        function konversiDisplay(qty, konversiQty, satuanBesar, satuan) {
+            satuan = satuan || 'PCS';
+            qty = parseInt(qty) || 0;
+            if (!konversiQty || !satuanBesar) return null;
+            var boxes = Math.floor(qty / konversiQty);
+            var rem = qty % konversiQty;
+            if (rem === 0) return boxes + ' ' + satuanBesar;
+            if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
+            return '1 ' + satuanBesar;
+        }
+
 function populateProductSelect($select, selectedId = null) {
     $select.empty().append('<option value="">Select Product</option>');
     $.each(products, function(index, product) {
@@ -182,7 +193,10 @@ function populateProductSelect($select, selectedId = null) {
         $(document).on('change', '.product-select', function() {
             let $row = $(this).closest('tr');
             let available = $(this).find(':selected').data('available') || 0;
-            $row.find('.available-qty').text(available);
+            let productId = $(this).val();
+            let product = products.find(function(p) { return p.id == productId; });
+            let k = product ? konversiDisplay(available, product.konversi_qty, product.satuan_besar, product.satuan) : null;
+            $row.find('.available-qty').text(available + (k ? ' (' + k + ')' : ''));
             $row.find('input[name*="qty_requested"]').attr('max', available);
         });
 
@@ -291,9 +305,12 @@ function populateProductSelect($select, selectedId = null) {
             }
 
             checked.forEach(function (p) {
+                var prod = products.find(function(pr) { return pr.id == p.id; });
+                var kk = prod ? konversiDisplay(p.available, prod.konversi_qty, prod.satuan_besar, prod.satuan) : null;
+                var availableDisplay = p.available + (kk ? ' (' + kk + ')' : '');
                 var newRow = '<tr class="item-row">'
                     + '<td><select name="items[' + rowIndex + '][product_id]" class="form-control product-select" required style="width:100%;"></select></td>'
-                    + '<td class="available-qty">' + p.available + '</td>'
+                    + '<td class="available-qty">' + availableDisplay + '</td>'
                     + '<td><input type="number" name="items[' + rowIndex + '][qty_requested]" class="form-control" min="1" max="' + p.available + '" required></td>'
                     + '<td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></td>'
                     + '</tr>';
