@@ -42,9 +42,18 @@
                                                 @currency($stock->harga_beli)
                                             </button>
                                         </td>
-                                        <td>{{ $stock->ownerStock?->qty ?? 0 }}</td>
-                                        <td>{{ $stock->qty_reserved ?? 0 }}</td>
-                                        <td>{{ $stock->qty_available ?? 0 }}</td>
+                                        <td>
+                                            @php $v = $stock->ownerStock?->qty ?? 0; $k = $stock->product->konversiDisplay($v); @endphp
+                                            {{ $v }}@if($k !== '-') <small class="text-muted">({{ $k }})</small>@endif
+                                        </td>
+                                        <td>
+                                            @php $v = $stock->qty_reserved ?? 0; $k = $stock->product->konversiDisplay($v); @endphp
+                                            {{ $v }}@if($k !== '-') <small class="text-muted">({{ $k }})</small>@endif
+                                        </td>
+                                        <td>
+                                            @php $v = $stock->qty_available ?? 0; $k = $stock->product->konversiDisplay($v); @endphp
+                                            {{ $v }}@if($k !== '-') <small class="text-muted">({{ $k }})</small>@endif
+                                        </td>
                                         <td>{{ $stock->created_at?->format('h:i a / d-M-Y') }}</td>
                                         <td>{{ $stock->expired_at?->format('d-M-Y') }}</td>
                                         <td>

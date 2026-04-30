@@ -55,7 +55,7 @@
                                                         <small>{{ $item->product?->name }}</small>
                                                         <span class="label label-default">{{ $item->qty }}</span>
                                                         @if($item->product?->konversi_qty && $item->product?->satuan_besar)
-                                                            <small class="text-muted">({{ $item->product?->konversiDisplay($item->qty) }})</small>
+                                                            <span class="label label-info">{{ $item->product?->konversiDisplay($item->qty) }}</span>
                                                         @endif
                                                         @if($value->stocks->where('product_id', $item->product_id)->count())
                                                             <span class="label label-success">
