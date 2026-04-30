@@ -54,9 +54,13 @@
                                         <ul>
                                             @foreach ($value->items as $item)
                                                 <li>
-                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_requested }} pcs
+                                                    {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_requested }}
+                                                    @php $k = $item->product?->konversiDisplay($item->qty_requested); @endphp
+                                                    @if($k && $k !== '-')
+                                                        <span class="text-muted">({{ $k }})</span>
+                                                    @endif
                                                     @if (!empty($item->notes))
-                                                        <small>({{ $item->notes }})</small>
+                                                        <small class="text-muted">– {{ $item->notes }}</small>
                                                     @endif
                                                 </li>
                                             @endforeach

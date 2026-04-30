@@ -50,7 +50,15 @@
                                         <td>
                                             <ul class="list-unstyled" style="margin:0">
                                                 @foreach ($value->pembelianProducts as $item)
-                                                    <li><small>{{ $item->product?->name }} × {{ $item->qty }}</small></li>
+                                                    <li>
+                                                        <small>
+                                                            {{ $item->product?->name }} × {{ $item->qty }}
+                                                            @php $k = $item->product?->konversiDisplay($item->qty); @endphp
+                                                            @if($k && $k !== '-')
+                                                                <span class="text-muted">({{ $k }})</span>
+                                                            @endif
+                                                        </small>
+                                                    </li>
                                                 @endforeach
                                             </ul>
                                         </td>
