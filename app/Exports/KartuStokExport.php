@@ -63,6 +63,7 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
     {
         $fmt = function ($qty) {
             $k = $this->stock->product->konversiDisplay($qty);
+
             return $qty.($k && $k !== '-' ? " ({$k})" : '');
         };
 

@@ -141,20 +141,16 @@
                                         @endphp
 
                                         <td>
-                                            {{ $ownerQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $ownerQty > 0 ? $value->konversiDisplay($ownerQty) : '-' }}
+                                            {{ $ownerQty }} {{ $value->satuan ?? '-' }}/<span class="label label-info">{{ $ownerQty > 0 ? $value->konversiDisplay($ownerQty) : '-' }}</span>
                                         </td>
                                         <td>
-                                            {{ $reservedQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $reservedQty > 0 ? $value->konversiDisplay($reservedQty) : '-' }}
+                                            {{ $reservedQty }} {{ $value->satuan ?? '-' }}/<span class="label label-info">{{ $reservedQty > 0 ? $value->konversiDisplay($reservedQty) : '-' }}</span>
                                         </td>
                                         <td>
-                                            {{ $availableQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $availableQty > 0 ? $value->konversiDisplay($availableQty) : '-' }}
+                                            {{ $availableQty }} {{ $value->satuan ?? '-' }}/<span class="label label-info">{{ $availableQty > 0 ? $value->konversiDisplay($availableQty) : '-' }}</span>
                                         </td>
                                         <td>
-                                            {{ $pembelianQty }} {{ $value->satuan ?? '-' }} /
-                                            {{ $pembelianQty > 0 ? $value->konversiDisplay($pembelianQty) : '-' }}
+                                            {{ $pembelianQty }} {{ $value->satuan ?? '-' }}/<span class="label label-info">{{ $pembelianQty > 0 ? $value->konversiDisplay($pembelianQty) : '-' }}</span>
                                         </td>
                                         <td>{{ $value->min_stock }}</td>
                                         <td>{{ $value->satuan ?? '-' }}</td>
