@@ -54,7 +54,7 @@ class PembelianController extends Controller
 
     public function getAllProducts()
     {
-        $products = Product::select('id', 'code', 'name', 'is_serialized', 'harga_beli', 'min_stock')
+        $products = Product::select('id', 'code', 'name', 'is_serialized', 'harga_beli', 'min_stock', 'konversi_qty', 'satuan_besar', 'satuan')
             ->withSum('stocks', 'qty_available')
             ->orderBy('name')
             ->get()

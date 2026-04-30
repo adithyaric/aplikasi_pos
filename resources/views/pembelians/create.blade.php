@@ -153,6 +153,22 @@
         let currentProducts = null;
         let productIndex = 0;
 
+        function konversiDisplay(qty, konversiQty, satuanBesar, satuan) {
+            satuan = satuan || 'PCS';
+            qty = parseInt(qty) || 0;
+            if (!konversiQty || !satuanBesar) return null;
+            var boxes = Math.floor(qty / konversiQty);
+            var rem = qty % konversiQty;
+            if (rem === 0) return boxes + ' ' + satuanBesar;
+            if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
+            return '1 ' + satuanBesar;
+        }
+        function fmtQtyK(qty, p) {
+            if (!p) return qty;
+            var k = konversiDisplay(qty, p.konversi_qty, p.satuan_besar, p.satuan);
+            return qty + (k ? ' (' + k + ')' : '');
+        }
+
 
         function populateProductSelects(products, target = '.product') {
             $(target).each(function() {
@@ -367,8 +383,8 @@
                     $checkTd,
                     $('<td>').text(p.code),
                     $('<td>').text(p.name),
-                    $('<td>').addClass('text-center').text(p.stock_count || 0),
-                    $('<td>').addClass('text-center').text(p.effective_min || p.min_stock || 0),
+                    $('<td>').addClass('text-center').html(fmtQtyK(p.stock_count || 0, p)),
+                    $('<td>').addClass('text-center').html(fmtQtyK(p.effective_min || p.min_stock || 0, p)),
                     $('<td>').addClass('text-center').append($statusBadge),
                     $('<td>').append($qtyInput)
                 );
