@@ -169,11 +169,14 @@ class StockController extends Controller
 
         return response()->json([
             'stock' => [
-                'id' => $stock->id,
-                'sku' => $stock->sku,
+                'id'           => $stock->id,
+                'sku'          => $stock->sku,
                 'product_name' => $stock->product->name,
                 'product_code' => $stock->product->code,
-                'supplier' => $stock->pembelian->supplier->name ?? '-',
+                'supplier'     => $stock->pembelian->supplier->name ?? '-',
+                'konversi_qty' => $stock->product->konversi_qty,
+                'satuan_besar' => $stock->product->satuan_besar,
+                'satuan'       => $stock->product->satuan,
             ],
             'transactions' => $result
         ]);

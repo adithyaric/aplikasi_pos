@@ -106,8 +106,20 @@
 
 @section('page-script')
     <script>
+        function konversiDisplay(qty, konversiQty, satuanBesar, satuan) {
+            satuan = satuan || 'PCS';
+            qty = parseInt(qty) || 0;
+            if (!konversiQty || !satuanBesar) return null;
+            var boxes = Math.floor(qty / konversiQty);
+            var rem = qty % konversiQty;
+            if (rem === 0) return boxes + ' ' + satuanBesar;
+            if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
+            return '1 ' + satuanBesar;
+        }
+
         $(document).ready(function() {
             let currentData = [];
+            let stockMeta = {};
 
             // Initialize select2
             $('#selectStock').select2({
@@ -136,6 +148,7 @@
                     },
                     success: function(response) {
                         currentData = response;
+                        stockMeta = response.stock;
 
                         // Update info
                         $('#displaySku').text(response.stock.sku);
@@ -144,7 +157,7 @@
                         $('#displaySupplier').text(response.stock.supplier);
 
                         // Render table
-                        renderKartuTable(response.transactions);
+                        renderKartuTable(response.transactions, stockMeta);
 
                         $('#btnLoadKartu').prop('disabled', false).html(
                             '<i class="fa fa-search"></i> Tampilkan Kartu');
@@ -165,7 +178,8 @@
                 });
             });
 
-            function renderKartuTable(transactions) {
+            function renderKartuTable(transactions, meta) {
+                meta = meta || {};
                 const tbody = $('#tableBody');
                 tbody.empty();
 
@@ -174,6 +188,11 @@
                         '<tr><td colspan="9" class="text-center">Tidak ada transaksi untuk SKU ini</td></tr>');
                     $('#totalPersediaan').text('0');
                     return;
+                }
+
+                function fmtQty(qty) {
+                    var k = konversiDisplay(qty, meta.konversi_qty, meta.satuan_besar, meta.satuan);
+                    return qty + (k ? ' <small class="text-muted">(' + k + ')</small>' : '');
                 }
 
                 let latestNilai = 0;
@@ -185,10 +204,10 @@
                 <tr>
                     <td>${index + 1}</td>
                     <td>${item.tanggal}</td>
-                    <td class="text-right">${item.stok_awal}</td>
-                    <td class="text-right">${item.masuk}</td>
-                    <td class="text-right">${item.keluar}</td>
-                    <td class="text-right"><strong>${item.stok_akhir}</strong></td>
+                    <td class="text-right">${fmtQty(item.stok_awal)}</td>
+                    <td class="text-right">${fmtQty(item.masuk)}</td>
+                    <td class="text-right">${fmtQty(item.keluar)}</td>
+                    <td class="text-right"><strong>${fmtQty(item.stok_akhir)}</strong></td>
                     <td class="text-right">${formatRupiah(item.harga)}</td>
                     <td class="text-right"><strong>${formatRupiah(item.nilai)}</strong></td>
                     <td><small>${item.keterangan}</small></td>
