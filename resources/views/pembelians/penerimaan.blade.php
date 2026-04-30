@@ -46,11 +46,10 @@
                                         <th class="text-center">No</th>
                                         <th>Product</th>
                                         <th>Satuan</th>
-                                        <th>Konversi</th>
-                                        <th class="text-center">Qty PO</th>
+                                        <th>Qty PO</th>
                                         <th>SKU</th>
                                         <th>Expired</th>
-                                        <th class="text-center">Qty Terima</th>
+                                        <th>Qty Terima</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -84,8 +83,7 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->product->satuan ?? '-' }}</td>
-                                                <td>{{ $item->product->konversiDisplay($item->qty) }}</td>
-                                                <td class="text-center">{{ $item->qty }}</td>
+                                                <td>{{ $item->qty }} <span class="label label-info">{{ $item->product?->konversiDisplay($item->qty) }}</span></td>
                                                 <td>
                                                     @if($isLocked)
                                                         <span class="text-success"><strong>{{ $stock->sku ?? '-' }}</strong></span>
@@ -108,9 +106,9 @@
                                                             value="{{ old('items.' . $loop->parent?->index . '_' . $stockIndex . '.expired_at', $stock?->expired_at?->format('Y-m-d')) }}">
                                                     @endif
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     @if($isLocked)
-                                                        <span class="label label-success">{{ $stock->qty ?? 0 }}</span>
+                                                    <span class="label label-success">{{ $stock->qty ?? 0 }}</span> <span class="label label-info">{{ $item->product?->konversiDisplay($stock->qty ?? 0) }}
                                                     @else
                                                         <input type="number"
                                                             name="items[{{ $loop->parent?->index }}_{{ $stockIndex }}][qty_diterima]"

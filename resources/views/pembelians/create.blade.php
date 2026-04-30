@@ -166,7 +166,7 @@
         function fmtQtyK(qty, p) {
             if (!p) return qty;
             var k = konversiDisplay(qty, p.konversi_qty, p.satuan_besar, p.satuan);
-            return qty + (k ? ' (' + k + ')' : '');
+            return qty + (k ? ' <span class="label label-info">' + k + '</span>' : '');
         }
 
 
@@ -211,7 +211,10 @@
                             <option value="" disabled selected>Pilih Produk</option>
                         </select>
                     </td>
-                    <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
+                    <td>
+                        <input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]">
+                        <span class="konversi-display"></span>
+                    </td>
                     <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
                     <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
                     <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
@@ -278,6 +281,15 @@
             }
         }
 
+        function updateKonversiDisplay($row) {
+            if (!currentProducts) return;
+            let productId = $row.find('.product').val();
+            let qty = parseInt($row.find('.qty').val()) || 0;
+            let prod = currentProducts.find(function(p) { return p.id == productId; });
+            let k = prod ? konversiDisplay(qty, prod.konversi_qty, prod.satuan_besar, prod.satuan) : null;
+            $row.find('.konversi-display').html(k ? '<span class="label label-info">' + k + '</span>' : '');
+        }
+
         $(document).on('change', '.product', function() {
             let $row = $(this).closest('tr');
             let harga_beli = $row.find('.harga_beli');
@@ -299,11 +311,17 @@
                 qtyInput.val(1);
             }
 
+            updateKonversiDisplay($row);
+
             $.get('/product/' + product_id, function(data) {
                 // Set raw value and trigger input to apply mask formatting
                 harga_beli.val(data.harga_beli).trigger('input');
                 updateSubtotalAndTotal();
             });
+        });
+
+        $(document).on('change input', '.qty', function() {
+            updateKonversiDisplay($(this).closest('tr'));
         });
 
         // Handle product change on page load for existing rows

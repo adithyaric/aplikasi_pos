@@ -46,7 +46,7 @@
                                                         {{ $item->product?->name }} × {{ $item->qty_to_pick }}
                                                         @php $k = $item->product?->konversiDisplay($item->qty_to_pick); @endphp
                                                         @if($k && $k !== '-')
-                                                            <span class="text-muted">({{ $k }})</span>
+                                                            <span class="label label-info">{{ $k }}</span>
                                                         @endif
                                                     </small>
                                                 </li>

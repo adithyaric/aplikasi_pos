@@ -192,7 +192,7 @@
 
                 function fmtQty(qty) {
                     var k = konversiDisplay(qty, meta.konversi_qty, meta.satuan_besar, meta.satuan);
-                    return qty + (k ? ' <small class="text-muted">(' + k + ')</small>' : '');
+                    return qty + (k ? ' <span class="label label-info">' + k + '</span>' : '');
                 }
 
                 let latestNilai = 0;

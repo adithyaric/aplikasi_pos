@@ -68,7 +68,7 @@
                                                     {{ $item->qty_to_pick }}
                                                     @php $k = $item->product->konversiDisplay($item->qty_to_pick); @endphp
                                                     @if($k !== '-')
-                                                        <small class="text-muted">({{ $k }})</small>
+                                                        <span class="label label-info">{{ $k }}</span>
                                                     @endif
                                                 </td>
                                                 <td>

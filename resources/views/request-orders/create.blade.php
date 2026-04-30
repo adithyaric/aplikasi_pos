@@ -196,7 +196,7 @@ function populateProductSelect($select, selectedId = null) {
             let productId = $(this).val();
             let product = products.find(function(p) { return p.id == productId; });
             let k = product ? konversiDisplay(available, product.konversi_qty, product.satuan_besar, product.satuan) : null;
-            $row.find('.available-qty').text(available + (k ? ' (' + k + ')' : ''));
+            $row.find('.available-qty').html(available + (k ? ' <span class="label label-info">' + k + '</span>' : ''));
             $row.find('input[name*="qty_requested"]').attr('max', available);
         });
 
@@ -307,7 +307,7 @@ function populateProductSelect($select, selectedId = null) {
             checked.forEach(function (p) {
                 var prod = products.find(function(pr) { return pr.id == p.id; });
                 var kk = prod ? konversiDisplay(p.available, prod.konversi_qty, prod.satuan_besar, prod.satuan) : null;
-                var availableDisplay = p.available + (kk ? ' (' + kk + ')' : '');
+                var availableDisplay = p.available + (kk ? ' <span class="label label-info">' + kk + '</span>' : '');
                 var newRow = '<tr class="item-row">'
                     + '<td><select name="items[' + rowIndex + '][product_id]" class="form-control product-select" required style="width:100%;"></select></td>'
                     + '<td class="available-qty">' + availableDisplay + '</td>'

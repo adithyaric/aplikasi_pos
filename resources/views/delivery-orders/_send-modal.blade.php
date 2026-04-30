@@ -29,7 +29,7 @@
                                     {{ $item->qty }}
                                     @php $k = $item->product->konversiDisplay($item->qty); @endphp
                                     @if($k !== '-')
-                                        <br><small class="text-muted">({{ $k }})</small>
+                                        <span class="label label-info">{{ $k }}</span>
                                     @endif
                                 </td>
                                 <td>

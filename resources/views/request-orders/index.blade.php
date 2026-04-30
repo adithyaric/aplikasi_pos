@@ -57,7 +57,7 @@
                                                     {{ $item->product->name ?? 'Produk' }}: {{ $item->qty_requested }}
                                                     @php $k = $item->product?->konversiDisplay($item->qty_requested); @endphp
                                                     @if($k && $k !== '-')
-                                                        <span class="text-muted">({{ $k }})</span>
+                                                        <span class="label label-info">{{ $k }}</span>
                                                     @endif
                                                     @if (!empty($item->notes))
                                                         <small class="text-muted">– {{ $item->notes }}</small>
