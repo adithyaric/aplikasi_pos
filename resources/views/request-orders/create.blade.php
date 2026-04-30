@@ -192,8 +192,9 @@ function populateProductSelect($select, selectedId = null) {
 
         $(document).on('change', '.product-select', function() {
             let $row = $(this).closest('tr');
-            let available = $(this).find(':selected').data('available') || 0;
             let productId = $(this).val();
+            if (!productId) return;
+            let available = $(this).find(':selected').data('available') || 0;
             let product = products.find(function(p) { return p.id == productId; });
             let k = product ? konversiDisplay(available, product.konversi_qty, product.satuan_besar, product.satuan) : null;
             $row.find('.available-qty').html(available + (k ? ' <span class="label label-info">' + k + '</span>' : ''));

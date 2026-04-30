@@ -66,6 +66,7 @@
                                         <td>
                                             <input type="number" class="form-control qty" name="product[0][qty]" required
                                                 value="1" min="1">
+                                            <span class="konversi-display"></span>
                                         </td>
                                         <td>
                                             <input type="text" class="form-control harga_beli numeral-mask"
