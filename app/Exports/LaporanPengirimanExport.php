@@ -59,6 +59,8 @@ class LaporanPengirimanExport implements FromCollection, WithHeadings, WithTitle
 
         foreach ($deliveries as $do) {
             foreach ($do->items as $item) {
+                $k = $item->product?->konversiDisplay($item->qty) ?? '-';
+
                 $rows->push([
                     $no++,
                     Carbon::parse($do->delivery_date)->format('d M Y'),
@@ -68,7 +70,7 @@ class LaporanPengirimanExport implements FromCollection, WithHeadings, WithTitle
                     $item->product?->code ?? '-',
                     $item->product?->name ?? '-',
                     $item->sku ?? '-',
-                    $item->qty,
+                    $item->qty.($k && $k !== '-' ? " ({$k})" : ''),
                     $item->product?->satuan ?? 'PCS',
                     ucfirst($do->status ?? '-'),
                     '',

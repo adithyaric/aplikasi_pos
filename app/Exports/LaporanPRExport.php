@@ -38,6 +38,8 @@ class LaporanPRExport implements FromCollection, WithHeadings, WithTitle
         $no = 1;
         foreach ($orders as $ro) {
             foreach ($ro->items as $item) {
+                $k = $item->product?->konversiDisplay($item->qty_requested) ?? '-';
+
                 $rows->push([
                     $no++,
                     Carbon::parse($ro->request_date)->format('d M Y'),
@@ -45,7 +47,7 @@ class LaporanPRExport implements FromCollection, WithHeadings, WithTitle
                     $ro->owner?->name ?? '-',
                     $item->product?->code ?? '-',
                     $item->product?->name ?? '-',
-                    $item->qty_requested,
+                    $item->qty_requested.($k && $k !== '-' ? " ({$k})" : ''),
                     $item->product?->satuan ?? 'PCS',
                     ucfirst($ro->status ?? '-'),
                     '-',

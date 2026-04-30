@@ -53,14 +53,17 @@ class PickingListSingleExport implements FromCollection, WithHeadings, WithMappi
         static $no = 0;
         $no++;
 
+        $kPick   = $item->product?->konversiDisplay($item->qty_to_pick) ?? '-';
+        $kPicked = $item->product?->konversiDisplay($item->qty_picked) ?? '-';
+
         return [
             $no,
             $item->product->code ?? '',
             $item->product->name ?? '',
             $item->location ?? '-',
             $item->product->satuan ?? 'PCS',
-            $item->qty_to_pick,
-            $item->qty_picked,
+            $item->qty_to_pick.($kPick && $kPick !== '-' ? " ({$kPick})" : ''),
+            $item->qty_picked.($kPicked && $kPicked !== '-' ? " ({$kPicked})" : ''),
         ];
     }
 

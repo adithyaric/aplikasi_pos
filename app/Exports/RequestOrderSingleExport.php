@@ -45,11 +45,13 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         static $no = 0;
         $no++;
 
+        $k = $item->product?->konversiDisplay($item->qty_requested) ?? '-';
+
         return [
             $no,
             $item->product->code ?? '',
             $item->product->name ?? '',
-            $item->qty_requested,
+            $item->qty_requested.($k && $k !== '-' ? " ({$k})" : ''),
             $item->product->satuan ?? 'PCS',
             'Rp '.number_format($item->product->harga_beli ?? 0, 0, ',', '.'),
         ];

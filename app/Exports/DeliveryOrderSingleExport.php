@@ -45,11 +45,13 @@ class DeliveryOrderSingleExport implements FromCollection, WithHeadings, WithMap
         static $no = 0;
         $no++;
 
+        $k = $item->product?->konversiDisplay($item->qty) ?? '-';
+
         return [
             $no,
             $item->product->code ?? '',
             $item->product->name ?? '',
-            $item->qty,
+            $item->qty.($k && $k !== '-' ? " ({$k})" : ''),
             $item->product->satuan ?? 'PCS',
         ];
     }

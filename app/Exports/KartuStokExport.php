@@ -61,13 +61,18 @@ class KartuStokExport implements FromCollection, WithHeadings, WithMapping, With
 
     public function map($row): array
     {
+        $fmt = function ($qty) {
+            $k = $this->stock->product->konversiDisplay($qty);
+            return $qty.($k && $k !== '-' ? " ({$k})" : '');
+        };
+
         return [
             $row['tanggal'],
             $row['batch'],
             $row['keterangan'],
-            $row['masuk'],
-            $row['keluar'],
-            $row['total'],
+            $fmt($row['masuk']),
+            $fmt($row['keluar']),
+            $fmt($row['total']),
         ];
     }
 

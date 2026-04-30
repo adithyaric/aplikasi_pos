@@ -38,6 +38,10 @@ class LaporanPOExport implements FromCollection, WithHeadings, WithTitle
         $no = 1;
         foreach ($pembelians as $p) {
             foreach ($p->pembelianProducts as $pp) {
+                $kQty = $pp->product?->konversiDisplay($pp->qty) ?? '-';
+                $qtyRcv = $pp->qty_received ?? $pp->qty;
+                $kRcv = $pp->product?->konversiDisplay($qtyRcv) ?? '-';
+
                 $rows->push([
                     $no++,
                     Carbon::parse($p->created_at)->format('d M Y'),
@@ -46,10 +50,10 @@ class LaporanPOExport implements FromCollection, WithHeadings, WithTitle
                     $p->supplier?->name ?? '-',
                     $pp->product?->code ?? '-',
                     $pp->product?->name ?? '-',
-                    $pp->qty,
+                    $pp->qty.($kQty && $kQty !== '-' ? " ({$kQty})" : ''),
                     $pp->product?->satuan ?? 'PCS',
                     $pp->subtotal,
-                    $pp->qty_received ?? $pp->qty,
+                    $qtyRcv.($kRcv && $kRcv !== '-' ? " ({$kRcv})" : ''),
                     ucfirst($p->status ?? '-'),
                     ''
                 ]);

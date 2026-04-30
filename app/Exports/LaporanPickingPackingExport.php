@@ -62,6 +62,9 @@ class LaporanPickingPackingExport implements FromCollection, WithHeadings, WithT
 
         foreach ($pickings as $pk) {
             foreach ($pk->items as $item) {
+                $kOrd  = $item->product?->konversiDisplay($item->qty_to_pick) ?? '-';
+                $kPick = $item->product?->konversiDisplay($item->qty_picked) ?? '-';
+
                 $rows->push([
                     $no++,
                     Carbon::parse($pk->created_at)->format('d M Y'),
@@ -71,9 +74,9 @@ class LaporanPickingPackingExport implements FromCollection, WithHeadings, WithT
                     $item->product?->code ?? '-',
                     $item->product?->name ?? '-',
                     $item->location ?? '-',
-                    $item->qty_to_pick,
-                    $item->qty_picked,
-                    $item->qty_picked,
+                    $item->qty_to_pick.($kOrd && $kOrd !== '-' ? " ({$kOrd})" : ''),
+                    $item->qty_picked.($kPick && $kPick !== '-' ? " ({$kPick})" : ''),
+                    $item->qty_picked.($kPick && $kPick !== '-' ? " ({$kPick})" : ''),
                     ucfirst($pk->status ?? '-'),
                     $pk->picker?->name ?? '-',
                     '-',
