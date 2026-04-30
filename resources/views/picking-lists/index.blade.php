@@ -18,7 +18,7 @@
                                     <td>Owner</td>
                                     <td>Picker</td>
                                     <td>Status</td>
-                                    <td>Total Items</td>
+                                    <td>Items</td>
                                     <td>Aksi</td>
                                 </tr>
                             </thead>
@@ -38,7 +38,21 @@
                                             <span class="label label-success">Completed</span>
                                         @endif
                                     </td>
-                                    <td>{{ $value->items->count() }} items</td>
+                                    <td>
+                                        <ul class="list-unstyled" style="margin:0">
+                                            @foreach ($value->items as $item)
+                                                <li>
+                                                    <small>
+                                                        {{ $item->product?->name }} × {{ $item->qty_to_pick }}
+                                                        @php $k = $item->product?->konversiDisplay($item->qty_to_pick); @endphp
+                                                        @if($k && $k !== '-')
+                                                            <span class="text-muted">({{ $k }})</span>
+                                                        @endif
+                                                    </small>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
                                     <td>
                                         <a class="btn-xs btn btn-default" href="{{ route('picking-lists.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @if (!isset($value->deliveryOrder))

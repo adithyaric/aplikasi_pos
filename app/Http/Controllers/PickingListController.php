@@ -13,7 +13,7 @@ class PickingListController extends Controller
 {
     public function index()
     {
-        $pickingLists = PickingList::with(['requestOrder.owner', 'picker'])
+        $pickingLists = PickingList::with(['requestOrder.owner', 'picker', 'items.product'])
             ->orderBy('created_at', 'desc')
             ->get();
 
