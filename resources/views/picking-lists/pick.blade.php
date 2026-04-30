@@ -64,7 +64,13 @@
                                                 <td>{{ $item->product->name }}</td>
                                                 <td>{{ $lokasi }}</td>
                                                 <td>{{ $item->sku ?? '-' }}</td>
-                                                <td>{{ $item->qty_to_pick }}</td>
+                                                <td>
+                                                    {{ $item->qty_to_pick }}
+                                                    @php $k = $item->product->konversiDisplay($item->qty_to_pick); @endphp
+                                                    @if($k !== '-')
+                                                        <small class="text-muted">({{ $k }})</small>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     <input type="number" name="items[{{ $item->id }}][qty_picked]"
                                                         class="form-control qty-input" value="{{ $item->qty_picked }}" min="0"

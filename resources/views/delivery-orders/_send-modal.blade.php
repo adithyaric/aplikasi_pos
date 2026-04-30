@@ -25,7 +25,13 @@
                             <tr>
                                 <td>{{ $item->product->name }}</td>
                                 <td>{{ $item->sku ?? '-' }}</td>
-                                <td class="text-center">{{ $item->qty }}</td>
+                                <td class="text-center">
+                                    {{ $item->qty }}
+                                    @php $k = $item->product->konversiDisplay($item->qty); @endphp
+                                    @if($k !== '-')
+                                        <br><small class="text-muted">({{ $k }})</small>
+                                    @endif
+                                </td>
                                 <td>
                                     <input type="number"
                                         name="items[{{ $item->id }}][qty_sent]"
