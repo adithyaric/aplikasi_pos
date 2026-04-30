@@ -35,7 +35,12 @@
                     <td>{{ $row['outlet'] }}</td>
                     <td>{{ $row['kode_barang'] }}</td>
                     <td>{{ $row['nama_barang'] }}</td>
-                    <td class="tc">{{ $row['qty'] }}</td>
+                    <td class="tc">
+                        {{ $row['qty'] }}
+                        @if(isset($row['konversi']) && $row['konversi'] !== '-')
+                            <br><small>({{ $row['konversi'] }})</small>
+                        @endif
+                    </td>
                     <td class="tc">{{ $row['satuan'] }}</td>
                     <td class="tc">{{ $row['status'] }}</td>
                     <td>{{ $row['kode_po'] }}</td>

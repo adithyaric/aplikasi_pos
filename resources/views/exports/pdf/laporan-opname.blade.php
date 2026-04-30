@@ -42,10 +42,19 @@
                         {{ $adj->stock?->expired_date ? \Carbon\Carbon::parse($adj->stock->expired_date)->format('d/m/Y') : '-' }}
                     </td>
                     <td class="tc">{{ $adj->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">{{ $adj->system_qty ?? ($adj->stock?->qty ?? 0) }}</td>
-                    <td class="tc">{{ $adj->physical_qty ?? 0 }}</td>
+                    <td class="tc">
+                        @php $sysQty = $adj->system_qty ?? ($adj->stock?->qty ?? 0); $k = $adj->product?->konversiDisplay($sysQty); @endphp
+                        {{ $sysQty }}@if($k && $k !== '-') <br><small>({{ $k }})</small>@endif
+                    </td>
+                    <td class="tc">
+                        @php $physQty = $adj->physical_qty ?? 0; $k = $adj->product?->konversiDisplay($physQty); @endphp
+                        {{ $physQty }}@if($k && $k !== '-') <br><small>({{ $k }})</small>@endif
+                    </td>
                     <td class="tc">{{ ($selisih >= 0 ? '+' : '') . $selisih }}</td>
-                    <td class="tc">{{ $adj->qty_adjustment ?? $selisih }}</td>
+                    <td class="tc">
+                        @php $adjQty = $adj->qty_adjustment ?? $selisih; $k = $adj->product?->konversiDisplay(abs($adjQty)); @endphp
+                        {{ $adjQty }}@if($k && $k !== '-') <br><small>({{ $k }})</small>@endif
+                    </td>
                     <td>{{ $adj->reason ?? '-' }}</td>
                     <td class="tc">{{ ucfirst($adj->status ?? '-') }}</td>
                     <td>{{ $adj->notes ?? '-' }}</td>

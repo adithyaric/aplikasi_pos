@@ -75,10 +75,26 @@
             <tr class="{{ $i % 2 == 1 ? 'alt' : '' }}">
                 <td class="tc">{{ $i + 1 }}</td>
                 <td class="tc">{{ $t['tanggal'] }}</td>
-                <td class="tr">{{ $t['stok_awal'] }}</td>
-                <td class="tr">{{ $t['masuk'] }}</td>
-                <td class="tr">{{ $t['keluar'] }}</td>
-                <td class="tr"><strong>{{ $t['stok_akhir'] }}</strong></td>
+                <td class="tr">
+                    {{ $t['stok_awal'] }}
+                    @php $k = $stock->product->konversiDisplay($t['stok_awal']); @endphp
+                    @if($k !== '-') <br><small>({{ $k }})</small>@endif
+                </td>
+                <td class="tr">
+                    {{ $t['masuk'] }}
+                    @php $k = $stock->product->konversiDisplay($t['masuk']); @endphp
+                    @if($k !== '-') <br><small>({{ $k }})</small>@endif
+                </td>
+                <td class="tr">
+                    {{ $t['keluar'] }}
+                    @php $k = $stock->product->konversiDisplay($t['keluar']); @endphp
+                    @if($k !== '-') <br><small>({{ $k }})</small>@endif
+                </td>
+                <td class="tr">
+                    <strong>{{ $t['stok_akhir'] }}</strong>
+                    @php $k = $stock->product->konversiDisplay($t['stok_akhir']); @endphp
+                    @if($k !== '-') <br><small>({{ $k }})</small>@endif
+                </td>
                 <td class="tr">{{ number_format($t['harga'], 0, ',', '.') }}</td>
                 <td class="tr"><strong>{{ number_format($t['nilai'], 0, ',', '.') }}</strong></td>
                 <td><small>{{ $t['keterangan'] }}</small></td>
