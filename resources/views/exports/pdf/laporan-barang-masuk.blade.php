@@ -20,9 +20,8 @@
                 <th style="width:8%">Kode Barang</th>
                 <th style="width:18%">Nama Barang</th>
                 <th style="width:12%">Batch</th>
-                <th style="width:6%">Qty Masuk</th>
+                <th style="width:9%">Qty Masuk</th>
                 <th style="width:6%">Satuan</th>
-                <th style="width:9%">Konversi</th>
                 <th style="width:10%">Keterangan</th>
             </tr>
         </thead>
@@ -36,14 +35,14 @@
                     <td>{{ $m->product?->code ?? '-' }}</td>
                     <td>{{ $m->product?->name ?? '-' }}</td>
                     <td>{{ $m->batch }}</td>
-                    <td class="tc">{{ $m->qty_in }}</td>
+                    @php $k = $m->product?->konversiDisplay($m->qty_in ?? 0); @endphp
+                    <td class="tc">{{ $m->qty_in . ($k && $k !== '-' ? " ({$k})" : '') }}</td>
                     <td class="tc">{{ $m->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">{{ $m->product?->konversiDisplay($m->qty_in ?? 0) ?? '-' }}</td>
                     <td>{{ $m->notes }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" class="tc">Tidak ada data</td>
+                    <td colspan="10" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

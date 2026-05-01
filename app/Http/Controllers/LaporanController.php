@@ -264,6 +264,9 @@ class LaporanController extends Controller
         $no   = 1;
         foreach ($pembelians as $p) {
             foreach ($p->pembelianProducts as $pp) {
+                $kQty  = $pp->product?->konversiDisplay($pp->qty) ?? '-';
+                $qtyRcv = $pp->qty_received ?? $pp->qty;
+                $kRcv  = $pp->product?->konversiDisplay($qtyRcv) ?? '-';
                 $rows[] = [
                     'no' => $no++,
                     'tanggal' => $p->created_at->isoFormat('DD MMM YYYY'),
@@ -272,11 +275,10 @@ class LaporanController extends Controller
                     'supplier' => $p->supplier?->name ?? '-',
                     'kode_barang' => $pp->product?->code ?? '-',
                     'nama_barang' => $pp->product?->name ?? '-',
-                    'qty' => $pp->qty,
+                    'qty' => $pp->qty . ($kQty && $kQty !== '-' ? " ({$kQty})" : ''),
                     'satuan' => $pp->product?->satuan ?? 'PCS',
-                    'konversi' => $pp->product?->konversiDisplay($pp->qty) ?? '-',
                     'harga_total' => $pp->subtotal,
-                    'qty_diterima' => $pp->qty_received ?? $pp->qty,
+                    'qty_diterima' => $qtyRcv . ($kRcv && $kRcv !== '-' ? " ({$kRcv})" : ''),
                     'status' => ucfirst($p->status ?? '-'),
                     'keterangan' => '',
                 ];
@@ -300,6 +302,7 @@ class LaporanController extends Controller
         $no   = 1;
         foreach ($orders as $ro) {
             foreach ($ro->items as $item) {
+                $k = $item->product?->konversiDisplay($item->qty_requested) ?? '-';
                 $rows[] = [
                     'no' => $no++,
                     'tanggal' => \Carbon\Carbon::parse($ro->request_date)->isoFormat('DD MMM YYYY'),
@@ -307,9 +310,8 @@ class LaporanController extends Controller
                     'outlet' => $ro->owner?->name ?? '-',
                     'kode_barang' => $item->product?->code ?? '-',
                     'nama_barang' => $item->product?->name ?? '-',
-                    'qty' => $item->qty_requested,
+                    'qty' => $item->qty_requested . ($k && $k !== '-' ? " ({$k})" : ''),
                     'satuan' => $item->product?->satuan ?? 'PCS',
-                    'konversi' => $item->product?->konversiDisplay($item->qty_requested) ?? '-',
                     'status' => ucfirst($ro->status ?? '-'),
                     'kode_po' => '-',
                     'keterangan' => '',

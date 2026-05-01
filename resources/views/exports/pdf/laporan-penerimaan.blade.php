@@ -22,10 +22,9 @@
                 <th style="width:14%">Nama Barang</th>
                 <th style="width:10%">Batch</th>
                 <th style="width:8%">Expired</th>
-                <th style="width:5%">Qty</th>
-                <th style="width:5%">Qty Diterima</th>
+                <th style="width:7%">Qty</th>
+                <th style="width:7%">Qty Diterima</th>
                 <th style="width:5%">Satuan</th>
-                <th style="width:8%">Konversi</th>
                 <th style="width:6%">Kondisi</th>
                 <th style="width:8%">Keterangan</th>
             </tr>
@@ -44,16 +43,16 @@
                     <td class="tc">
                         {{ $s->expired_date ? \Carbon\Carbon::parse($s->expired_date)->format('d/m/Y') : '-' }}
                     </td>
-                    <td class="tc">{{ $s->qty ?? 0 }}</td>
-                    <td class="tc">{{ $s->qty_diterima ?? 0 }}</td>
+                    @php $kQty = $s->product?->konversiDisplay($s->qty ?? 0); $kRcv = $s->product?->konversiDisplay($s->qty_diterima ?? 0); @endphp
+                    <td class="tc">{{ ($s->qty ?? 0) . ($kQty && $kQty !== '-' ? " ({$kQty})" : '') }}</td>
+                    <td class="tc">{{ ($s->qty_diterima ?? 0) . ($kRcv && $kRcv !== '-' ? " ({$kRcv})" : '') }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">{{ $s->product?->konversiDisplay($s->qty ?? 0) ?? '-' }}</td>
                     <td class="tc">Baik</td>
                     <td>{{ $s->pembelian?->notes ?? 'Pembelian' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="15" class="tc">Tidak ada data</td>
+                    <td colspan="14" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

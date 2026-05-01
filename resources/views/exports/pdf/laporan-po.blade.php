@@ -19,12 +19,11 @@
                 <th style="width:9%">No PR</th>
                 <th style="width:10%">Supplier</th>
                 <th style="width:8%">Kode Barang</th>
-                <th style="width:15%">Nama Barang</th>
-                <th style="width:4%">QTY</th>
+                <th style="width:17%">Nama Barang</th>
+                <th style="width:8%">QTY</th>
                 <th style="width:5%">Satuan</th>
-                <th style="width:8%">Konversi</th>
                 <th style="width:9%">Harga Total</th>
-                <th style="width:6%">QTY Terima</th>
+                <th style="width:8%">QTY Terima</th>
                 <th style="width:6%">Status</th>
                 <th style="width:8%">Keterangan</th>
             </tr>
@@ -41,7 +40,6 @@
                     <td>{{ $row['nama_barang'] }}</td>
                     <td class="tc">{{ $row['qty'] }}</td>
                     <td class="tc">{{ $row['satuan'] }}</td>
-                    <td class="tc">{{ $row['konversi'] }}</td>
                     <td class="tr">Rp {{ number_format($row['harga_total'], 0, ',', '.') }}</td>
                     <td class="tc">{{ $row['qty_diterima'] }}</td>
                     <td class="tc">{{ $row['status'] }}</td>
@@ -49,7 +47,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="14" class="tc">Tidak ada data</td>
+                    <td colspan="13" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

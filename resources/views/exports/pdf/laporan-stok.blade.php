@@ -19,8 +19,7 @@
                 <th style="width:9%">Expired Date</th>
                 <th style="width:8%">Kategori</th>
                 <th style="width:5%">Satuan</th>
-                <th style="width:9%">Konversi</th>
-                <th style="width:6%">Stok</th>
+                <th style="width:9%">Stok</th>
                 <th style="width:6%">Min Stok</th>
                 <th style="width:6%">Selisih</th>
                 <th style="width:7%">Status Stok</th>
@@ -49,8 +48,8 @@
                     </td>
                     <td>{{ $s->product?->category?->name ?? '-' }}</td>
                     <td class="tc">{{ $s->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">{{ $s->product?->konversiDisplay($s->qty ?? 0) ?? '-' }}</td>
-                    <td class="tc">{{ $s->qty ?? 0 }}</td>
+                    @php $k = $s->product?->konversiDisplay($s->qty ?? 0); @endphp
+                    <td class="tc">{{ ($s->qty ?? 0) . ($k && $k !== '-' ? " ({$k})" : '') }}</td>
                     <td class="tc">{{ $minStok }}</td>
                     <td class="tc">{{ ($selisih >= 0 ? '+' : '') . $selisih }}</td>
                     <td class="tc">{{ $statusStok }}</td>
@@ -59,7 +58,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="14" class="tc">Tidak ada data</td>
+                    <td colspan="13" class="tc">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>
