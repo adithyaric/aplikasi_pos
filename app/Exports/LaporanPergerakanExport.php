@@ -69,18 +69,21 @@ class LaporanPergerakanExport implements FromCollection, WithHeadings, WithTitle
             $saranReorder = ($s->qty ?? 0) <= $minStok ? 'Ya' : 'Tidak';
             $qtyReorder = ($s->qty ?? 0) <= $minStok ? max(0, $minStok * 2 - ($s->qty ?? 0)) : 0;
 
+            $qty      = $s->qty ?? 0;
+            $kStok    = $s->product?->konversiDisplay($qty);
+            $kReorder = $qtyReorder > 0 ? $s->product?->konversiDisplay($qtyReorder) : null;
             $rows->push([
                 $no++,
                 $s->product?->code ?? '-',
                 $s->product?->name ?? '-',
-                $s->qty ?? 0,
+                $qty . ($kStok && $kStok !== '-' ? " ({$kStok})" : ''),
                 $avgKeluar,
                 $hariTanpa,
                 $kategori,
                 $statusStok,
                 $minStok,
                 $saranReorder,
-                $qtyReorder,
+                $qtyReorder > 0 ? ($qtyReorder . ($kReorder && $kReorder !== '-' ? " ({$kReorder})" : '')) : 0,
                 '',
             ]);
         }

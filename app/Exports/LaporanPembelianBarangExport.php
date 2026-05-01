@@ -59,6 +59,7 @@ class LaporanPembelianBarangExport implements FromCollection, WithHeadings, With
 
         foreach ($pembelians as $p) {
             foreach ($p->pembelianProducts as $pp) {
+                $k = $pp->product?->konversiDisplay($pp->qty ?? 0);
                 $rows->push([
                     $no++,
                     Carbon::parse($p->created_at)->format('d M Y'),
@@ -66,7 +67,7 @@ class LaporanPembelianBarangExport implements FromCollection, WithHeadings, With
                     $p->supplier?->name ?? '-',
                     $pp->product?->code ?? '-',
                     $pp->product?->name ?? '-',
-                    $pp->qty,
+                    ($pp->qty ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
                     $pp->product?->satuan ?? 'PCS',
                     $pp->harga_beli,
                     $pp->subtotal,

@@ -61,6 +61,10 @@ class LaporanPenerimaanBarangExport implements FromCollection, WithHeadings, Wit
         $no = 1;
 
         foreach ($stocks as $s) {
+            $qty        = $s->qty ?? 0;
+            $qtyDiterima = $s->qty_diterima ?? 0;
+            $kQty      = $s->product?->konversiDisplay($qty);
+            $kDiterima  = $s->product?->konversiDisplay($qtyDiterima);
             $rows->push([
                 $no++,
                 Carbon::parse($s->created_at)->format('d M Y'),
@@ -71,8 +75,8 @@ class LaporanPenerimaanBarangExport implements FromCollection, WithHeadings, Wit
                 $s->product?->name ?? '-',
                 $s->sku ?? '-',
                 $s->expired_date ? Carbon::parse($s->expired_date)->format('d/m/Y') : '-',
-                $s->qty ?? 0,
-                $s->qty_diterima ?? 0,
+                $qty . ($kQty && $kQty !== '-' ? " ({$kQty})" : ''),
+                $qtyDiterima . ($kDiterima && $kDiterima !== '-' ? " ({$kDiterima})" : ''),
                 $s->product?->satuan ?? 'PCS',
                 'Baik',
                 $s->pembelian?->notes ?? 'Pembelian',

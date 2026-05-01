@@ -44,6 +44,7 @@ class LaporanBarangMasukExport implements FromCollection, WithHeadings, WithTitl
                 if ($m->reference_type === 'App\Models\Pembelian') { $supplier = $ref?->supplier?->name ?? '-'; }
             }
             preg_match('/SKU:\s*(\S+)/', $m->notes ?? '', $matches);
+            $k = $m->product?->konversiDisplay($m->qty_in ?? 0);
             $rows->push([
                 $no++,
                 $m->created_at->format('d M Y'),
@@ -52,7 +53,7 @@ class LaporanBarangMasukExport implements FromCollection, WithHeadings, WithTitl
                 $m->product?->code ?? '-',
                 $m->product?->name ?? '-',
                 $matches[1] ?? '-',
-                $m->qty_in,
+                ($m->qty_in ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
                 $m->product?->satuan ?? 'PCS',
                 $m->notes ?? ''
             ]);

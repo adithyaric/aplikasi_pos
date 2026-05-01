@@ -38,12 +38,7 @@
                     <td>{{ $row['kode_barang'] }}</td>
                     <td>{{ $row['nama_barang'] }}</td>
                     <td>{{ $row['batch'] }}</td>
-                    <td class="tc">
-                        {{ $row['qty_kirim'] }}
-                        @if(isset($row['konversi_kirim']) && $row['konversi_kirim'] !== '-')
-                            <br><small>({{ $row['konversi_kirim'] }})</small>
-                        @endif
-                    </td>
+                    <td class="tc">{{ $row['qty_kirim'] }}</td>
                     <td class="tc">{{ $row['satuan'] }}</td>
                     <td class="tc">{{ $row['status'] }}</td>
                     <td>{{ $row['keterangan'] }}</td>

@@ -77,6 +77,7 @@ class LaporanAktifitasExport implements FromCollection, WithHeadings, WithTitle
         $no = 1;
 
         foreach ($movements as $m) {
+            $k = $m->product?->konversiDisplay($m->qty ?? 0);
             $rows->push([
                 $no++,
                 Carbon::parse($m->created_at)->format('d M Y'),
@@ -84,7 +85,7 @@ class LaporanAktifitasExport implements FromCollection, WithHeadings, WithTitle
                 $m->doc_code,
                 $m->product?->code ?? '-',
                 $m->product?->name ?? '-',
-                $m->qty,
+                ($m->qty ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
                 $m->product?->satuan ?? 'PCS',
                 $m->product?->lokasi,
                 optional($m->product?->suppliers)->pluck('pic_supplier')?->filter()->implode(', '),

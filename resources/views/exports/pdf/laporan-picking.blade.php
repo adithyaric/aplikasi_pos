@@ -41,24 +41,9 @@
                     <td>{{ $row['kode_barang'] }}</td>
                     <td>{{ $row['nama_barang'] }}</td>
                     <td>{{ $row['lokasi'] }}</td>
-                    <td class="tc">
-                        {{ $row['qty_order'] }}
-                        @if(isset($row['konversi_order']) && $row['konversi_order'] !== '-')
-                            <br><small>({{ $row['konversi_order'] }})</small>
-                        @endif
-                    </td>
-                    <td class="tc">
-                        {{ $row['qty_pick'] }}
-                        @if(isset($row['konversi_pick']) && $row['konversi_pick'] !== '-')
-                            <br><small>({{ $row['konversi_pick'] }})</small>
-                        @endif
-                    </td>
-                    <td class="tc">
-                        {{ $row['qty_pack'] }}
-                        @if(isset($row['konversi_pick']) && $row['konversi_pick'] !== '-')
-                            <br><small>({{ $row['konversi_pick'] }})</small>
-                        @endif
-                    </td>
+                    <td class="tc">{{ $row['qty_order'] }}</td>
+                    <td class="tc">{{ $row['qty_pick'] }}</td>
+                    <td class="tc">{{ $row['qty_pack'] }}</td>
                     <td class="tc">{{ $row['status'] }}</td>
                     <td class="tc">{{ $row['picker'] }}</td>
                     <td class="tc">{{ $row['packer'] }}</td>

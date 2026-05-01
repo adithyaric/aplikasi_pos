@@ -36,7 +36,8 @@
                     <td>{{ $m->doc_code }}</td>
                     <td>{{ $m->product?->code ?? '-' }}</td>
                     <td>{{ $m->product?->name ?? '-' }}</td>
-                    <td class="tc">{{ $m->qty }}</td>
+                    @php $k = $m->product?->konversiDisplay($m->qty); @endphp
+                    <td class="tc">{{ $m->qty . ($k && $k !== '-' ? " ({$k})" : '') }}</td>
                     <td class="tc">{{ $m->product?->satuan ?? 'PCS' }}</td>
                     <td class="tc">{{ $m->lokasi }}</td>
                     <td class="tc">{{ $m->pic }}</td>

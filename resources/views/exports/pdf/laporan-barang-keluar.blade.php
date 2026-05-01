@@ -36,7 +36,8 @@
                     <td>{{ $m->product?->name ?? '-' }}</td>
                     <td>{{ $m->batch }}</td>
                     <td class="tc">{{ $m->product?->satuan ?? 'PCS' }}</td>
-                    <td class="tc">{{ $m->qty_out }}</td>
+                    @php $k = $m->product?->konversiDisplay($m->qty_out); @endphp
+                    <td class="tc">{{ $m->qty_out . ($k && $k !== '-' ? " ({$k})" : '') }}</td>
                     <td>{{ $m->notes }}</td>
                 </tr>
             @empty

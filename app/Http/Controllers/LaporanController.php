@@ -480,6 +480,7 @@ class LaporanController extends Controller
         $no = 1;
         foreach ($deliveries as $do) {
             foreach ($do->items as $item) {
+                $k = $item->product?->konversiDisplay($item->qty) ?? '-';
                 $rows[] = [
                     'no' => $no++,
                     'tanggal' => \Carbon\Carbon::parse($do->delivery_date)->isoFormat('DD MMM YYYY'),
@@ -489,9 +490,8 @@ class LaporanController extends Controller
                     'kode_barang' => $item->product?->code ?? '-',
                     'nama_barang' => $item->product?->name ?? '-',
                     'batch' => $item->sku ?? '-',
-                    'qty_kirim' => $item->qty,
+                    'qty_kirim' => $item->qty . ($k && $k !== '-' ? " ({$k})" : ''),
                     'satuan' => $item->product?->satuan ?? 'PCS',
-                    'konversi_kirim' => $item->product?->konversiDisplay($item->qty) ?? '-',
                     'status' => ucfirst($do->status ?? '-'),
                     'keterangan' => '',
                 ];
@@ -515,6 +515,8 @@ class LaporanController extends Controller
         $no = 1;
         foreach ($pickings as $pk) {
             foreach ($pk->items as $item) {
+                $kOrd  = $item->product?->konversiDisplay($item->qty_to_pick) ?? '-';
+                $kPick = $item->product?->konversiDisplay($item->qty_picked) ?? '-';
                 $rows[] = [
                     'no' => $no++,
                     'tanggal' => $pk->created_at->isoFormat('DD MMM YYYY'),
@@ -524,11 +526,9 @@ class LaporanController extends Controller
                     'kode_barang' => $item->product?->code ?? '-',
                     'nama_barang' => $item->product?->name ?? '-',
                     'lokasi' => $item->location ?? '-',
-                    'qty_order' => $item->qty_to_pick,
-                    'qty_pick' => $item->qty_picked,
-                    'qty_pack' => $item->qty_picked,
-                    'konversi_order' => $item->product?->konversiDisplay($item->qty_to_pick) ?? '-',
-                    'konversi_pick'  => $item->product?->konversiDisplay($item->qty_picked) ?? '-',
+                    'qty_order' => $item->qty_to_pick . ($kOrd && $kOrd !== '-' ? " ({$kOrd})" : ''),
+                    'qty_pick'  => $item->qty_picked  . ($kPick && $kPick !== '-' ? " ({$kPick})" : ''),
+                    'qty_pack'  => $item->qty_picked  . ($kPick && $kPick !== '-' ? " ({$kPick})" : ''),
                     'status' => ucfirst($pk->status ?? '-'),
                     'picker' => $pk->picker?->name ?? '-',
                     'packer' => '-',
@@ -582,6 +582,7 @@ class LaporanController extends Controller
         $no = 1;
         foreach ($pembelians as $p) {
             foreach ($p->pembelianProducts as $pp) {
+                $k = $pp->product?->konversiDisplay($pp->qty) ?? '-';
                 $rows[] = [
                     'no' => $no++,
                     'tanggal' => $p->created_at->isoFormat('DD MMM YYYY'),
@@ -589,7 +590,7 @@ class LaporanController extends Controller
                     'supplier' => $p->supplier?->name ?? '-',
                     'kode_barang' => $pp->product?->code ?? '-',
                     'nama_barang' => $pp->product?->name ?? '-',
-                    'qty' => $pp->qty,
+                    'qty' => $pp->qty . ($k && $k !== '-' ? " ({$k})" : ''),
                     'satuan' => $pp->product?->satuan ?? 'PCS',
                     'harga_satuan' => $pp->harga_beli,
                     'total_harga' => $pp->subtotal,
@@ -658,18 +659,22 @@ class LaporanController extends Controller
             $minStok    = $adj
                 ? (int) ceil($baseMin * (1 + $adj->adjustment_percentage / 100))
                 : (int) $baseMin;
+            $qty        = $s->qty ?? 0;
+            $qtyReorder = $qty <= $minStok ? max(0, $minStok * 2 - $qty) : 0;
+            $kStok      = $s->product?->konversiDisplay($qty) ?? '-';
+            $kReorder   = $s->product?->konversiDisplay($qtyReorder) ?? '-';
 
             return [
                 'kode_barang'   => $s->product?->code ?? '-',
                 'nama_barang'   => $s->product?->name ?? '-',
-                'stok'          => $s->qty ?? 0,
+                'stok'          => $qty . ($kStok && $kStok !== '-' ? " ({$kStok})" : ''),
                 'avg_keluar'    => $avgKeluar,
                 'hari_tanpa'    => $hariTanpa,
                 'kategori'      => $avgKeluar >= 10 ? 'Fast Moving' : ($avgKeluar >= 3 ? 'Medium Moving' : 'Slow Moving'),
-                'status_stok'   => ($s->qty ?? 0) > $minStok ? 'Aman' : (($s->qty ?? 0) > 0 ? 'Kritis' : 'Habis'),
+                'status_stok'   => $qty > $minStok ? 'Aman' : ($qty > 0 ? 'Kritis' : 'Habis'),
                 'min_stok'      => $minStok,
-                'saran_reorder' => ($s->qty ?? 0) <= $minStok ? 'Ya' : 'Tidak',
-                'qty_reorder'   => ($s->qty ?? 0) <= $minStok ? max(0, $minStok * 2 - ($s->qty ?? 0)) : 0,
+                'saran_reorder' => $qty <= $minStok ? 'Ya' : 'Tidak',
+                'qty_reorder'   => $qty <= $minStok ? ($qtyReorder . ($kReorder && $kReorder !== '-' ? " ({$kReorder})" : '')) : 0,
                 'keterangan'    => '',
             ];
         })->values()->all();

@@ -56,6 +56,7 @@ class LaporanBarangKeluarExport implements FromCollection, WithHeadings, WithTit
 
             preg_match('/SKU:\s*(\S+)/', $m->notes ?? '', $matches);
             $batch = $matches[1] ?? '-';
+            $k = $m->product?->konversiDisplay($m->qty_out ?? 0);
 
             $rows->push([
                 $no++,
@@ -66,7 +67,7 @@ class LaporanBarangKeluarExport implements FromCollection, WithHeadings, WithTit
                 $m->product?->name ?? '-',
                 $batch,
                 $m->product?->satuan ?? 'PCS',
-                $m->qty_out,
+                ($m->qty_out ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
                 $m->notes ?? '',
             ]);
         }

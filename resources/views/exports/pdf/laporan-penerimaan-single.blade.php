@@ -92,6 +92,8 @@
                 $qtyPo    = $item->qty ?? 0;
                 $qtyTerima = $item->qty_diterima ?? $stock?->qty ?? 0;
                 $selisih  = $qtyTerima - $qtyPo;
+                $kPo      = $item->product?->konversiDisplay($qtyPo);
+                $kTerima  = $item->product?->konversiDisplay($qtyTerima);
             @endphp
             <tr class="{{ $i % 2 == 1 ? 'alt' : '' }}">
                 <td class="tc">{{ $i + 1 }}</td>
@@ -102,8 +104,8 @@
                     {{ $stock?->expired_date ? \Carbon\Carbon::parse($stock->expired_date)->format('d/m/Y') : '-' }}
                 </td>
                 <td class="tc">{{ $item->product?->satuan ?? 'PCS' }}</td>
-                <td class="tc">{{ $qtyPo }}</td>
-                <td class="tc"><strong>{{ $qtyTerima }}</strong></td>
+                <td class="tc">{{ $qtyPo . ($kPo && $kPo !== '-' ? " ({$kPo})" : '') }}</td>
+                <td class="tc"><strong>{{ $qtyTerima . ($kTerima && $kTerima !== '-' ? " ({$kTerima})" : '') }}</strong></td>
                 <td class="tc" style="{{ $selisih < 0 ? 'color:#c00;' : '' }}">
                     {{ ($selisih >= 0 ? '+' : '') . $selisih }}
                 </td>

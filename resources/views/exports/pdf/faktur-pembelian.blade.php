@@ -117,8 +117,12 @@
                 <td>{{ $item->product?->code ?? '-' }}</td>
                 <td>{{ $item->product?->name ?? '-' }}</td>
                 <td class="tc">{{ $item->product?->satuan ?? $item->product?->unit ?? 'PCS' }}</td>
-                <td class="tc">{{ $item->qty }}</td>
-                <td class="tc">{{ $item->qty_diterima ?? '-' }}</td>
+                @php
+                    $kQty = $item->product?->konversiDisplay($item->qty);
+                    $kRcv = $item->qty_diterima ? $item->product?->konversiDisplay($item->qty_diterima) : null;
+                @endphp
+                <td class="tc">{{ $item->qty . ($kQty && $kQty !== '-' ? " ({$kQty})" : '') }}</td>
+                <td class="tc">{{ $item->qty_diterima ? ($item->qty_diterima . ($kRcv && $kRcv !== '-' ? " ({$kRcv})" : '')) : '-' }}</td>
                 <td class="tr">{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                 <td class="tr">{{ number_format($item->subtotal, 0, ',', '.') }}</td>
             </tr>
