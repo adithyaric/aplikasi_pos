@@ -85,7 +85,7 @@ class LaporanAktifitasExport implements FromCollection, WithHeadings, WithTitle
                 $m->doc_code,
                 $m->product?->code ?? '-',
                 $m->product?->name ?? '-',
-                ($m->qty ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
+                ($m->qty ?? 0).($k && $k !== '-' ? " ({$k})" : ''),
                 $m->product?->satuan ?? 'PCS',
                 $m->product?->lokasi,
                 optional($m->product?->suppliers)->pluck('pic_supplier')?->filter()->implode(', '),

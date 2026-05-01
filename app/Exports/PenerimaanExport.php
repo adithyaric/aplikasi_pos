@@ -55,8 +55,8 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
             $item->product->code ?? '',
             $item->product->name ?? '',
             $item->product->satuan ?? 'PCS',
-            $item->qty . ($k && $k !== '-' ? " ({$k})" : ''),
-            ($item->qty_diterima ?? 0) . ($kd && $kd !== '-' ? " ({$kd})" : ''),
+            $item->qty.($k && $k !== '-' ? " ({$k})" : ''),
+            ($item->qty_diterima ?? 0).($kd && $kd !== '-' ? " ({$kd})" : ''),
             'Rp '.number_format($item->harga_beli, 0, ',', '.'),
             'Rp '.number_format($item->subtotal, 0, ',', '.'),
         ];

@@ -60,7 +60,7 @@ class PembelianSingleExport implements FromCollection, WithHeadings, WithMapping
             $no,
             $item->product->code ?? '',
             $item->product->name ?? '',
-            $item->qty . ($k && $k !== '-' ? " ({$k})" : ''),
+            $item->qty.($k && $k !== '-' ? " ({$k})" : ''),
             $item->product->satuan ?? 'PCS',
             'Rp '.number_format($item->harga_beli, 0, ',', '.'),
             'Rp '.number_format($item->subtotal, 0, ',', '.'),

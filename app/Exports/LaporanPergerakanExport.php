@@ -76,14 +76,14 @@ class LaporanPergerakanExport implements FromCollection, WithHeadings, WithTitle
                 $no++,
                 $s->product?->code ?? '-',
                 $s->product?->name ?? '-',
-                $qty . ($kStok && $kStok !== '-' ? " ({$kStok})" : ''),
+                $qty.($kStok && $kStok !== '-' ? " ({$kStok})" : ''),
                 $avgKeluar,
                 $hariTanpa,
                 $kategori,
                 $statusStok,
                 $minStok,
                 $saranReorder,
-                $qtyReorder > 0 ? ($qtyReorder . ($kReorder && $kReorder !== '-' ? " ({$kReorder})" : '')) : 0,
+                $qtyReorder > 0 ? ($qtyReorder.($kReorder && $kReorder !== '-' ? " ({$kReorder})" : '')) : 0,
                 '',
             ]);
         }

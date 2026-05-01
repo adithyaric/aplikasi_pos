@@ -75,7 +75,7 @@ class StockOpnameExport implements FromCollection, WithHeadings, WithMapping, Wi
                 ? Carbon::parse($item->stock->expired_at)->format('d/m/Y')
                 : '-',
             $item->product->satuan ?? 'PCS',
-            $systemQty . ($konvDisplay && $konvDisplay !== '-' ? " ({$konvDisplay})" : ''),
+            $systemQty.($konvDisplay && $konvDisplay !== '-' ? " ({$konvDisplay})" : ''),
             $physicalQty,
             ($selisih >= 0 ? '+' : '').$selisih,
             ($item->quantity >= 0 ? '+' : '').$item->quantity,

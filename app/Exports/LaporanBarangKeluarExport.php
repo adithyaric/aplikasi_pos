@@ -67,7 +67,7 @@ class LaporanBarangKeluarExport implements FromCollection, WithHeadings, WithTit
                 $m->product?->name ?? '-',
                 $batch,
                 $m->product?->satuan ?? 'PCS',
-                ($m->qty_out ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
+                ($m->qty_out ?? 0).($k && $k !== '-' ? " ({$k})" : ''),
                 $m->notes ?? '',
             ]);
         }

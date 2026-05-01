@@ -53,7 +53,7 @@ class LaporanBarangMasukExport implements FromCollection, WithHeadings, WithTitl
                 $m->product?->code ?? '-',
                 $m->product?->name ?? '-',
                 $matches[1] ?? '-',
-                ($m->qty_in ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
+                ($m->qty_in ?? 0).($k && $k !== '-' ? " ({$k})" : ''),
                 $m->product?->satuan ?? 'PCS',
                 $m->notes ?? ''
             ]);

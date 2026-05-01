@@ -74,7 +74,7 @@ class StockExport implements FromCollection, WithHeadings, WithTitle
                 $s->expired_at ? Carbon::parse($s->expired_at)->format('d/m/Y') : '-',
                 $s->product?->category?->name ?? '-',
                 $s->product?->satuan ?? 'PCS',
-                $qty . ($konvDisplay && $konvDisplay !== '-' ? " ({$konvDisplay})" : ''),
+                $qty.($konvDisplay && $konvDisplay !== '-' ? " ({$konvDisplay})" : ''),
                 $minStok,
                 ($selisih >= 0 ? '+' : '').$selisih,
                 $statusStok,

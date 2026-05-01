@@ -67,7 +67,7 @@ class LaporanPembelianBarangExport implements FromCollection, WithHeadings, With
                     $p->supplier?->name ?? '-',
                     $pp->product?->code ?? '-',
                     $pp->product?->name ?? '-',
-                    ($pp->qty ?? 0) . ($k && $k !== '-' ? " ({$k})" : ''),
+                    ($pp->qty ?? 0).($k && $k !== '-' ? " ({$k})" : ''),
                     $pp->product?->satuan ?? 'PCS',
                     $pp->harga_beli,
                     $pp->subtotal,
