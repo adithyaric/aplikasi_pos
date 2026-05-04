@@ -60,13 +60,13 @@
                                 <i class="fa fa-save"></i> Save Stock Opname
                             </button>
                             <a id="btnExportTemplate" href="{{ route('stock.opname.export-template') }}"
-                               class="btn btn-info">
+                               class="btn btn-sm btn-default">
                                 <i class="fa fa-file-excel-o"></i> Export Template
                             </a>
                             <form method="GET" action="{{ route('laporan.stock-opname') }}" style="display:inline;">
                                 <input type="hidden" name="tanggal" id="exportTanggal" value="{{ date('Y-m-d') }}" />
                                 <input type="hidden" name="lokasi" id="exportLokasi" value="" />
-                                <button type="submit" class="btn btn-success">
+                                <button type="submit" class="btn btn-sm btn-success">
                                     <i class="fa fa-file-excel-o"></i> Export Laporan
                                 </button>
                             </form>

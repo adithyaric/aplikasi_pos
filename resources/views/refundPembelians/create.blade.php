@@ -120,52 +120,35 @@
                             TAB 2: Outlet ke Gudang
                             ══════════════════════════════════════════════ --}}
                                 <div class="tab-pane" id="tab-outlet">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Outlet <span class="text-danger">*</span></label>
-                                                <select id="outlet_id" class="form-control select2" name="outlet_id"
-                                                    data-placeholder="Pilih Outlet" style="width:100%" disabled>
-                                                    <option value="" disabled selected>Pilih Outlet</option>
-                                                    @foreach ($outlets as $o)
-                                                        <option value="{{ $o->id }}"
-                                                            {{ old('outlet_id') == $o->id ? 'selected' : '' }}>
-                                                            {{ $o->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                @error('outlet_id')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                {{-- [CHANGED] Select Delivery Order, not Pembelian --}}
-                                                <label>No. Delivery Order <span class="text-danger">*</span></label>
-                                                <select id="delivery_order_id" class="form-control select2"
-                                                    name="delivery_order_id" data-placeholder="Pilih Delivery Order"
-                                                    style="width:100%" disabled>
-                                                    <option value="" disabled selected>Pilih Delivery Order</option>
-                                                </select>
-                                                @error('delivery_order_id')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                    <div class="form-group">
+                                        <label>Outlet <span class="text-danger">*</span></label>
+                                        <select id="outlet_id" class="form-control select2" name="outlet_id"
+                                            data-placeholder="Pilih Outlet" style="width:100%" disabled>
+                                            <option value="" disabled selected>Pilih Outlet</option>
+                                            @foreach ($outlets as $o)
+                                                <option value="{{ $o->id }}"
+                                                    {{ old('outlet_id') == $o->id ? 'selected' : '' }}>
+                                                    {{ $o->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('outlet_id')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div id="outlet-product-area" style="display:none">
                                         <h4>Daftar Produk Outlet</h4>
                                         <div class="text-muted small" style="margin-bottom:8px">
-                                            Produk dari delivery order tersebut. Hapus baris yang tidak diretur.
+                                            Produk otomatis dari stok outlet. Hapus baris yang tidak diretur.
                                         </div>
                                         <div class="table-responsive text-nowrap">
                                             <table class="table table-bordered table-striped" id="tbl-outlet">
                                                 <thead class="bg-green">
                                                     <tr>
                                                         <th>Produk</th>
-                                                        <th width="80">SKU</th>
+                                                        <th width="80">SKU/Batch</th>
+                                                        <th width="90">No. DO</th>
                                                         <th width="70">Tersedia</th>
                                                         <th width="80">Qty Retur</th>
                                                         <th>Alasan</th>
@@ -325,41 +308,17 @@
             });
         });
 
-        // ── TAB 2: Outlet change → load delivery orders ───────────────────────────
+        // ── TAB 2: Outlet change → load all outlet stocks ────────────────────────
         $('#outlet_id').on('change', function() {
             var outletId = $(this).val();
             if (!outletId) return;
-
-            $('#delivery_order_id').prop('disabled', true).find('option:not(:first)').remove();
-            $('#outlet-product-area, #outlet-empty').hide();
-            $('#outlet-repeater').empty();
-            $('#btn-submit').prop('disabled', true);
-
-            $.get('/retur/outlet/' + outletId + '/delivery-orders', function(data) {
-                if (!data.length) {
-                    alert('Tidak ada delivery order yang sudah diterima untuk outlet ini.');
-                    return;
-                }
-                $.each(data, function(i, do_) {
-                    var label = do_.code + (do_.received_date ? ' (' + do_.received_date + ')' :
-                    '');
-                    $('#delivery_order_id').append($('<option>').val(do_.id).text(label));
-                });
-                $('#delivery_order_id').prop('disabled', false).trigger('change.select2');
-            });
-        });
-
-        // ── TAB 2: Delivery Order change → load outlet stocks ────────────────────
-        $('#delivery_order_id').on('change', function() {
-            var doId = $(this).val();
-            if (!doId) return;
 
             $('#outlet-product-area, #outlet-empty').hide();
             $('#outlet-loading').show();
             $('#outlet-repeater').empty();
             $('#btn-submit').prop('disabled', true);
 
-            $.get('/retur/delivery-order/' + doId + '/items', function(data) {
+            $.get('/retur/outlet/' + outletId + '/products', function(data) {
                 $('#outlet-loading').hide();
 
                 if (!data.length) {
@@ -376,6 +335,7 @@
                     <input type="hidden" name="product[${i}][stock_id]" value="${item.stock_id}">
                 </td>
                 <td><span class="label label-default">${item.sku}</span></td>
+                <td><small class="text-muted">${item.do_code}</small></td>
                 <td><span class="badge bg-green">${item.qty_available}</span></td>
                 <td>
                     <input type="number" class="form-control" style="width:70px"

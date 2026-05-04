@@ -92,10 +92,7 @@ Route::middleware(['role:outlet|kasir|admin|superadmin'])->group(function () {
 
     // AJAX helpers for retur — must be BEFORE the resource
     Route::get('/retur/supplier/{supplier}/products', [RefundPembelianController::class, 'getSupplierProducts'])->name('retur.supplier.products');
-
-    // Outlet loads DeliveryOrders, not Pembelians
-    Route::get('/retur/outlet/{outlet}/delivery-orders', [RefundPembelianController::class, 'getOutletDeliveryOrders'])->name('retur.outlet.delivery-orders');
-    Route::get('/retur/delivery-order/{deliveryOrder}/items', [RefundPembelianController::class, 'getDeliveryOrderItemsForRetur'])->name('retur.delivery-order.items');
+    Route::get('/retur/outlet/{outlet}/products', [RefundPembelianController::class, 'getOutletProducts'])->name('retur.outlet.products');
 
     // Terima retur (penerimaan barang retur dari supplier)
     Route::get('/refundPembelian/{refundPembelian}/terima', [RefundPembelianController::class, 'terimaForm'])->name('refundPembelian.terima.form');

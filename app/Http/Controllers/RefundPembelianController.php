@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DeliveryOrder;
 use App\Models\Kas;
 use App\Models\Outlet;
 use App\Models\OwnerStock;
@@ -43,38 +42,31 @@ class RefundPembelianController extends Controller
     }
 
     /**
-     * Received DeliveryOrders for an outlet.
+     * All outlet stocks for an outlet (for retur, showing DO source).
      */
-    public function getOutletDeliveryOrders(Outlet $outlet)
+    public function getOutletProducts(Outlet $outlet)
     {
-        $orders = DeliveryOrder::where('owner_id', $outlet->id)
-            ->where('status', 'delivered')
-            ->whereHas('items.stock.ownerStock', fn ($q) => $q->where('qty', '>', 0))
-            ->get(['id', 'code', 'received_date']);
-
-        return response()->json($orders);
-    }
-
-    /**
-     * Items from a DeliveryOrder with current OwnerStock qty.
-     */
-    public function getDeliveryOrderItemsForRetur(DeliveryOrder $deliveryOrder)
-    {
-        $items = $deliveryOrder->items()
-            ->with(['product', 'stock.ownerStock'])
+        $stocks = OwnerStock::where('owner_id', $outlet->id)
+            ->where('qty', '>', 0)
+            ->with(['product', 'stock'])
             ->get()
-            ->map(fn ($item) => [
-                'stock_id'      => $item->stock_id,
-                'product_id'    => $item->product_id,
-                'product_name'  => $item->product->name,
-                'sku'           => $item->sku ?? $item->stock->sku ?? '-',
-                'qty_available' => $item->stock->ownerStock->qty ?? 0,
-                'harga_beli'    => $item->harga_beli ?? $item->stock->harga_beli ?? 0,
-            ])
-            ->filter(fn ($i) => $i['qty_available'] > 0)
-            ->values();
+            ->map(function ($ownerStock) use ($outlet) {
+                $doItem = \App\Models\DeliveryOrderItem::where('stock_id', $ownerStock->stock_id)
+                    ->whereHas('deliveryOrder', fn ($q) => $q->where('owner_id', $outlet->id)->where('status', 'delivered'))
+                    ->with('deliveryOrder:id,code')
+                    ->first();
 
-        return response()->json($items);
+                return [
+                    'stock_id'      => $ownerStock->stock_id,
+                    'product_id'    => $ownerStock->product_id,
+                    'product_name'  => $ownerStock->product->name,
+                    'sku'           => $ownerStock->stock->sku ?? '-',
+                    'do_code'       => $doItem?->deliveryOrder?->code ?? '-',
+                    'qty_available' => $ownerStock->qty,
+                ];
+            });
+
+        return response()->json($stocks->values());
     }
 
     // -----------------------------------------------------------------------
@@ -109,7 +101,7 @@ class RefundPembelianController extends Controller
             'type'              => 'required|in:gudang_ke_supplier,outlet_ke_gudang',
             'supplier_id'       => 'required_if:type,gudang_ke_supplier|nullable|exists:suppliers,id',
             'outlet_id'         => 'required_if:type,outlet_ke_gudang|nullable|exists:outlets,id',
-            'delivery_order_id' => 'required_if:type,outlet_ke_gudang|nullable|exists:delivery_orders,id',
+            'delivery_order_id' => 'nullable|exists:delivery_orders,id',
             'product'           => 'required|array|min:1',
             'product.*.product_id' => 'required|exists:products,id',
             'product.*.qty'        => 'required|integer|min:1',
@@ -122,7 +114,6 @@ class RefundPembelianController extends Controller
             'type.required' => 'Tipe refund wajib dipilih.',
             'supplier_id.required_if' => 'Supplier wajib diisi untuk tipe Gudang ke Supplier.',
             'outlet_id.required_if' => 'Outlet wajib diisi untuk tipe Outlet ke Gudang.',
-            'delivery_order_id.required_if' => 'Nomor DO wajib diisi untuk tipe Outlet ke Gudang.',
             'product.required' => 'Minimal harus ada satu produk.',
             'product.*.product_id.required' => 'ID Produk tidak valid.',
             'product.*.qty.min' => 'Jumlah barang minimal 1.',
