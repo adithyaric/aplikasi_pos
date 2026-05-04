@@ -229,20 +229,22 @@ class StockController extends Controller
     public function saveOpname(Request $request)
     {
         $request->validate([
-            'adjustment_date' => 'required|date',
-            'items' => 'required|array',
-            'items.*.stock_id' => 'required|exists:stocks,id',
-            'items.*.selisih' => 'required|numeric',
-            'items.*.keterangan' => 'nullable|string',
+            'adjustment_date'           => 'required|date',
+            'items'                     => 'required|array',
+            'items.*.stock_id'          => 'required|exists:stocks,id',
+            'items.*.selisih'           => 'required|numeric',
+            'items.*.system_qty'        => 'nullable|numeric',
+            'items.*.physical_qty'      => 'nullable|numeric',
+            'items.*.keterangan'        => 'nullable|string',
         ], [
-            'adjustment_date.required' => 'Tanggal penyesuaian harus diisi.',
-            'adjustment_date.date' => 'Tanggal penyesuaian harus berupa tanggal yang valid.',
-            'items.required' => 'Item harus diisi.',
-            'items.array' => 'Item harus berupa array.',
+            'adjustment_date.required'  => 'Tanggal penyesuaian harus diisi.',
+            'adjustment_date.date'      => 'Tanggal penyesuaian harus berupa tanggal yang valid.',
+            'items.required'            => 'Item harus diisi.',
+            'items.array'               => 'Item harus berupa array.',
             'items.*.stock_id.required' => 'Stok harus dipilih.',
-            'items.*.stock_id.exists' => 'Stok yang dipilih tidak ditemukan.',
-            'items.*.selisih.required' => 'Selisih harus diisi.',
-            'items.*.selisih.numeric' => 'Selisih harus berupa angka.',
+            'items.*.stock_id.exists'   => 'Stok yang dipilih tidak ditemukan.',
+            'items.*.selisih.required'  => 'Selisih harus diisi.',
+            'items.*.selisih.numeric'   => 'Selisih harus berupa angka.',
             'items.*.keterangan.string' => 'Keterangan harus berupa teks.',
         ]);
 

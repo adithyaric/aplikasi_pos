@@ -59,13 +59,10 @@
                             <button class="btn btn-success" id="btnSaveOpname">
                                 <i class="fa fa-save"></i> Save Stock Opname
                             </button>
-                            <form method="GET" action="{{ route('laporan.stock-opname') }}" style="display:inline;">
-                                <input type="hidden" name="tanggal" id="exportTanggal" value="{{ date('Y-m-d') }}" />
-                                <input type="hidden" name="lokasi" id="exportLokasi" value="" />
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-file-excel-o"></i> Export Excel
-                                </button>
-                            </form>
+                            <a id="btnExportTemplate" href="{{ route('stock.opname.export-template') }}"
+                               class="btn btn-success">
+                                <i class="fa fa-file-excel-o"></i> Export Template
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -182,12 +179,10 @@
                 });
             });
 
-            $('#tglStockOpname').on('change', function() {
-                $('#exportTanggal').val($(this).val());
-            });
-
             $('#filterLokasi').on('change', function() {
-                $('#exportLokasi').val($(this).val());
+                var lok  = $(this).val();
+                var base = '{{ route('stock.opname.export-template') }}';
+                $('#btnExportTemplate').attr('href', lok ? base + '?lokasi=' + encodeURIComponent(lok) : base);
                 loadStockData();
             });
 
@@ -200,22 +195,27 @@
 
                 const items = [];
                 $('#tableBody tr').each(function() {
-                    const productInput = $(this).find('.product-name');
-                    const selectStock = $(this).find('.select-stock');
+                    const row          = $(this);
+                    const productInput = row.find('.product-name');
+                    const selectStock  = row.find('.select-stock');
 
                     let stockId = productInput.data('stock-id');
                     if (!stockId && selectStock.length) {
                         stockId = selectStock.val();
                     }
 
-                    const selisih = parseFloat($(this).find('.selisih').val()) || 0;
-                    const keterangan = $(this).find('.keterangan').val().trim();
+                    const selisih     = parseFloat(row.find('.selisih').val()) || 0;
+                    const keterangan  = row.find('.keterangan').val().trim();
+                    const systemQty   = parseFloat(row.find('.stock_dikartu').val()) || 0;
+                    const physicalQty = parseFloat(row.find('.stock_fisik').val()) || 0;
 
                     if (stockId && selisih !== 0) {
                         items.push({
-                            stock_id:   stockId,
-                            selisih:    selisih,
-                            keterangan: keterangan,
+                            stock_id:     stockId,
+                            selisih:      selisih,
+                            system_qty:   systemQty,
+                            physical_qty: physicalQty,
+                            keterangan:   keterangan,
                         });
                     }
                 });
