@@ -10,10 +10,10 @@
                 <div class="box">
                     <div class="box-header">
                         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                            <select id="filterKategori" class="form-control input-sm" style="width:auto; min-width:160px;">
+                            <select id="filterKategori" class="form-control input-sm select2" style="width:auto; min-width:160px;">
                                 <option value="">Semua Kategori</option>
                             </select>
-                            <select id="filterLokasi" class="form-control input-sm" style="width:auto; min-width:160px;">
+                            <select id="filterLokasi" class="form-control input-sm select2" style="width:auto; min-width:160px;">
                                 <option value="">Semua Lokasi</option>
                             </select>
                         </div>

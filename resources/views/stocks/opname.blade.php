@@ -60,9 +60,16 @@
                                 <i class="fa fa-save"></i> Save Stock Opname
                             </button>
                             <a id="btnExportTemplate" href="{{ route('stock.opname.export-template') }}"
-                               class="btn btn-success">
+                               class="btn btn-info">
                                 <i class="fa fa-file-excel-o"></i> Export Template
                             </a>
+                            <form method="GET" action="{{ route('laporan.stock-opname') }}" style="display:inline;">
+                                <input type="hidden" name="tanggal" id="exportTanggal" value="{{ date('Y-m-d') }}" />
+                                <input type="hidden" name="lokasi" id="exportLokasi" value="" />
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-file-excel-o"></i> Export Laporan
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -179,10 +186,15 @@
                 });
             });
 
+            $('#tglStockOpname').on('change', function() {
+                $('#exportTanggal').val($(this).val());
+            });
+
             $('#filterLokasi').on('change', function() {
                 var lok  = $(this).val();
                 var base = '{{ route('stock.opname.export-template') }}';
                 $('#btnExportTemplate').attr('href', lok ? base + '?lokasi=' + encodeURIComponent(lok) : base);
+                $('#exportLokasi').val(lok);
                 loadStockData();
             });
 

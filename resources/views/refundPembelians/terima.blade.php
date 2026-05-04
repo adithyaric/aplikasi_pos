@@ -50,7 +50,6 @@
                             <div class="alert alert-info">
                                 <i class="fa fa-info-circle"></i>
                                 Pilih resolusi untuk setiap item: <strong>Retur Barang</strong> (stok gudang kembali)
-                                atau <strong>Ganti Uang</strong> (kas bertambah).
                             </div>
 
                             <table class="table table-bordered table-striped">
