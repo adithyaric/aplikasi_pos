@@ -38,6 +38,16 @@
                         <button class="btn btn-sm bg-orange" data-toggle="modal" data-target="#modalImportMinStock">
                             <i class="fa fa-upload"></i> Import Min Stock
                         </button>
+                        <div class="row" style="margin-top:10px;">
+                            <div class="col-xs-12" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <select id="filterKategori" class="form-control input-sm" style="width:auto; min-width:160px;">
+                                    <option value="">Semua Kategori</option>
+                                </select>
+                                <select id="filterLokasi" class="form-control input-sm" style="width:auto; min-width:160px;">
+                                    <option value="">Semua Lokasi</option>
+                                </select>
+                            </div>
+                        </div>
                     </div><!-- /.box-header -->
 
                     {{-- Modal Import --}}
@@ -122,6 +132,7 @@
                                     <td>Notif</td>
                                     {{-- <td>Serialized</td> --}}
                                     <td>Aksi</td>
+                                    <td style="display:none;">Lokasi</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -183,6 +194,7 @@
                                                     onclick="return confirm('Are you sure?')">Hapus</button>
                                             </form>
                                         </td>
+                                        <td style="display:none;">{{ $value->lokasi ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -224,6 +236,47 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
+            // Destroy master-layout's auto-init so we can add hidden column config
+            if ($.fn.DataTable.isDataTable('#example1')) {
+                $('#example1').DataTable().destroy();
+            }
+            var table = $('#example1').DataTable({
+                columnDefs: [{ visible: false, targets: [15] }]
+            });
+
+            // Populate Kategori dropdown (column 3) from loaded data
+            table.column(3).data().unique().sort().each(function(val) {
+                if (val && String(val).trim() !== '') {
+                    $('#filterKategori').append(
+                        '<option value="' + val + '">' + val + '</option>'
+                    );
+                }
+            });
+
+            // Populate Lokasi dropdown (column 15) from loaded data
+            table.column(15).data().unique().sort().each(function(val) {
+                if (val && String(val).trim() !== '') {
+                    $('#filterLokasi').append(
+                        '<option value="' + val + '">' + val + '</option>'
+                    );
+                }
+            });
+
+            function escReg(val) {
+                return val.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+            }
+
+            $('#filterKategori').on('change', function() {
+                var val = $(this).val();
+                table.column(3).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+            });
+
+            $('#filterLokasi').on('change', function() {
+                var val = $(this).val();
+                table.column(15).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+            });
+
+            // Price history modal (unchanged)
             $('#priceHistoryModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
