@@ -8,6 +8,16 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
+                    <div class="box-header">
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <select id="filterKategori" class="form-control input-sm" style="width:auto; min-width:160px;">
+                                <option value="">Semua Kategori</option>
+                            </select>
+                            <select id="filterLokasi" class="form-control input-sm" style="width:auto; min-width:160px;">
+                                <option value="">Semua Lokasi</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
@@ -25,6 +35,8 @@
                                     <td>Expired</td>
                                     <td>Status</td>
                                     <td>Action</td>
+                                    <td style="display:none;">Kategori</td>
+                                    <td style="display:none;">Lokasi</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,6 +81,8 @@
                                                 <i class="fa fa-history"></i> History
                                             </button>
                                         </td>
+                                        <td style="display:none;">{{ $stock->product->category?->name ?? '' }}</td>
+                                        <td style="display:none;">{{ $stock->product->lokasi ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -163,13 +177,48 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
-            // Destroy pre‑initialised DataTables (from master) to avoid column mismatch
+            // Destroy pre-initialised DataTables (from master) to avoid column mismatch
+            if ($.fn.DataTable.isDataTable('#example1')) {
+                $('#example1').DataTable().destroy();
+            }
             if ($.fn.DataTable.isDataTable('#example2')) {
                 $('#example2').DataTable().destroy();
             }
             if ($.fn.DataTable.isDataTable('#example3')) {
                 $('#example3').DataTable().destroy();
             }
+
+            var table = $('#example1').DataTable({
+                columnDefs: [{ visible: false, targets: [13, 14] }]
+            });
+
+            // Populate Kategori dropdown (column 13)
+            table.column(13).data().unique().sort().each(function(val) {
+                if (val && String(val).trim() !== '') {
+                    $('#filterKategori').append($('<option>', { value: val, text: val }));
+                }
+            });
+
+            // Populate Lokasi dropdown (column 14)
+            table.column(14).data().unique().sort().each(function(val) {
+                if (val && String(val).trim() !== '') {
+                    $('#filterLokasi').append($('<option>', { value: val, text: val }));
+                }
+            });
+
+            function escReg(val) {
+                return val.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+            }
+
+            $('#filterKategori').on('change', function() {
+                var val = $(this).val();
+                table.column(13).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+            });
+
+            $('#filterLokasi').on('change', function() {
+                var val = $(this).val();
+                table.column(14).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+            });
 
             $('#priceHistoryModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -210,11 +259,9 @@
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
 
-                // Clear old data and show loading
                 $('#activityBody').html('<tr><td colspan="4" class="text-center">Loading...</td></tr>');
                 $('#movementBody').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
 
-                // Destroy DataTables if already initialised (to reset them)
                 if ($.fn.DataTable.isDataTable('#example2')) {
                     $('#example2').DataTable().destroy();
                 }
@@ -223,7 +270,6 @@
                 }
 
                 $.get('/stock/' + id + '/history', function (res) {
-                    // Activities
                     var aRows = '';
                     if (res.activities.length) {
                         res.activities.forEach(function (item) {
@@ -245,7 +291,6 @@
                     }
                     $('#activityBody').html(aRows);
 
-                    // Movements
                     var mRows = '';
                     if (res.movements.length) {
                         res.movements.forEach(function (item) {
@@ -259,7 +304,6 @@
                     }
                     $('#movementBody').html(mRows);
 
-                    // Re‑initialise DataTables with fresh data
                     $('#example2').DataTable();
                     $('#example3').DataTable();
 
@@ -268,7 +312,6 @@
                     $('#movementBody').html('<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>');
                 });
             });
-
         });
     </script>
 @endsection
