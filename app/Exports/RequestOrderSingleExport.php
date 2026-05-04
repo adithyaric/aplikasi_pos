@@ -147,11 +147,11 @@ class RequestOrderSingleExport implements FromCollection, WithHeadings, WithMapp
         $sheet->setCellValue('D'.$notesRow, $this->requestOrder->notes ?? '');
         $sheet->getStyle('B'.$notesRow)->getFont()->setBold(false);
 
-        // Catatan Tambahan (extra notes)
+        // Sample Barang (extra notes)
         $extraNotes = $this->requestOrder->additionalNotes ?? collect();
         $afterNotesRow = $notesRow + 2;
         if ($extraNotes->isNotEmpty()) {
-            $sheet->setCellValue('B'.$afterNotesRow, 'Catatan Tambahan');
+            $sheet->setCellValue('B'.$afterNotesRow, 'Sample Barang');
             $sheet->getStyle('B'.$afterNotesRow)->getFont()->setBold(true);
 
             $enHeader = $afterNotesRow + 1;

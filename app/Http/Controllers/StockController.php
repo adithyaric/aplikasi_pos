@@ -16,7 +16,7 @@ class StockController extends Controller
     {
         return view('stocks.index', [
             'stocks' => Stock::with([
-                'product',
+                'product.category',
                 'pembelian.supplier',
                 'ownerStock.owner',
             ])
