@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StockOpnameTemplateExport;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Activitylog\Models\Activity;
 
 class StockController extends Controller
@@ -294,5 +297,28 @@ class StockController extends Controller
 
             return response()->json(['success' => false, 'message' => 'Gagal menyimpan: '.$e->getMessage()], 500);
         }
+    }
+
+    public function exportOpnameTemplate(Request $request)
+    {
+        $settings = json_decode(Storage::disk('public')->get('settings.json'), true) ?? [];
+
+        $query = Stock::with('product')
+            ->where('qty', '>', 0)
+            ->whereNotNull('sku')
+            ->orderBy('product_id')
+            ->orderBy('sku');
+
+        if ($lokasi = $request->input('lokasi')) {
+            $query->whereHas('product', fn ($q) => $q->where('lokasi', $lokasi));
+        }
+
+        $stocks = $query->get();
+        $date   = date('Y-m-d');
+
+        return Excel::download(
+            new StockOpnameTemplateExport($stocks, $date, $settings),
+            'Template_Stock_Opname-'.$date.'.xlsx'
+        );
     }
 }

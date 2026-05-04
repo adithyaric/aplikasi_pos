@@ -173,6 +173,7 @@ Route::middleware(['role:outlet|kasir|admin|superadmin'])->group(function () {
     Route::get('/stock-opname', [App\Http\Controllers\StockController::class, 'opname'])->name('stock.opname');
     Route::get('/stock-opname/data', [App\Http\Controllers\StockController::class, 'getOpnameData'])->name('stock.opname.data');
     Route::post('/stock-opname/save', [App\Http\Controllers\StockController::class, 'saveOpname'])->name('stock.opname.save');
+    Route::get('/stock-opname/export-template', [App\Http\Controllers\StockController::class, 'exportOpnameTemplate'])->name('stock.opname.export-template');
 
 
     // Supplier
