@@ -247,18 +247,14 @@
             // Populate Kategori dropdown (column 3) from loaded data
             table.column(3).data().unique().sort().each(function(val) {
                 if (val && String(val).trim() !== '') {
-                    $('#filterKategori').append(
-                        '<option value="' + val + '">' + val + '</option>'
-                    );
+                    $('#filterKategori').append($('<option>', { value: val, text: val }));
                 }
             });
 
             // Populate Lokasi dropdown (column 15) from loaded data
             table.column(15).data().unique().sort().each(function(val) {
                 if (val && String(val).trim() !== '') {
-                    $('#filterLokasi').append(
-                        '<option value="' + val + '">' + val + '</option>'
-                    );
+                    $('#filterLokasi').append($('<option>', { value: val, text: val }));
                 }
             });
 

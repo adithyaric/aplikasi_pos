@@ -40,7 +40,7 @@ class ProductController extends Controller
         }
 
         $products = $products->orderBy('code')
-            ->with(['stocks' => function ($query) {
+            ->with(['category', 'stocks' => function ($query) {
                 $query->where('qty', '>', 0)
                     ->orderBy('status')
                     ->orderBy('serial_number');
