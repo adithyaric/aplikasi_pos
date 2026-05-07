@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\PickingList;
 use App\Models\PickingListItem;
 use App\Models\RequestOrder;
-use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PickingListController extends Controller
 {
@@ -113,23 +113,45 @@ class PickingListController extends Controller
 
     public function updateItem(Request $request, PickingListItem $item)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'qty_picked' => 'required|integer|min:0|max:'.$item->qty_to_pick,
         ], [
             'qty_picked.required' => 'Jumlah yang diambil harus diisi.',
             'qty_picked.integer'  => 'Jumlah yang diambil harus berupa angka.',
             'qty_picked.min'      => 'Jumlah yang diambil minimal 0.',
-            'qty_picked.max'      => 'Jumlah yang diambil tidak boleh melebihi :max.',
+            'qty_picked.max'      => 'Jumlah yang diambil tidak boleh melebihi '.$item->qty_to_pick.'.',
         ]);
 
+        if ($validator->fails()) {
+            $msg = $validator->errors()->first();
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422);
+            }
+
+            return back()->withErrors($validator);
+        }
+
         if ($request->filled('val_barcode') && $request->val_barcode !== $item->product->code) {
-            return back()->with('toast_error', 'Barcode tidak cocok untuk produk '.$item->product->name.' (expected: '.$item->product->code.')');
+            $msg = 'Barcode tidak cocok untuk '.$item->product->name.' (expected: '.$item->product->code.')';
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422);
+            }
+
+            return back()->with('toast_error', $msg);
         }
 
         $item->update([
             'qty_picked' => $request->qty_picked,
             'is_picked'  => $request->qty_picked == $item->qty_to_pick,
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success'   => true,
+                'is_picked' => (bool) $item->is_picked,
+                'message'   => 'Item '.$item->product->name.' berhasil diperbarui.',
+            ]);
+        }
 
         return redirect()->back()->with('toast_success', 'Item '.$item->product->name.' berhasil diperbarui.');
     }
@@ -153,32 +175,49 @@ class PickingListController extends Controller
 
     public function bulkUpdate(Request $request, PickingList $pickingList)
     {
-        $request->validate([
-            'items' => 'required|array',
+        $validator = Validator::make($request->all(), [
+            'items'              => 'required|array',
             'items.*.qty_picked' => 'required|integer|min:0',
         ], [
-            'items.required' => 'Item harus diisi.',
-            'items.array' => 'Item harus berupa array.',
+            'items.required'              => 'Item harus diisi.',
             'items.*.qty_picked.required' => 'Jumlah yang diambil harus diisi.',
-            'items.*.qty_picked.integer' => 'Jumlah yang diambil harus berupa angka.',
-            'items.*.qty_picked.min' => 'Jumlah yang diambil minimal 0.',
+            'items.*.qty_picked.integer'  => 'Jumlah yang diambil harus berupa angka.',
+            'items.*.qty_picked.min'      => 'Jumlah yang diambil minimal 0.',
         ]);
 
-        $items = $pickingList->items()->get()->keyBy('id');
+        if ($validator->fails()) {
+            $msg = $validator->errors()->first();
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422);
+            }
+
+            return back()->withErrors($validator);
+        }
+
+        $items   = $pickingList->items()->get()->keyBy('id');
+        $updated = [];
+        $errors  = [];
 
         foreach ($request->items as $itemId => $data) {
             if (! isset($items[$itemId])) { continue; }
             $item = $items[$itemId];
-            $qty = $data['qty_picked'];
+            $qty  = (int) $data['qty_picked'];
 
             if ($qty > $item->qty_to_pick) {
-                return back()->withErrors("Qty picked for item {$item->sku} exceeds max");
+                $errors[$itemId] = "Qty picked untuk {$item->product->name} melebihi maksimal ({$item->qty_to_pick})";
+
+                continue;
             }
 
             $item->update([
                 'qty_picked' => $qty,
-                'is_picked' => $qty == $item->qty_to_pick,
+                'is_picked'  => $qty == $item->qty_to_pick,
             ]);
+            $updated[$itemId] = ['is_picked' => (bool) $item->is_picked];
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'updated' => $updated, 'errors' => $errors]);
         }
 
         return redirect()->back()->with('toast_success', 'Bulk update successful');

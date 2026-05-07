@@ -80,9 +80,27 @@ class DeliveryOrderController extends Controller
     public function send(Request $request, DeliveryOrder $deliveryOrder)
     {
         $request->validate([
-            'photo' => 'nullable|image|max:2048',
-            'items' => 'required|array',
+            'photo'   => 'nullable|image|max:2048',
+            'items'   => 'required|array',
+            'samples' => 'nullable|array',
+        ], [
+            'items.required' => 'Data item pengiriman wajib diisi.',
         ]);
+
+        // Validate sample qty when additionalNotes exist
+        $notes = $deliveryOrder->requestOrder?->additionalNotes ?? collect();
+        if ($notes->isNotEmpty()) {
+            $samples = $request->input('samples', []);
+            foreach ($notes as $note) {
+                if (! isset($samples[$note->id]['qty_sample'])) {
+                    return back()->with('toast_error', "Qty sample untuk \"{$note->kategori}\" wajib diisi.");
+                }
+                $qtySample = (int) $samples[$note->id]['qty_sample'];
+                if ($qtySample !== $note->qty) {
+                    return back()->with('toast_error', "Qty sample untuk \"{$note->kategori}\" harus tepat {$note->qty} (diisi: {$qtySample}).");
+                }
+            }
+        }
 
         $itemData = $request->input('items', []);
 
@@ -140,8 +158,7 @@ class DeliveryOrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('delivery-orders.show', $deliveryOrder)
-                ->with('toast_success', 'Delivery order sent');
+            return redirect()->route('delivery-orders.show', $deliveryOrder)->with('toast_success', 'Delivery order sent');
         } catch (\Exception $e) {
             DB::rollBack();
 
