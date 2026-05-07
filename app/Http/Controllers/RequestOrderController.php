@@ -150,7 +150,7 @@ class RequestOrderController extends Controller
         $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:request_order_items,id',
-            'items.*.qty_approved' => 'required|integer|min:0',
+            'items.*.qty_approved' => 'required|integer|min:1',
             'items.*.item_status' => 'required|in:approved,partial,rejected',
         ], [
             'items.required' => 'Item harus diisi.',

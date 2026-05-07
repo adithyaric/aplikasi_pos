@@ -224,6 +224,16 @@ Route::middleware(['role:outlet|kasir|admin|superadmin'])->group(function () {
 
     Route::get('/laporan/retur-supplier', [LaporanController::class, 'exportReturSupplier'])->name('laporan.retur-supplier');
     Route::get('/laporan/retur-outlet', [LaporanController::class, 'exportReturOutlet'])->name('laporan.retur-outlet');
+
+    // Retur single-document exports (xlsx + PDF)
+    Route::get('/laporan/retur-pembelian/{refundPembelian}/export', [LaporanController::class, 'exportReturPembelianSingle'])->name('laporan.retur-pembelian.single');
+    Route::get('/laporan/retur-outlet/{refundPembelian}/export', [LaporanController::class, 'exportReturOutletSingle'])->name('laporan.retur-outlet.single');
+    Route::get('/laporan/pdf/retur-pembelian/{refundPembelian}', [LaporanController::class, 'pdfReturPembelianSingle'])->name('laporan.pdf.retur-pembelian-single');
+    Route::get('/laporan/pdf/retur-outlet/{refundPembelian}', [LaporanController::class, 'pdfReturOutletSingle'])->name('laporan.pdf.retur-outlet-single');
+
+    // Retur keseluruhan PDF
+    Route::get('/laporan/pdf/retur-supplier', [LaporanController::class, 'pdfReturSupplier'])->name('laporan.pdf.retur-supplier');
+    Route::get('/laporan/pdf/retur-outlet', [LaporanController::class, 'pdfReturOutlet'])->name('laporan.pdf.retur-outlet');
 });
 
 Route::middleware(['role:superadmin'])->group(function () {

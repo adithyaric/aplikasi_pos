@@ -106,6 +106,22 @@
             </div>
         </div>
     </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-warning">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-undo"></i> Laporan Retur Ke Supplier</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_retur_supplier"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="box box-danger">
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-undo"></i> Laporan Retur Outlet</h3></div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_retur_outlet"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- ============ MODALS ============ --}}
@@ -123,7 +139,9 @@ $modals = [
     ['id'=>'aktifitas',   'title'=>'Laporan Aktivitas Gudang',        'pdf'=>'laporan.pdf.aktifitas', 'xls'=>'laporan.export.aktifitas', 'date'=>true],
     ['id'=>'pembelian',   'title'=>'Laporan Pembelian Barang',        'pdf'=>'laporan.pdf.pembelian', 'xls'=>'laporan.export.pembelian', 'date'=>true],
     ['id'=>'opname',      'title'=>'Laporan Stok Opname &amp; Adjusment', 'pdf'=>'laporan.pdf.opname','xls'=>'laporan.stock-opname',     'date'=>true],
-    ['id'=>'pergerakan',  'title'=>'Laporan Pergerakan &amp; Kebutuhan Stok','pdf'=>'laporan.pdf.pergerakan','xls'=>'laporan.export.pergerakan','date'=>false],
+    ['id'=>'pergerakan',    'title'=>'Laporan Pergerakan &amp; Kebutuhan Stok',  'pdf'=>'laporan.pdf.pergerakan',      'xls'=>'laporan.export.pergerakan', 'date'=>false],
+    ['id'=>'retur_supplier','title'=>'Laporan Retur Ke Supplier Keseluruhan',    'pdf'=>'laporan.pdf.retur-supplier',  'xls'=>'laporan.retur-supplier',    'date'=>true],
+    ['id'=>'retur_outlet',  'title'=>'Laporan Retur Outlet Keseluruhan',          'pdf'=>'laporan.pdf.retur-outlet',    'xls'=>'laporan.retur-outlet',      'date'=>true],
 ];
 @endphp
 

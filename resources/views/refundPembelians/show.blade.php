@@ -29,6 +29,26 @@
                                 <i class="fa fa-inbox"></i> Proses Penerimaan Retur
                             </a>
                         @endif
+
+                        @if ($refundPembelian->type === 'gudang_ke_supplier')
+                            <a href="{{ route('laporan.retur-pembelian.single', $refundPembelian->id) }}"
+                                class="btn btn-success btn-sm" target="_blank">
+                                <i class="fa fa-file-excel-o"></i> Export XLSX
+                            </a>
+                            <a href="{{ route('laporan.pdf.retur-pembelian-single', $refundPembelian->id) }}"
+                                class="btn btn-danger btn-sm" target="_blank">
+                                <i class="fa fa-file-pdf-o"></i> Export PDF
+                            </a>
+                        @else
+                            <a href="{{ route('laporan.retur-outlet.single', $refundPembelian->id) }}"
+                                class="btn btn-success btn-sm" target="_blank">
+                                <i class="fa fa-file-excel-o"></i> Export XLSX
+                            </a>
+                            <a href="{{ route('laporan.pdf.retur-outlet-single', $refundPembelian->id) }}"
+                                class="btn btn-danger btn-sm" target="_blank">
+                                <i class="fa fa-file-pdf-o"></i> Export PDF
+                            </a>
+                        @endif
                     </div>
 
                     <div class="box-body">

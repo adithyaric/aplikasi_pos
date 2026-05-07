@@ -89,7 +89,11 @@ class ReturOutletExport implements FromCollection, WithHeadings, WithMapping, Wi
             $item->product->name ?? '-',
             $item->sku ?? '-',
             $item->stock?->expired_at ? Carbon::parse($item->stock->expired_at)->isoFormat('DD MMMM YYYY') : '-',
-            $item->qty,
+            (function () use ($item) {
+                $k = $item->product?->konversiDisplay($item->qty) ?? '-';
+
+                return $item->qty.($k && $k !== '-' ? " ({$k})" : '');
+            })(),
             $item->product->satuan ?? 'PCS',
             $item->alasan,
             $retur->status === 'complete' ? 'Terkirim' : 'Proses',

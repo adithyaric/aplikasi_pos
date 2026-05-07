@@ -86,7 +86,11 @@ class ReturSupplierExport implements FromCollection, WithHeadings, WithMapping, 
             $item->product->code ?? '-',
             $item->product->name ?? '-',
             $item->sku ?? '-',
-            $item->qty,
+            (function () use ($item) {
+                $k = $item->product?->konversiDisplay($item->qty) ?? '-';
+
+                return $item->qty.($k && $k !== '-' ? " ({$k})" : '');
+            })(),
             $item->product->satuan ?? 'PCS',
             $item->alasan,
             $retur->status === 'retur' ? 'Proses' : 'Complete',

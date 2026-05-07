@@ -30,14 +30,15 @@
                                             <input type="date" name="tanggal_selesai" class="form-control input-sm" required>
                                         </div>
                                         <div class="col-md-3 col-6">
-                                            <select name="type" class="form-control input-sm"
+                                            <select name="type" id="typeSelect" class="form-control input-sm"
                                                 onchange="updateFormAction(this.value)">
-                                                <option value="gudang_ke_supplier">Gudang ke Supplier</option>
-                                                <option value="outlet">Retur Outlet</option>
+                                                <option value="" {{ $selectedType === null ? 'selected' : '' }}>Tampil Semua</option>
+                                                <option value="gudang_ke_supplier" {{ $selectedType === 'gudang_ke_supplier' ? 'selected' : '' }}>Gudang ke Supplier</option>
+                                                <option value="outlet_ke_gudang" {{ $selectedType === 'outlet_ke_gudang' ? 'selected' : '' }}>Retur Outlet</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3 col-6">
-                                            <button type="submit" class="btn btn-warning btn-sm w-100">
+                                            <button type="submit" id="exportButton" class="btn btn-success btn-sm w-100">
                                                 <i class="fa fa-file-excel-o"></i> Export
                                             </button>
                                         </div>
@@ -87,13 +88,13 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a class="btn btn-default btn-sm"
+                                            <a class="btn btn-default btn-xs"
                                                 href="{{ route('refundPembelian.show', $value->id) }}">
                                                 <i class="fa fa-eye"></i> Show
                                             </a>
 
                                             @if ($value->type === 'gudang_ke_supplier' && $value->status === 'retur')
-                                                <a class="btn btn-success btn-sm"
+                                                <a class="btn btn-success btn-xs"
                                                     href="{{ route('refundPembelian.terima.form', $value->id) }}">
                                                     <i class="fa fa-inbox"></i> Terima
                                                 </a>
@@ -104,11 +105,30 @@
                                                     method="post" style="display:inline">
                                                     @method('delete')
                                                     @csrf
-                                                    <button class="btn btn-danger btn-sm"
+                                                    <button class="btn btn-danger btn-xs"
                                                         onclick="return confirm('Hapus data ini?')">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
                                                 </form>
+                                            @endif
+                                            @if ($value->type === 'gudang_ke_supplier')
+                                                <a href="{{ route('laporan.retur-pembelian.single', $value->id) }}"
+                                                    class="btn btn-success btn-xs" target="_blank">
+                                                    <i class="fa fa-file-excel-o"></i> Export XLSX
+                                                </a>
+                                                <a href="{{ route('laporan.pdf.retur-pembelian-single', $value->id) }}"
+                                                    class="btn btn-danger btn-xs" target="_blank">
+                                                    <i class="fa fa-file-pdf-o"></i> Export PDF
+                                                </a>
+                                            @else
+                                                <a href="{{ route('laporan.retur-outlet.single', $value->id) }}"
+                                                    class="btn btn-success btn-xs" target="_blank">
+                                                    <i class="fa fa-file-excel-o"></i> Export XLSX
+                                                </a>
+                                                <a href="{{ route('laporan.pdf.retur-outlet-single', $value->id) }}"
+                                                    class="btn btn-danger btn-xs" target="_blank">
+                                                    <i class="fa fa-file-pdf-o"></i> Export PDF
+                                                </a>
                                             @endif
                                         </td>
                                     </tr>
@@ -123,17 +143,31 @@
 @endsection
 @section('page-script')
     <script>
+        // function setExportAction(type) {
+        //     const form = document.getElementById('exportForm');
+        //     const button = document.getElementById('exportButton');
+        //     if (type === 'gudang_ke_supplier') {
+        //         form.action = "{{ route('laporan.retur-supplier') }}";
+        //         button.className = 'btn btn-warning btn-sm w-100';
+        //     } else {
+        //         form.action = "{{ route('laporan.retur-outlet') }}";
+        //         button.className = 'btn btn-info btn-sm w-100';
+        //     }
+        // }
+
         function updateFormAction(type) {
-            const form = document.getElementById('exportForm');
-            const button = document.getElementById('exportButton');
-            if (type === 'gudang_ke_supplier') {
-                form.action = "{{ route('laporan.retur-supplier') }}";
-                button.className = 'btn btn-warning btn-sm';
+            // setExportAction(type);
+
+            const url = new URL(window.location.href);
+            if (type) {
+                url.searchParams.set('type', type);
             } else {
-                form.action = "{{ route('laporan.retur-outlet') }}";
-                button.className = 'btn btn-info btn-sm';
+                url.searchParams.delete('type');
             }
+            window.location.href = url.toString();
         }
-        updateFormAction('gudang_ke_supplier');
+
+        // const currentType = "{{ $selectedType ?? '' }}";
+        // setExportAction(currentType || 'gudang_ke_supplier');
     </script>
 @endsection

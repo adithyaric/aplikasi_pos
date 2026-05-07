@@ -73,10 +73,17 @@ class RefundPembelianController extends Controller
     // Resource
     // -----------------------------------------------------------------------
 
-    public function index()
+    public function index(Request $request)
     {
+        $query = RefundPembelian::with('user', 'supplier', 'outlet')->latest();
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
         return view('refundPembelians.index', [
-            'refundPembelians' => RefundPembelian::with('user', 'supplier', 'outlet')->latest()->get(),
+            'refundPembelians' => $query->get(),
+            'selectedType'     => $request->type,
         ]);
     }
 

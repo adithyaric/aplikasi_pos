@@ -26,6 +26,8 @@ use App\Exports\PenjualanSupplierExport;
 use App\Exports\PickingListSingleExport;
 use App\Exports\RequestOrderSingleExport;
 use App\Exports\ReturOutletExport;
+use App\Exports\ReturOutletSingleExport;
+use App\Exports\ReturPembelianSingleExport;
 use App\Exports\ReturSupplierExport;
 use App\Exports\StockExport;
 use App\Exports\StockOpnameExport;
@@ -34,6 +36,7 @@ use App\Models\Outlet;
 use App\Models\Pembelian;
 use App\Models\PickingList;
 use App\Models\ProductMinimumAdjustment;
+use App\Models\RefundPembelian;
 use App\Models\RequestOrder;
 use App\Models\Stock;
 use App\Models\StockAdjustment;
@@ -234,6 +237,93 @@ class LaporanController extends Controller
             new ReturOutletExport($mulai, $selesai, $settings),
             'laporan-retur-outlet.xlsx'
         );
+    }
+
+    public function exportReturPembelianSingle(RefundPembelian $refundPembelian)
+    {
+        $settings = $this->getSettings();
+        $refundPembelian->load('supplier', 'user', 'refundPembelianItems.product', 'refundPembelianItems.stock.pembelian');
+
+        return Excel::download(
+            new ReturPembelianSingleExport($refundPembelian, $settings),
+            'Dokumen_Retur_Pembelian-'.$refundPembelian->code.'.xlsx'
+        );
+    }
+
+    public function exportReturOutletSingle(RefundPembelian $refundPembelian)
+    {
+        $settings = $this->getSettings();
+        $refundPembelian->load('outlet', 'deliveryOrder', 'user', 'refundPembelianItems.product', 'refundPembelianItems.stock');
+
+        return Excel::download(
+            new ReturOutletSingleExport($refundPembelian, $settings),
+            'Dokumen_Retur_Outlet-'.$refundPembelian->code.'.xlsx'
+        );
+    }
+
+    public function pdfReturPembelianSingle(RefundPembelian $refundPembelian)
+    {
+        $settings = $this->getSettings();
+        $retur    = $refundPembelian->load('supplier', 'user', 'refundPembelianItems.product', 'refundPembelianItems.stock');
+
+        return Pdf::loadView('exports.pdf.retur-pembelian-single', compact('retur', 'settings'))
+            ->setPaper('a4', 'landscape')
+            ->stream('Dokumen_Retur_Pembelian-'.$retur->code.'.pdf');
+    }
+
+    public function pdfReturOutletSingle(RefundPembelian $refundPembelian)
+    {
+        $settings = $this->getSettings();
+        $retur    = $refundPembelian->load('outlet', 'deliveryOrder', 'user', 'refundPembelianItems.product', 'refundPembelianItems.stock');
+
+        return Pdf::loadView('exports.pdf.retur-outlet-single', compact('retur', 'settings'))
+            ->setPaper('a4', 'landscape')
+            ->stream('Dokumen_Retur_Outlet-'.$retur->code.'.pdf');
+    }
+
+    public function pdfReturSupplier(Request $request)
+    {
+        $settings          = $this->getSettings();
+        [$mulai, $selesai] = $this->dateRange($request);
+
+        $rows = RefundPembelian::with([
+            'supplier',
+            'refundPembelianItems.product',
+            'refundPembelianItems.stock.pembelian',
+        ])
+            ->where('type', 'gudang_ke_supplier')
+            ->whereDate('tanggal', '>=', $mulai)
+            ->whereDate('tanggal', '<=', $selesai)
+            ->orderBy('tanggal')
+            ->get()
+            ->flatMap(fn ($retur) => $retur->refundPembelianItems->each(fn ($item) => $item->retur = $retur));
+
+        return Pdf::loadView('exports.pdf.laporan-retur-supplier', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')
+            ->stream('Laporan_Retur_Ke_Supplier_Keseluruhan.pdf');
+    }
+
+    public function pdfReturOutlet(Request $request)
+    {
+        $settings          = $this->getSettings();
+        [$mulai, $selesai] = $this->dateRange($request);
+
+        $rows = RefundPembelian::with([
+            'outlet',
+            'deliveryOrder',
+            'refundPembelianItems.product',
+            'refundPembelianItems.stock',
+        ])
+            ->where('type', 'outlet_ke_gudang')
+            ->whereDate('tanggal', '>=', $mulai)
+            ->whereDate('tanggal', '<=', $selesai)
+            ->orderBy('tanggal')
+            ->get()
+            ->flatMap(fn ($retur) => $retur->refundPembelianItems->each(fn ($item) => $item->retur = $retur));
+
+        return Pdf::loadView('exports.pdf.laporan-retur-outlet', compact('rows', 'settings', 'mulai', 'selesai'))
+            ->setPaper('a4', 'landscape')
+            ->stream('Laporan_Retur_Outlet_Keseluruhan.pdf');
     }
 
     // ── PDF Methods ──────────────────────────────────────────────────────────
