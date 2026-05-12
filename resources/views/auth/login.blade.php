@@ -1,45 +1,47 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<div class="login-box-body">
+    <div class="text-center" style="margin-bottom: 20px;">
+        <img src="{{ asset('img/logo.png') }}" alt="Logo" style="height: 60px;">
+        <p class="login-box-msg" style="margin-top: 8px;">Warehouse Management System</p>
+    </div>
+
+    @if (session('status'))
+        <div class="alert alert-success">{{ session('status') }}</div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="loginname" :value="__('Email/No Telp')" />
-            <x-text-input id="loginname" class="block w-full mt-1" type="text" name="loginname" :value="old('loginname')"
-                required />
-            <x-input-error :messages="$errors->get('loginname')" class="mt-2" />
+        <div class="form-group has-feedback {{ $errors->has('loginname') ? 'has-error' : '' }}">
+            <input type="text" name="loginname" class="form-control"
+                   placeholder="Email / Username" value="{{ old('loginname') }}" required autofocus>
+            <span class="fa fa-user form-control-feedback"></span>
+            @error('loginname')
+                <span class="help-block">{{ $message }}</span>
+            @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block w-full mt-1" type="password" name="password" required
-                autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="form-group has-feedback {{ $errors->has('password') ? 'has-error' : '' }}">
+            <input type="password" name="password" class="form-control"
+                   placeholder="Password" required autocomplete="current-password">
+            <span class="fa fa-lock form-control-feedback"></span>
+            @error('password')
+                <span class="help-block">{{ $message }}</span>
+            @enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="text-indigo-600 border-gray-300 rounded shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                href="{{ route('register') }}">
-                {{ __('Register') }}
-            </a>
-            <x-primary-button class="ml-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+        <div class="row">
+            <div class="col-xs-8">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="remember"> Ingat saya
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <button type="submit" class="btn btn-primary btn-block btn-flat">Masuk</button>
+            </div>
         </div>
     </form>
+</div>
 </x-guest-layout>

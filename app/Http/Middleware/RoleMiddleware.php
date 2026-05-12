@@ -26,11 +26,11 @@ class RoleMiddleware
 
         // 3. Define landing pages per role
         $homeRoutes = [
-            'customer'   => 'market.index',
-            'kasir'      => 'dashboard',
-            'outlet'     => 'dashboard',
-            'admin'      => 'dashboard',
-            'superadmin' => 'admin.index', // Adjust to your actual route name
+            'customer'     => 'market.index',
+            'admin-gudang' => 'dashboard',
+            'staff-outlet' => 'dashboard',
+            'owner'        => 'dashboard',
+            'superadmin'   => 'dashboard',
         ];
 
         $target = $homeRoutes[$user->role] ?? 'login';

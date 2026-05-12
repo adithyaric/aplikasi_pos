@@ -23,9 +23,9 @@ class AdminController extends Controller
         return view('admins.create', [
             'roles' => [
                 'superadmin',
-                'admin',
-                'kasir',
-                'outlet',
+                'admin-gudang',
+                'staff-outlet',
+                'owner',
             ],
             'outlets' => Outlet::get(),
         ]);
@@ -52,9 +52,9 @@ class AdminController extends Controller
             'admin' => $admin,
             'roles' => [
                 'superadmin',
-                'admin',
-                'kasir',
-                'outlet',
+                'admin-gudang',
+                'staff-outlet',
+                'owner',
             ],
             'outlets' => Outlet::get(),
         ]);
@@ -65,7 +65,7 @@ class AdminController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'username' => 'required',
-            'outlet_id' => 'required_if:role,kasir|required_if:role,admin',
+            'outlet_id' => 'required_if:role,staff-outlet|required_if:role,admin-gudang',
             'role' => 'required',
             'status' => 'required',
             'email' => 'required|email|unique:users,email,'.$admin->id,

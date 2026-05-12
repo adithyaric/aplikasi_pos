@@ -6,26 +6,35 @@
 </section>
 <section class="content">
 
-{{-- Helper macro: date range inputs in modal --}}
+@php $role = auth()->user()->role; @endphp
 
-{{-- 1. LAPORAN PURCHASE ORDER --}}
 <div class="row">
+    {{-- Laporan PO --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-primary">
-            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan Purchase Order</h3></div>
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan PO</h3></div>
             <div class="box-footer">
                 <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_po"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan PR (Permintaan Outlet) --}}
+    @if (in_array($role, ['superadmin', 'staff-outlet']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-primary">
-            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan Purchase Request</h3></div>
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Laporan PR (Permintaan Outlet)</h3></div>
             <div class="box-footer">
                 <button class="btn btn-sm btn-default btn-block" data-toggle="modal" data-target="#modal_pr"><i class="fa fa-bar-chart"></i> Lihat Laporan</button>
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Barang Masuk --}}
+    @if (in_array($role, ['superadmin', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-success">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-arrow-down"></i> Laporan Barang Masuk</h3></div>
@@ -34,6 +43,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Barang Keluar --}}
+    @if (in_array($role, ['superadmin', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-warning">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-arrow-up"></i> Laporan Barang Keluar</h3></div>
@@ -42,6 +55,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Stok Barang --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-info">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-cubes"></i> Laporan Stok Barang</h3></div>
@@ -50,6 +67,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Penerimaan Barang --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-success">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-inbox"></i> Laporan Penerimaan Barang</h3></div>
@@ -58,6 +79,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Pengiriman Barang --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-warning">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-truck"></i> Laporan Pengiriman Barang</h3></div>
@@ -66,6 +91,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Picking & Packing --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-primary">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-list-ol"></i> Laporan Picking &amp; Packing</h3></div>
@@ -74,6 +103,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Aktivitas Gudang --}}
+    @if (in_array($role, ['superadmin', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-info">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-tasks"></i> Laporan Aktivitas Gudang</h3></div>
@@ -82,6 +115,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Pembelian Barang --}}
+    @if (in_array($role, ['superadmin', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-primary">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-shopping-cart"></i> Laporan Pembelian Barang</h3></div>
@@ -90,6 +127,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Stok Opname & Adjusment --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-danger">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-balance-scale"></i> Laporan Stok Opname &amp; Adjusment</h3></div>
@@ -98,6 +139,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Pergerakan & Kebutuhan Stok --}}
+    @if (in_array($role, ['superadmin', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-info">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-line-chart"></i> Laporan Pergerakan &amp; Kebutuhan Stok</h3></div>
@@ -106,6 +151,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Retur Ke Supplier --}}
+    @if (in_array($role, ['superadmin', 'admin-gudang', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-warning">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-undo"></i> Laporan Retur Ke Supplier</h3></div>
@@ -114,6 +163,10 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Laporan Retur Outlet --}}
+    @if (in_array($role, ['superadmin', 'staff-outlet', 'owner']))
     <div class="col-md-4 col-sm-6">
         <div class="box box-danger">
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-undo"></i> Laporan Retur Outlet</h3></div>
@@ -122,26 +175,27 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 {{-- ============ MODALS ============ --}}
 
 @php
 $modals = [
-    ['id'=>'po',          'title'=>'Laporan Purchase Order',          'pdf'=>'laporan.pdf.po',        'xls'=>'laporan.export.po',        'date'=>true],
-    ['id'=>'pr',          'title'=>'Laporan Purchase Request',        'pdf'=>'laporan.pdf.pr',        'xls'=>'laporan.export.pr',        'date'=>true],
-    ['id'=>'masuk',       'title'=>'Laporan Barang Masuk',            'pdf'=>'laporan.pdf.barang-masuk',  'xls'=>'laporan.export.barang-masuk',  'date'=>true],
-    ['id'=>'keluar',      'title'=>'Laporan Barang Keluar',           'pdf'=>'laporan.pdf.barang-keluar', 'xls'=>'laporan.export.barang-keluar', 'date'=>true],
-    ['id'=>'stok',        'title'=>'Laporan Stok Barang',             'pdf'=>'laporan.pdf.stok',      'xls'=>'laporan.stock',            'date'=>false],
-    ['id'=>'penerimaan',  'title'=>'Laporan Penerimaan Barang',       'pdf'=>'laporan.pdf.penerimaan','xls'=>'laporan.export.penerimaan','date'=>true],
-    ['id'=>'pengiriman',  'title'=>'Laporan Pengiriman Barang',       'pdf'=>'laporan.pdf.pengiriman','xls'=>'laporan.export.pengiriman','date'=>true],
-    ['id'=>'picking',     'title'=>'Laporan Picking &amp; Packing',   'pdf'=>'laporan.pdf.picking',   'xls'=>'laporan.export.picking',   'date'=>true],
-    ['id'=>'aktifitas',   'title'=>'Laporan Aktivitas Gudang',        'pdf'=>'laporan.pdf.aktifitas', 'xls'=>'laporan.export.aktifitas', 'date'=>true],
-    ['id'=>'pembelian',   'title'=>'Laporan Pembelian Barang',        'pdf'=>'laporan.pdf.pembelian', 'xls'=>'laporan.export.pembelian', 'date'=>true],
-    ['id'=>'opname',      'title'=>'Laporan Stok Opname &amp; Adjusment', 'pdf'=>'laporan.pdf.opname','xls'=>'laporan.stock-opname',     'date'=>true],
-    ['id'=>'pergerakan',    'title'=>'Laporan Pergerakan &amp; Kebutuhan Stok',  'pdf'=>'laporan.pdf.pergerakan',      'xls'=>'laporan.export.pergerakan', 'date'=>false],
-    ['id'=>'retur_supplier','title'=>'Laporan Retur Ke Supplier Keseluruhan',    'pdf'=>'laporan.pdf.retur-supplier',  'xls'=>'laporan.retur-supplier',    'date'=>true],
-    ['id'=>'retur_outlet',  'title'=>'Laporan Retur Outlet Keseluruhan',          'pdf'=>'laporan.pdf.retur-outlet',    'xls'=>'laporan.retur-outlet',      'date'=>true],
+    ['id'=>'po',          'title'=>'Laporan PO',                           'pdf'=>'laporan.pdf.po',        'xls'=>'laporan.export.po',        'date'=>true],
+    ['id'=>'pr',          'title'=>'Laporan PR (Permintaan Outlet)',        'pdf'=>'laporan.pdf.pr',        'xls'=>'laporan.export.pr',        'date'=>true],
+    ['id'=>'masuk',       'title'=>'Laporan Barang Masuk',                 'pdf'=>'laporan.pdf.barang-masuk',  'xls'=>'laporan.export.barang-masuk',  'date'=>true],
+    ['id'=>'keluar',      'title'=>'Laporan Barang Keluar',                'pdf'=>'laporan.pdf.barang-keluar', 'xls'=>'laporan.export.barang-keluar', 'date'=>true],
+    ['id'=>'stok',        'title'=>'Laporan Stok Barang',                  'pdf'=>'laporan.pdf.stok',      'xls'=>'laporan.stock',            'date'=>false],
+    ['id'=>'penerimaan',  'title'=>'Laporan Penerimaan Barang',            'pdf'=>'laporan.pdf.penerimaan','xls'=>'laporan.export.penerimaan','date'=>true],
+    ['id'=>'pengiriman',  'title'=>'Laporan Pengiriman Barang',            'pdf'=>'laporan.pdf.pengiriman','xls'=>'laporan.export.pengiriman','date'=>true],
+    ['id'=>'picking',     'title'=>'Laporan Picking &amp; Packing',        'pdf'=>'laporan.pdf.picking',   'xls'=>'laporan.export.picking',   'date'=>true],
+    ['id'=>'aktifitas',   'title'=>'Laporan Aktivitas Gudang',             'pdf'=>'laporan.pdf.aktifitas', 'xls'=>'laporan.export.aktifitas', 'date'=>true],
+    ['id'=>'pembelian',   'title'=>'Laporan Pembelian Barang',             'pdf'=>'laporan.pdf.pembelian', 'xls'=>'laporan.export.pembelian', 'date'=>true],
+    ['id'=>'opname',      'title'=>'Laporan Stok Opname &amp; Adjusment',  'pdf'=>'laporan.pdf.opname',    'xls'=>'laporan.stock-opname',     'date'=>true],
+    ['id'=>'pergerakan',  'title'=>'Laporan Pergerakan &amp; Kebutuhan Stok','pdf'=>'laporan.pdf.pergerakan','xls'=>'laporan.export.pergerakan','date'=>false],
+    ['id'=>'retur_supplier','title'=>'Laporan Retur Ke Supplier',          'pdf'=>'laporan.pdf.retur-supplier','xls'=>'laporan.retur-supplier','date'=>true],
+    ['id'=>'retur_outlet',  'title'=>'Laporan Retur Outlet',               'pdf'=>'laporan.pdf.retur-outlet',  'xls'=>'laporan.retur-outlet',  'date'=>true],
 ];
 @endphp
 

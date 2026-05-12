@@ -53,7 +53,7 @@ class LaporanController extends Controller
     public function index()
     {
         return view('laporan.index', [
-            'cashiers' => User::where('role', 'kasir')->get(),
+            'cashiers' => User::where('role', 'staff-outlet')->get(),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
         ]);
