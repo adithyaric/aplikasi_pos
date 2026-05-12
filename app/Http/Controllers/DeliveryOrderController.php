@@ -96,7 +96,7 @@ class DeliveryOrderController extends Controller
                     return back()->with('toast_error', "Qty sample untuk \"{$note->kategori}\" wajib diisi.");
                 }
                 $qtySample = (int) $samples[$note->id]['qty_sample'];
-                if ($qtySample !== $note->qty) {
+                if ($qtySample !== (int) $note->qty) {
                     return back()->with('toast_error', "Qty sample untuk \"{$note->kategori}\" harus tepat {$note->qty} (diisi: {$qtySample}).");
                 }
             }
