@@ -1,9 +1,6 @@
 <x-guest-layout>
 <div class="login-box-body">
-    <div class="text-center" style="margin-bottom: 20px;">
-        <img src="{{ asset('img/logo.png') }}" alt="Logo" style="height: 60px;">
-        <p class="login-box-msg" style="margin-top: 8px;">Warehouse Management System</p>
-    </div>
+    <p class="login-box-msg">Warehouse Management System</p>
 
     @if (session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>

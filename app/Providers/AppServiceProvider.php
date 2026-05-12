@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,7 +26,18 @@ class AppServiceProvider extends ServiceProvider
             $view->with('categories', \App\Models\Category::get());
         });
 
-        View::composer('layouts.master', function ($view) {
+        $loadCompanyLogo = function () {
+            $settings = json_decode(Storage::disk('public')->get('settings.json') ?? '{}', true) ?? [];
+            $logo = $settings['logo'] ?? null;
+            return $logo ? Storage::url($logo) : asset('img/logo.png');
+        };
+
+        View::composer('layouts.guest', function ($view) use ($loadCompanyLogo) {
+            $view->with('companyLogo', $loadCompanyLogo());
+        });
+
+        View::composer('layouts.master', function ($view) use ($loadCompanyLogo) {
+            $view->with('companyLogo', $loadCompanyLogo());
             if (Auth::check()) {
                 $today = now()->toDateString();
                 $activeAdjs = \App\Models\ProductMinimumAdjustment::activeOn($today)

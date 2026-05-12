@@ -10,8 +10,11 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ asset('assets/zenTheme/css/AdminLTE.min.css') }}">
 </head>
-<body class="hold-transition login-page">
-    <div class="login-box">
+<body class="hold-transition login-page" style="display:flex; align-items:center; justify-content:center; min-height:100vh;">
+    <div class="login-box" style="margin:0;">
+        <div class="login-logo">
+            <img src="{{ $companyLogo }}" alt="Logo" style="height:70px;">
+        </div>
         {{ $slot }}
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
