@@ -94,7 +94,11 @@
 
         {{-- Permintaan Barang --}}
         @if (in_array($role, ['superadmin', 'admin-gudang', 'staff-outlet']))
-        <li class="treeview {{ request()->is('request-orders*') || request()->is('picking-lists*') || request()->is('delivery-orders*') ? 'active' : '' }}">
+        @php
+            $permintaanActive = request()->is('request-orders*') || request()->is('picking-lists*')
+                || (in_array($role, ['superadmin', 'admin-gudang']) && request()->is('delivery-orders*'));
+        @endphp
+        <li class="treeview {{ $permintaanActive ? 'active' : '' }}">
             <a href="#"><i class="fa fa-exchange"></i><span>Permintaan Barang</span><i class="fa fa-angle-left pull-right"></i></a>
             <ul class="treeview-menu">
                 @if (in_array($role, ['superadmin', 'staff-outlet']))
@@ -114,23 +118,37 @@
         </li>
         @endif
 
+        {{-- Riwayat Permintaan (staff-outlet only — separate from Permintaan Barang) --}}
+        @if ($role === 'staff-outlet')
+        <li class="{{ request()->is('delivery-orders*') ? 'active' : '' }}">
+            <a href="/delivery-orders"><i class="fa fa-history"></i><span>Riwayat Permintaan</span></a>
+        </li>
+        @endif
+
         {{-- Retur Barang --}}
         @if (in_array($role, ['superadmin', 'admin-gudang', 'staff-outlet']))
+        @if ($role === 'staff-outlet')
+        {{-- Staff-outlet: single direct link to their outlet retur --}}
+        <li class="{{ request()->is('refundPembelian*') ? 'active' : '' }}">
+            <a href="/refundPembelian"><i class="fa fa-undo"></i><span>Retur Barang</span></a>
+        </li>
+        @else
         <li class="treeview {{ request()->is('refundPembelian*') ? 'active' : '' }}">
             <a href="#"><i class="fa fa-undo"></i><span>Retur Barang</span><i class="fa fa-angle-left pull-right"></i></a>
             <ul class="treeview-menu">
                 @if (in_array($role, ['superadmin', 'admin-gudang']))
-                <li class="{{ request()->is('refundPembelian*') && request()->get('type') === 'gudang' ? 'active' : '' }}">
-                    <a href="/refundPembelian?type=gudang"><i class="fa fa-undo"></i><span>Retur Barang Gudang</span></a>
+                <li class="{{ request()->is('refundPembelian*') && request()->get('type') === 'gudang_ke_supplier' ? 'active' : '' }}">
+                    <a href="/refundPembelian?type=gudang_ke_supplier"><i class="fa fa-undo"></i><span>Retur Barang Gudang</span></a>
                 </li>
                 @endif
-                @if (in_array($role, ['superadmin', 'staff-outlet']))
-                <li class="{{ request()->is('refundPembelian*') && request()->get('type') === 'outlet' ? 'active' : '' }}">
-                    <a href="/refundPembelian?type=outlet"><i class="fa fa-undo"></i><span>Retur Barang Outlet</span></a>
+                @if ($role === 'superadmin')
+                <li class="{{ request()->is('refundPembelian*') && request()->get('type') === 'outlet_ke_gudang' ? 'active' : '' }}">
+                    <a href="/refundPembelian?type=outlet_ke_gudang"><i class="fa fa-undo"></i><span>Retur Barang Outlet</span></a>
                 </li>
                 @endif
             </ul>
         </li>
+        @endif
         @endif
 
         {{-- Outlet (superadmin only) --}}

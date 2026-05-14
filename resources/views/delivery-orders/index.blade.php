@@ -2,12 +2,13 @@
 @section('title', 'Delivery Orders')
 @section('container')
     <section class="content-header">
-        <h1>DELIVERY ORDERS (OUTBOUND)</h1>
+        <h1>{{ auth()->user()->role === 'staff-outlet' ? 'PENERIMAAN BARANG DO' : 'DELIVERY ORDERS (OUTBOUND)' }}</h1>
     </section>
     <section class="content">
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
+                    @if (auth()->user()->role !== 'staff-outlet')
                     <div class="box-header">
                         <div class="pull-right" style="display:flex; align-items:center; gap:8px;">
                             <label class="control-label" style="margin:0;">Filter Outlet:</label>
@@ -19,6 +20,7 @@
                             </select>
                         </div>
                     </div>
+                    @endif
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
@@ -52,7 +54,7 @@
                                     </td>
                                     <td>
                                         <a class="btn-xs btn btn-default" href="{{ route('delivery-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
-                                        @if ($value->status == 'draft' || $value->status == 'sent')
+                                        @if (auth()->user()->role !== 'staff-outlet' && ($value->status == 'draft' || $value->status == 'sent'))
                                             <button class="btn-xs btn btn-success" data-toggle="modal"
                                                 data-target="#sendModal{{ $value->id }}">Send</button>
 

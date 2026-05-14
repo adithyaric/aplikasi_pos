@@ -4,7 +4,7 @@
 
 @section('container')
     <section class="content-header">
-        <h1>Data Retur Pembelian</h1>
+        <h1>{{ $isStaffOutlet ? 'Riwayat Retur Ke Gudang' : 'Data Retur Pembelian' }}</h1>
     </section>
 
     <section class="content">
@@ -21,29 +21,64 @@
                             </div>
 
                             <div class="col-md-8 col-sm-12">
-                                <form method="GET" action="{{ route('laporan.retur-supplier') }}" id="exportForm">
-                                    <div class="row g-0">
-                                        <div class="col-md-3 col-6">
-                                            <input type="date" name="tanggal_mulai" class="form-control input-sm" required>
+                                @if ($isStaffOutlet)
+                                    {{-- Staff outlet: export only their outlet's retur by date range --}}
+                                    <form method="GET" action="{{ route('laporan.retur-outlet') }}">
+                                        <div class="row g-0">
+                                            <div class="col-xs-4">
+                                                <input type="date" name="tanggal_mulai" class="form-control input-sm" required>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <input type="date" name="tanggal_selesai" class="form-control input-sm" required>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                                    <i class="fa fa-file-excel-o"></i> Export
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-3 col-6">
-                                            <input type="date" name="tanggal_selesai" class="form-control input-sm" required>
+                                    </form>
+                                @else
+                                    {{-- Admin: export with type + outlet filter --}}
+                                    <form method="GET" action="{{ route('laporan.retur-supplier') }}" id="exportForm">
+                                        <div class="row g-0" style="gap:4px 0">
+                                            <div class="col-xs-3">
+                                                <input type="date" name="tanggal_mulai" class="form-control input-sm" required>
+                                            </div>
+                                            <div class="col-xs-3">
+                                                <input type="date" name="tanggal_selesai" class="form-control input-sm" required>
+                                            </div>
+                                            <div class="col-xs-3">
+                                                <select name="type" id="typeSelect" class="form-control input-sm"
+                                                    onchange="updateTypeFilter(this.value)">
+                                                    <option value="" {{ $selectedType === null ? 'selected' : '' }}>Tampil Semua</option>
+                                                    <option value="gudang_ke_supplier" {{ $selectedType === 'gudang_ke_supplier' ? 'selected' : '' }}>Gudang ke Supplier</option>
+                                                    <option value="outlet_ke_gudang" {{ $selectedType === 'outlet_ke_gudang' ? 'selected' : '' }}>Retur Outlet</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-xs-3">
+                                                <button type="submit" id="exportButton" class="btn btn-success btn-sm w-100">
+                                                    <i class="fa fa-file-excel-o"></i> Export
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-3 col-6">
-                                            <select name="type" id="typeSelect" class="form-control input-sm"
-                                                onchange="updateFormAction(this.value)">
-                                                <option value="" {{ $selectedType === null ? 'selected' : '' }}>Tampil Semua</option>
-                                                <option value="gudang_ke_supplier" {{ $selectedType === 'gudang_ke_supplier' ? 'selected' : '' }}>Gudang ke Supplier</option>
-                                                <option value="outlet_ke_gudang" {{ $selectedType === 'outlet_ke_gudang' ? 'selected' : '' }}>Retur Outlet</option>
+                                    </form>
+                                    {{-- Outlet filter (separate, URL-based) --}}
+                                    <div class="row" style="margin-top:6px">
+                                        <div class="col-xs-6">
+                                            <select id="outlet-filter" class="form-control input-sm select2"
+                                                style="width:100%" onchange="updateOutletFilter(this.value)">
+                                                <option value="">-- Filter Outlet --</option>
+                                                @foreach ($outlets as $outlet)
+                                                    <option value="{{ $outlet->id }}"
+                                                        {{ (string)($selectedOutletId ?? '') === (string)$outlet->id ? 'selected' : '' }}>
+                                                        {{ $outlet->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-3 col-6">
-                                            <button type="submit" id="exportButton" class="btn btn-success btn-sm w-100">
-                                                <i class="fa fa-file-excel-o"></i> Export
-                                            </button>
-                                        </div>
                                     </div>
-                                </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -53,10 +88,14 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Kode Retur</th>
-                                    <th>Jenis</th>
-                                    <th>Supplier / Outlet</th>
+                                    @if (!$isStaffOutlet)
+                                        <th>Jenis</th>
+                                    @endif
+                                    <th>{{ $isStaffOutlet ? 'Outlet' : 'Supplier / Outlet' }}</th>
                                     <th>Tanggal</th>
-                                    <th>Total</th>
+                                    @if (!$isStaffOutlet)
+                                        <th>Total</th>
+                                    @endif
                                     <th>Operator</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
@@ -67,18 +106,22 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $value->code }}</td>
-                                        <td>
-                                            @if ($value->type === 'gudang_ke_supplier')
-                                                <span class="label label-warning">Gudang → Supplier</span>
-                                            @else
-                                                <span class="label label-info">Outlet → Gudang</span>
-                                            @endif
-                                        </td>
+                                        @if (!$isStaffOutlet)
+                                            <td>
+                                                @if ($value->type === 'gudang_ke_supplier')
+                                                    <span class="label label-warning">Gudang → Supplier</span>
+                                                @else
+                                                    <span class="label label-info">Outlet → Gudang</span>
+                                                @endif
+                                            </td>
+                                        @endif
                                         <td>
                                             {{ $value->type === 'gudang_ke_supplier' ? $value->supplier->name ?? '-' : $value->outlet->name ?? '-' }}
                                         </td>
                                         <td>{{ $value->tanggal->format('d M Y') }}</td>
-                                        <td>@currency($value->total)</td>
+                                        @if (!$isStaffOutlet)
+                                            <td>@currency($value->total)</td>
+                                        @endif
                                         <td>{{ $value->user->name ?? '-' }}</td>
                                         <td>
                                             @if ($value->status === 'retur')
@@ -93,7 +136,7 @@
                                                 <i class="fa fa-eye"></i> Show
                                             </a>
 
-                                            @if ($value->type === 'gudang_ke_supplier' && $value->status === 'retur')
+                                            @if (!$isStaffOutlet && $value->type === 'gudang_ke_supplier' && $value->status === 'retur')
                                                 <a class="btn btn-success btn-xs"
                                                     href="{{ route('refundPembelian.terima.form', $value->id) }}">
                                                     <i class="fa fa-inbox"></i> Terima
@@ -111,23 +154,24 @@
                                                     </button>
                                                 </form>
                                             @endif
+
                                             @if ($value->type === 'gudang_ke_supplier')
                                                 <a href="{{ route('laporan.retur-pembelian.single', $value->id) }}"
                                                     class="btn btn-success btn-xs" target="_blank">
-                                                    <i class="fa fa-file-excel-o"></i> Export XLSX
+                                                    <i class="fa fa-file-excel-o"></i> XLSX
                                                 </a>
                                                 <a href="{{ route('laporan.pdf.retur-pembelian-single', $value->id) }}"
                                                     class="btn btn-danger btn-xs" target="_blank">
-                                                    <i class="fa fa-file-pdf-o"></i> Export PDF
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
                                                 </a>
                                             @else
                                                 <a href="{{ route('laporan.retur-outlet.single', $value->id) }}"
                                                     class="btn btn-success btn-xs" target="_blank">
-                                                    <i class="fa fa-file-excel-o"></i> Export XLSX
+                                                    <i class="fa fa-file-excel-o"></i> XLSX
                                                 </a>
                                                 <a href="{{ route('laporan.pdf.retur-outlet-single', $value->id) }}"
                                                     class="btn btn-danger btn-xs" target="_blank">
-                                                    <i class="fa fa-file-pdf-o"></i> Export PDF
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
                                                 </a>
                                             @endif
                                         </td>
@@ -141,24 +185,11 @@
         </div>
     </section>
 @endsection
+
 @section('page-script')
     <script>
-        // function setExportAction(type) {
-        //     const form = document.getElementById('exportForm');
-        //     const button = document.getElementById('exportButton');
-        //     if (type === 'gudang_ke_supplier') {
-        //         form.action = "{{ route('laporan.retur-supplier') }}";
-        //         button.className = 'btn btn-warning btn-sm w-100';
-        //     } else {
-        //         form.action = "{{ route('laporan.retur-outlet') }}";
-        //         button.className = 'btn btn-info btn-sm w-100';
-        //     }
-        // }
-
-        function updateFormAction(type) {
-            // setExportAction(type);
-
-            const url = new URL(window.location.href);
+        function updateTypeFilter(type) {
+            var url = new URL(window.location.href);
             if (type) {
                 url.searchParams.set('type', type);
             } else {
@@ -167,7 +198,14 @@
             window.location.href = url.toString();
         }
 
-        // const currentType = "{{ $selectedType ?? '' }}";
-        // setExportAction(currentType || 'gudang_ke_supplier');
+        function updateOutletFilter(outletId) {
+            var url = new URL(window.location.href);
+            if (outletId) {
+                url.searchParams.set('outlet_id', outletId);
+            } else {
+                url.searchParams.delete('outlet_id');
+            }
+            window.location.href = url.toString();
+        }
     </script>
 @endsection

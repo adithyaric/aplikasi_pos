@@ -16,11 +16,16 @@ class RequestOrderController extends Controller
 {
     public function index()
     {
-        $requests = RequestOrder::with(['owner', 'requestedBy'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user  = auth()->user();
+        $query = RequestOrder::with(['owner', 'requestedBy'])
+            ->orderBy('created_at', 'desc');
 
-        $outlets = Outlet::orderBy('name')->get();
+        if ($user->role === 'staff-outlet') {
+            $query->where('owner_id', $user->outlet_id);
+        }
+
+        $requests = $query->get();
+        $outlets  = Outlet::orderBy('name')->get();
 
         return view('request-orders.index', compact('requests', 'outlets'));
     }

@@ -15,11 +15,16 @@ class DeliveryOrderController extends Controller
 {
     public function index()
     {
-        $deliveryOrders = DeliveryOrder::with(['requestOrder', 'owner', 'items.product'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user  = auth()->user();
+        $query = DeliveryOrder::with(['requestOrder', 'owner', 'items.product'])
+            ->orderBy('created_at', 'desc');
 
-        $outlets = Outlet::orderBy('name')->get();
+        if ($user->role === 'staff-outlet') {
+            $query->where('owner_id', $user->outlet_id);
+        }
+
+        $deliveryOrders = $query->get();
+        $outlets        = Outlet::orderBy('name')->get();
 
         return view('delivery-orders.index', compact('deliveryOrders', 'outlets'));
     }

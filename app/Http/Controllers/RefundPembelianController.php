@@ -75,15 +75,29 @@ class RefundPembelianController extends Controller
 
     public function index(Request $request)
     {
+        $user    = auth()->user();
+        $isStaff = $user->role === 'staff-outlet';
+
         $query = RefundPembelian::with('user', 'supplier', 'outlet')->latest();
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
+        if ($isStaff) {
+            $query->where('type', 'outlet_ke_gudang')
+                ->where('outlet_id', $user->outlet_id);
+        } else {
+            if ($request->filled('type')) {
+                $query->where('type', $request->type);
+            }
+            if ($request->filled('outlet_id')) {
+                $query->where('outlet_id', $request->outlet_id);
+            }
         }
 
         return view('refundPembelians.index', [
             'refundPembelians' => $query->get(),
-            'selectedType'     => $request->type,
+            'selectedType'     => $isStaff ? 'outlet_ke_gudang' : $request->type,
+            'selectedOutletId' => $isStaff ? $user->outlet_id : $request->outlet_id,
+            'outlets'          => Outlet::orderBy('name')->get(),
+            'isStaffOutlet'    => $isStaff,
         ]);
     }
 
@@ -93,10 +107,15 @@ class RefundPembelianController extends Controller
         $nextNumber = $lastRetur ? ((int) substr($lastRetur->code, 3) + 1) : 1;
         $code       = 'RTR'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
+        $user          = auth()->user();
+        $isStaffOutlet = $user->role === 'staff-outlet';
+
         return view('refundPembelians.create', [
-            'suppliers' => Supplier::get(),
-            'outlets'   => Outlet::get(),
-            'code'      => $code,
+            'suppliers'     => Supplier::get(),
+            'outlets'       => Outlet::get(),
+            'code'          => $code,
+            'isStaffOutlet' => $isStaffOutlet,
+            'staffOutletId' => $isStaffOutlet ? $user->outlet_id : null,
         ]);
     }
 
