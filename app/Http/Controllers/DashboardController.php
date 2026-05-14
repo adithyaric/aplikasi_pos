@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeliveryOrder;
+use App\Models\DeliveryOrderItem;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Product;
+use App\Models\RefundPembelian;
+use App\Models\RequestOrder;
+use App\Models\RequestOrderItem;
 use App\Models\Stock;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
@@ -76,32 +81,72 @@ class DashboardController extends Controller
             ->sortByDesc('deficit')
             ->values();
 
-        $bestBuyProducts = [];
-        $bestBuySuppliers = [];
-        $salesGraph = [];
-        $productGraph = [];
-        $monthlyRevenue = [];
+        // Stat cards
+        $totalStock        = (int) Stock::sum('qty_available');
+        $pendingOrdersCount = RequestOrder::whereIn('status', ['pending', 'approved'])->count();
+        $deliveredCount    = DeliveryOrder::where('status', 'delivered')->count();
+        $refundCount       = RefundPembelian::count();
+
+        // Top 5 products by available stock (inventory chart)
+        $inventoryChart = Stock::selectRaw('product_id, SUM(qty_available) as total_qty')
+            ->with('product:id,name,code')
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->limit(5)
+            ->get();
+
+        // Top 5 most requested products (status order donut chart)
+        $statusOrderChart = RequestOrderItem::selectRaw('product_id, SUM(qty_requested) as total_qty')
+            ->with('product:id,name')
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->limit(5)
+            ->get();
+
+        // Top 5 products most delivered to outlets
+        $topProducts = DeliveryOrderItem::selectRaw('product_id, SUM(qty_sent) as total_qty')
+            ->with('product:id,name,code')
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->limit(5)
+            ->get();
+
+        // 5 most recent request orders
+        $recentOrders = RequestOrder::with(['owner:id,name'])
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // Slow moving: products with stock but not delivered in last 90 days
+        $recentlyDeliveredIds = DeliveryOrderItem::where('created_at', '>=', now()->subDays(90))
+            ->distinct()
+            ->pluck('product_id');
+
+        $slowMovingProducts = Product::select('id', 'code', 'name')
+            ->withSum('stocks', 'qty_available')
+            ->whereNotIn('id', $recentlyDeliveredIds)
+            ->orderByDesc('stocks_sum_qty_available')
+            ->limit(5)
+            ->get();
 
         if ($request->wantsJson()) {
-            // Return the data as a JSON response
             return response()->json([
-                'bestBuyProducts' => $bestBuyProducts,
-                'bestBuySuppliers' => $bestBuySuppliers,
-                'salesGraph' => $salesGraph,
-                'productGraph' => $productGraph,
-                'monthlyRevenue' => $monthlyRevenue,
+                'bestBuyProducts'  => [],
+                'bestBuySuppliers' => [],
+                'salesGraph'       => [],
+                'productGraph'     => [],
+                'monthlyRevenue'   => [],
             ]);
         }
 
-        // $activeAdjustments is defined above and reused here for the adjustment modal
         $adjustmentProducts = Product::select('id', 'code', 'name', 'min_stock')
             ->withSum('stocks', 'qty_available')
             ->orderBy('name')
             ->get()
             ->map(function ($p) use ($activeAdjustments) {
                 $adj = $activeAdjustments->get($p->id)?->first();
-                $p->active_from  = $adj?->active_from;
-                $p->active_until = $adj?->active_until;
+                $p->active_from   = $adj?->active_from;
+                $p->active_until  = $adj?->active_until;
                 $p->current_stock = (int) ($p->stocks_sum_qty_available ?? 0);
                 $p->effective_min = $adj
                     ? (int) ceil($p->min_stock * (1 + $adj->adjustment_percentage / 100))
@@ -111,17 +156,29 @@ class DashboardController extends Controller
             });
 
         return view('dashboard.index', [
-            // 'users' => User::count(),
             'products'           => Product::count(),
             'stocks'             => Stock::sum('qty'),
             'penjualans'         => Penjualan::count(),
             'pembelianTerkirim'  => Pembelian::where('is_published', true)->count(),
             'totalRevenue'       => 0,
+            // Stat cards
+            'totalStock'         => $totalStock,
+            'pendingOrdersCount' => $pendingOrdersCount,
+            'deliveredCount'     => $deliveredCount,
+            'refundCount'        => $refundCount,
+            'lowStockCount'      => $lowVelocityProducts->count(),
+            // Charts
+            'inventoryChart'     => $inventoryChart,
+            'statusOrderChart'   => $statusOrderChart,
+            'topProducts'        => $topProducts,
+            // Tables
+            'recentOrders'       => $recentOrders,
+            'slowMovingProducts' => $slowMovingProducts,
+            // Existing widgets
             'urgentSuppliers'    => $urgentSuppliers,
-            'nearExpiryStocks'    => $nearExpiryStocks,
+            'nearExpiryStocks'   => $nearExpiryStocks,
             'lowVelocityProducts' => $lowVelocityProducts,
             'adjustmentProducts' => $adjustmentProducts,
-            // 'sliders' => Slider::where('status', 'active')->get(),
         ]);
     }
 
@@ -162,7 +219,6 @@ class DashboardController extends Controller
             'website' => $request->website,
         ];
 
-        // Handle logo upload
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('logos', 'public');
             $data['logo'] = $path;

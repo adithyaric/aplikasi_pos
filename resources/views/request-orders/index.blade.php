@@ -86,7 +86,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                        @if (auth()->user()->role == 'outlet')
+                                        @if (auth()->user()->role == 'staff-outlet')
                                         <a class="btn-xs btn btn-default" href="{{ route('request-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @else
                                         <a class="btn-xs btn btn-default" href="{{ route('request-orders.verify', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>

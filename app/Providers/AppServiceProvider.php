@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $loadCompanyLogo = function () {
             $settings = json_decode(Storage::disk('public')->get('settings.json') ?? '{}', true) ?? [];
             $logo = $settings['logo'] ?? null;
+
             return $logo ? Storage::url($logo) : asset('img/logo.png');
         };
 
