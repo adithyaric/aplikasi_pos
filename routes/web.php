@@ -144,6 +144,7 @@ Route::middleware(['role:admin-gudang|staff-outlet|owner|superadmin'])->group(fu
     Route::patch('picking-list-items/{item}', [App\Http\Controllers\PickingListController::class, 'updateItem'])->name('picking-list-items.update');
     Route::post('picking-lists/{pickingList}/complete', [App\Http\Controllers\PickingListController::class, 'complete'])->name('picking-lists.complete');
     Route::post('picking-lists/{pickingList}/bulk-update', [App\Http\Controllers\PickingListController::class, 'bulkUpdate'])->name('picking-lists.bulk-update');
+    Route::patch('picking-lists/{pickingList}/picker-name', [App\Http\Controllers\PickingListController::class, 'updatePickerName'])->name('picking-lists.update-picker-name');
 
     // Delivery Orders
     Route::resource('delivery-orders', App\Http\Controllers\DeliveryOrderController::class);

@@ -29,6 +29,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-sm-4">
+                                <label>Nama Picker</label>
+                                <div style="display:flex;gap:4px;">
+                                    <input type="text" id="picker-name-input" class="form-control"
+                                        value="{{ $pickingList->picker_name ?? auth()->user()->name }}"
+                                        placeholder="Nama Picker">
+                                    <button type="button" id="btn-save-picker" class="btn btn-default">
+                                        <i class="fa fa-save"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <div class="col-sm-2" style="padding-top:25px;">
                                 <a id="btn-export"
                                    href="{{ route('laporan.pickinglist', $pickingList->id) }}"
@@ -130,9 +141,10 @@
 @section('page-script')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    var baseExportUrl = '{{ route('laporan.pickinglist', $pickingList->id) }}';
-    var bulkUpdateUrl = '{{ route('picking-lists.bulk-update', $pickingList->id) }}';
-    var csrfToken     = '{{ csrf_token() }}';
+    var baseExportUrl    = '{{ route('laporan.pickinglist', $pickingList->id) }}';
+    var bulkUpdateUrl    = '{{ route('picking-lists.bulk-update', $pickingList->id) }}';
+    var pickerNameUrl    = '{{ route('picking-lists.update-picker-name', $pickingList->id) }}';
+    var csrfToken        = '{{ csrf_token() }}';
 
     // ── row state helpers ─────────────────────────────────────────────────────
 
@@ -156,6 +168,31 @@
         $row.removeClass('bg-info bg-danger');
         $row.find('.row-error-msg').hide().text('');
     }
+
+    // ── picker name ───────────────────────────────────────────────────────────
+
+    $('#btn-save-picker').on('click', function () {
+        var $btn  = $(this).prop('disabled', true);
+        var name  = $('#picker-name-input').val().trim();
+        if (!name) { $btn.prop('disabled', false); return; }
+
+        $.ajax({
+            url:      pickerNameUrl,
+            type:     'POST',
+            dataType: 'json',
+            headers:  { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+            data:     { _method: 'PATCH', picker_name: name },
+            success: function () {
+                Swal.fire({ icon: 'success', title: 'Tersimpan', text: 'Nama picker diperbarui.', timer: 1500, showConfirmButton: false });
+            },
+            error: function () {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal menyimpan nama picker.' });
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+            },
+        });
+    });
 
     // ── location filter ───────────────────────────────────────────────────────
 
@@ -257,8 +294,11 @@
             postData['items[' + itemId + '][qty_picked]'] = qtyPicked;
         });
 
-        // Nothing valid to send
-        if (Object.keys(postData).length <= 1) {
+        var pickerName = $('#picker-name-input').val().trim();
+        if (pickerName) { postData['picker_name'] = pickerName; }
+
+        var hasItems = Object.keys(postData).some(function (k) { return k.indexOf('items[') === 0; });
+        if (!hasItems) {
             $btn.prop('disabled', false).html('<i class="fa fa-save"></i> Bulk Update');
             return;
         }
@@ -322,7 +362,11 @@
             return;
         }
 
-        // All picked — submit
+        // All picked — inject picker_name and submit
+        var pickerName = $('#picker-name-input').val().trim();
+        if (pickerName) {
+            $('<input>').attr({ type: 'hidden', name: 'picker_name', value: pickerName }).appendTo(this);
+        }
         this.submit();
     });
 </script>

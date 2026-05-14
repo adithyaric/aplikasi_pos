@@ -23,7 +23,7 @@
                             </tr>
                             <tr>
                                 <th>Picker</th>
-                                <td>{{ $pickingList->picker->name ?? '-' }}</td>
+                                <td>{{ $pickingList->picker_name ?? $pickingList->picker?->name ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Status</th>

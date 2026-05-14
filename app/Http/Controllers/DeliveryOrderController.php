@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DeliveryOrder;
 use App\Models\DeliveryOrderItem;
+use App\Models\Outlet;
 use App\Models\OwnerStock;
 use App\Models\PickingList;
 use App\Models\StockMovement;
@@ -18,7 +19,9 @@ class DeliveryOrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('delivery-orders.index', compact('deliveryOrders'));
+        $outlets = Outlet::orderBy('name')->get();
+
+        return view('delivery-orders.index', compact('deliveryOrders', 'outlets'));
     }
 
     public function show(DeliveryOrder $deliveryOrder)

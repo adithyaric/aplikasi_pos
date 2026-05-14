@@ -13,6 +13,7 @@ class PickingList extends Model
         'code',
         'request_order_id',
         'picker_id',
+        'picker_name',
         'status',
         'started_at',
         'completed_at',

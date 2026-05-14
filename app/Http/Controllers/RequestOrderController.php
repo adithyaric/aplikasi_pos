@@ -20,7 +20,9 @@ class RequestOrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('request-orders.index', compact('requests'));
+        $outlets = Outlet::orderBy('name')->get();
+
+        return view('request-orders.index', compact('requests', 'outlets'));
     }
 
     public function create()

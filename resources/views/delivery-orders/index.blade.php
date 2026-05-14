@@ -8,6 +8,17 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="box">
+                    <div class="box-header">
+                        <div class="pull-right" style="display:flex; align-items:center; gap:8px;">
+                            <label class="control-label" style="margin:0;">Filter Outlet:</label>
+                            <select id="outlet-filter" class="select2" style="min-width:220px;">
+                                <option value="">-- Semua Outlet --</option>
+                                @foreach ($outlets as $outlet)
+                                    <option value="{{ $outlet->id }}">{{ $outlet->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="box-body table-responsive">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
@@ -22,7 +33,7 @@
                                 </tr>
                             </thead>
                             @foreach ($deliveryOrders as $value)
-                                <tr>
+                                <tr data-outlet="{{ $value->owner_id ?? '' }}">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>{{ $value->requestOrder->code }}</td>
@@ -57,4 +68,23 @@
             </div>
         </div>
     </section>
+@endsection
+
+@section('page-script')
+<script>
+    $(function () {
+        var selectedOutlet = '';
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (!selectedOutlet) return true;
+            var row = $('#example1').DataTable().row(dataIndex).node();
+            return String($(row).data('outlet')) === selectedOutlet;
+        });
+
+        $('#outlet-filter').on('change', function () {
+            selectedOutlet = $(this).val();
+            $('#example1').DataTable().draw();
+        });
+    });
+</script>
 @endsection

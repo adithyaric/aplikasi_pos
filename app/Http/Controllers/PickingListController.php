@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Outlet;
 use App\Models\PickingList;
 use App\Models\PickingListItem;
 use App\Models\RequestOrder;
@@ -17,7 +18,9 @@ class PickingListController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('picking-lists.index', compact('pickingLists'));
+        $outlets = Outlet::orderBy('name')->get();
+
+        return view('picking-lists.index', compact('pickingLists', 'outlets'));
     }
 
     public function show(PickingList $pickingList)
@@ -100,15 +103,35 @@ class PickingListController extends Controller
         }
     }
 
-    public function startPicking(PickingList $pickingList)
+    public function startPicking(Request $request, PickingList $pickingList)
     {
+        $request->validate([
+            'picker_name' => 'nullable|string|max:255',
+        ]);
+
         $pickingList->update([
-            'status' => 'in_progress',
-            'picker_id' => auth()->id(),
-            'started_at' => now(),
+            'status'      => 'in_progress',
+            'picker_id'   => auth()->id(),
+            'picker_name' => $request->filled('picker_name') ? $request->picker_name : auth()->user()->name,
+            'started_at'  => now(),
         ]);
 
         return redirect()->route('picking-lists.pick', $pickingList);
+    }
+
+    public function updatePickerName(Request $request, PickingList $pickingList)
+    {
+        $request->validate([
+            'picker_name' => 'required|string|max:255',
+        ]);
+
+        $pickingList->update(['picker_name' => $request->picker_name]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('toast_success', 'Nama picker diperbarui.');
     }
 
     public function updateItem(Request $request, PickingListItem $item)
@@ -156,7 +179,7 @@ class PickingListController extends Controller
         return redirect()->back()->with('toast_success', 'Item '.$item->product->name.' berhasil diperbarui.');
     }
 
-    public function complete(PickingList $pickingList)
+    public function complete(Request $request, PickingList $pickingList)
     {
         $allPicked = $pickingList->items()->where('is_picked', false)->count() === 0;
 
@@ -164,10 +187,12 @@ class PickingListController extends Controller
             return back()->with('toast_error', 'All items must be picked');
         }
 
-        $pickingList->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
+        $data = ['status' => 'completed', 'completed_at' => now()];
+        if ($request->filled('picker_name')) {
+            $data['picker_name'] = $request->picker_name;
+        }
+
+        $pickingList->update($data);
 
         return redirect()->route('picking-lists.show', $pickingList)
             ->with('toast_success', 'Picking completed');
@@ -192,6 +217,10 @@ class PickingListController extends Controller
             }
 
             return back()->withErrors($validator);
+        }
+
+        if ($request->filled('picker_name')) {
+            $pickingList->update(['picker_name' => $request->picker_name]);
         }
 
         $items   = $pickingList->items()->get()->keyBy('id');
