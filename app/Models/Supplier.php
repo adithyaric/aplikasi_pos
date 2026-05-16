@@ -26,6 +26,18 @@ class Supplier extends Model
         'deadline_interval_weeks'    => 'integer',
     ];
 
+    public static function generateNextKode(): string
+    {
+        $last = static::withTrashed()
+            ->where('kode_supplier', 'like', 'S%')
+            ->orderByRaw('CAST(SUBSTRING(kode_supplier, 2) AS UNSIGNED) DESC')
+            ->value('kode_supplier');
+
+        $next = $last ? ((int) substr($last, 1)) + 1 : 1;
+
+        return 'S' . str_pad($next, 5, '0', STR_PAD_LEFT);
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'product_supplier');

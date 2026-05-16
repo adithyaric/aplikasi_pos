@@ -121,28 +121,36 @@ class RefundPembelianController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'code'              => 'required|string|unique:refund_pembelians,code',
-            'tanggal'           => 'required|date',
-            'type'              => 'required|in:gudang_ke_supplier,outlet_ke_gudang',
-            'supplier_id'       => 'required_if:type,gudang_ke_supplier|nullable|exists:suppliers,id',
-            'outlet_id'         => 'required_if:type,outlet_ke_gudang|nullable|exists:outlets,id',
-            'delivery_order_id' => 'nullable|exists:delivery_orders,id',
-            'product'           => 'required|array|min:1',
+        $type = $request->input('type');
+
+        $rules = [
+            'code'    => 'required|string|unique:refund_pembelians,code',
+            'tanggal' => 'required|date',
+            'type'    => 'required|in:gudang_ke_supplier,outlet_ke_gudang',
+            'product' => 'required|array|min:1',
             'product.*.product_id' => 'required|exists:products,id',
             'product.*.qty'        => 'required|integer|min:1',
             'product.*.alasan'     => 'required|string',
             'product.*.stock_id'   => 'required|exists:stocks,id',
-        ], [
-            'code.required' => 'Kode refund wajib diisi.',
-            'code.unique' => 'Kode refund sudah terdaftar.',
+        ];
+
+        if ($type === 'gudang_ke_supplier') {
+            $rules['supplier_id'] = 'required|exists:suppliers,id';
+        } elseif ($type === 'outlet_ke_gudang') {
+            $rules['outlet_id'] = 'required|exists:outlets,id';
+        }
+
+        $request->validate($rules, [
+            'code.required'    => 'Kode refund wajib diisi.',
+            'code.unique'      => 'Kode refund sudah terdaftar.',
             'tanggal.required' => 'Tanggal harus dipilih.',
-            'type.required' => 'Tipe refund wajib dipilih.',
-            'supplier_id.required_if' => 'Supplier wajib diisi untuk tipe Gudang ke Supplier.',
-            'outlet_id.required_if' => 'Outlet wajib diisi untuk tipe Outlet ke Gudang.',
-            'product.required' => 'Minimal harus ada satu produk.',
+            'type.required'    => 'Tipe refund wajib dipilih.',
+            'supplier_id.required' => 'Supplier wajib diisi untuk retur Gudang ke Supplier.',
+            'outlet_id.required'   => 'Outlet wajib diisi untuk retur Outlet ke Gudang.',
+            'product.required'     => 'Minimal harus ada satu produk.',
+            'product.min'          => 'Minimal harus ada satu produk.',
             'product.*.product_id.required' => 'ID Produk tidak valid.',
-            'product.*.qty.min' => 'Jumlah barang minimal 1.',
+            'product.*.qty.min'    => 'Jumlah barang minimal 1.',
             'product.*.alasan.required' => 'Alasan retur wajib diisi.',
         ]);
 
@@ -369,8 +377,6 @@ class RefundPembelianController extends Controller
 
         DB::beginTransaction();
         try {
-            $uangTotal = 0;
-
             foreach ($request->items as $itemId => $itemData) {
                 $item       = RefundPembelianItem::findOrFail($itemId);
                 $resolution = $itemData['resolution'];

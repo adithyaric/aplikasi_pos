@@ -138,7 +138,7 @@
                                         <label>Outlet <span class="text-danger">*</span></label>
                                         <select id="outlet_id" class="form-control select2" name="outlet_id"
                                             data-placeholder="Pilih Outlet" style="width:100%"
-                                            {{ $isStaffOutlet ? '' : 'disabled' }}
+                                            {{ $isStaffOutlet ? '' : 'disabled' }}>
                                             <option value="" selected>Pilih Outlet</option>
                                             @foreach ($outlets as $o)
                                                 <option value="{{ $o->id }}"
@@ -199,7 +199,7 @@
 
                         <div class="box-footer">
                             <a href="{{ route('refundPembelian.index') }}" class="btn btn-default">Kembali</a>
-                            <button type="submit" class="btn btn-primary" id="btn-submit" disabled>
+                            <button type="submit" class="btn btn-primary" id="btn-submit">
                                 <i class="fa fa-save"></i> Simpan
                             </button>
                         </div>
@@ -242,11 +242,7 @@
 
         // ── Submit guard ──────────────────────────────────────────────────────────
         function checkSubmit() {
-            var type = $('#type').val();
-            var hasRows = type === 'gudang_ke_supplier'
-                ? (dtSupplier ? dtSupplier.rows().count() : $('#supplier-repeater tr').length) > 0
-                : (dtOutlet   ? dtOutlet.rows().count()   : $('#outlet-repeater tr').length)   > 0;
-            $('#btn-submit').prop('disabled', !hasRows);
+            $('#btn-submit').prop('disabled', false);
         }
 
         // ── Remove row (individual) ───────────────────────────────────────────────

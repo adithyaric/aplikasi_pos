@@ -20,7 +20,9 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('suppliers.create', []);
+        return view('suppliers.create', [
+            'nextKode' => Supplier::generateNextKode(),
+        ]);
     }
 
     public function store(SupplierRequest $request)

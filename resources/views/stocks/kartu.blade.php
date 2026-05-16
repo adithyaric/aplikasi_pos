@@ -58,7 +58,7 @@
                                 <td>: <span id="displayProduct">-</span></td>
                             </tr>
                             <tr>
-                                <td>Kode Produk</td>
+                                <td>Barcode</td>
                                 <td>: <span id="displayCode">-</span></td>
                             </tr>
                             <tr>

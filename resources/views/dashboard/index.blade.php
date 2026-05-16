@@ -21,9 +21,9 @@
 
     <section class="content">
 
-        <!-- STAT CARDS -->
+        <!-- Baris 1: STAT CARDS -->
         <div class="row">
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="small-box bg-aqua">
                     <div class="inner">
                         <h3>{{ number_format($totalStock) }}</h3>
@@ -35,7 +35,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="small-box bg-yellow">
                     <div class="inner">
                         <h3>{{ number_format($pendingOrdersCount) }}</h3>
@@ -47,7 +47,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="small-box bg-green">
                     <div class="inner">
                         <h3>{{ number_format($deliveredCount) }}</h3>
@@ -59,7 +59,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="small-box bg-red">
                     <div class="inner">
                         <h3>{{ number_format($lowStockCount) }}</h3>
@@ -72,134 +72,42 @@
                 </div>
             </div>
         </div>
-        <!-- END STAT CARDS -->
+        <!-- END Baris 1 -->
 
-        <!-- CHARTS + NOTIFICATIONS ROW -->
+        <!-- Baris 2: INVENTORY + PRODUK TERLARIS -->
         <div class="row">
-            <!-- CHARTS (LEFT) -->
-            <div class="col-md-8">
-                <div class="row">
-                    <!-- Inventory Bar Chart -->
-                    <div class="col-xs-12">
-                        <div class="box box-primary">
-                            <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-bar-chart"></i> Inventory (Top 5 Stok Terbanyak)</h3>
-                                <div class="box-tools pull-right">
-                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                                </div>
-                            </div>
-                            <div class="box-body">
-                                <div id="chartInventory" style="min-height:260px"></div>
-                            </div>
+            <div class="col-md-6">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-bar-chart"></i> Inventory (Top 5 Stok Terbanyak)</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                         </div>
                     </div>
-                    <!-- Status Order Donut Chart -->
-                    <div class="col-xs-12">
-                        <div class="box box-info">
-                            <div class="box-header with-border">
-                                <h3 class="box-title"><i class="fa fa-pie-chart"></i> Status Order (Top 5 Paling Banyak Dipesan)</h3>
-                                <div class="box-tools pull-right">
-                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                                </div>
-                            </div>
-                            <div class="box-body">
-                                <div id="chartStatusOrder" style="min-height:260px"></div>
-                            </div>
-                        </div>
+                    <div class="box-body">
+                        <div id="chartInventory" style="min-height:260px"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- NOTIFICATIONS (RIGHT) -->
-            <div class="col-md-4">
-                <div class="box box-warning">
+            <div class="col-md-6">
+                <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-bell"></i> Tugas &amp; Notifikasi</h3>
+                        <h3 class="box-title"><i class="fa fa-star"></i> Produk Terlaris (Top 5 Terkirim ke Outlet)</h3>
                         <div class="box-tools pull-right">
-                            <span class="badge bg-red">{{ $urgentSuppliers->count() + $nearExpiryStocks->where('expired_at', '<=', now()->addDays(14))->count() }}</span>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                         </div>
                     </div>
-                    <div class="box-body" style="max-height:560px;overflow-y:auto;padding:0">
-                        @if($urgentSuppliers->isNotEmpty())
-                            <div class="callout callout-danger" style="margin:10px 10px 0">
-                                <h4><i class="fa fa-calendar-times-o"></i> Deadline PO Supplier</h4>
-                            </div>
-                            @foreach($urgentSuppliers as $s)
-                                @php $days = \Carbon\Carbon::today()->diffInDays($s->next_deadline, false); @endphp
-                                <div class="callout {{ $days === 0 ? 'callout-danger' : 'callout-warning' }}" style="margin:5px 10px">
-                                    <p>
-                                        <strong>{{ $s->name }}</strong><br>
-                                        <small>{{ $s->next_deadline->isoFormat('DD MMM YYYY') }}</small>
-                                    </p>
-                                    <div>
-                                        @if($days === 0)
-                                            <span class="label label-danger">HARI INI</span>
-                                        @else
-                                            <span class="label label-warning">H-{{ $days }}</span>
-                                        @endif
-                                        <a href="{{ route('pembelian.create', ['supplier_id' => $s->id]) }}" class="btn btn-xs btn-primary pull-right">
-                                            <i class="fa fa-plus"></i> Buat PO
-                                        </a>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
-
-                        @if($nearExpiryStocks->isNotEmpty())
-                            <div class="callout callout-warning" style="margin:10px 10px 0">
-                                <h4><i class="fa fa-clock-o"></i> Stok Mendekati Expired
-                                    <span class="badge bg-red">{{ $nearExpiryStocks->count() }}</span>
-                                </h4>
-                            </div>
-                            @foreach($nearExpiryStocks->take(8) as $stock)
-                                @php $daysLeft = (int) \Carbon\Carbon::today()->diffInDays($stock->expired_at, false); @endphp
-                                <div class="callout {{ $daysLeft <= 7 ? 'callout-danger' : ($daysLeft <= 14 ? 'callout-warning' : 'callout-info') }}" style="margin:5px 10px;padding:8px 15px">
-                                    <p class="no-margin">
-                                        <strong>{{ $stock->product?->name ?? '—' }}</strong>
-                                        <span class="label {{ $daysLeft <= 7 ? 'label-danger' : ($daysLeft <= 14 ? 'label-warning' : 'label-default') }} pull-right">{{ $daysLeft }} hari</span>
-                                    </p>
-                                    <small class="text-muted">Qty: {{ $stock->qty_available }} | Exp: {{ \Carbon\Carbon::parse($stock->expired_at)->format('d M Y') }}</small>
-                                </div>
-                            @endforeach
-                            @if($nearExpiryStocks->count() > 8)
-                                <div style="padding:5px 15px 10px">
-                                    <small class="text-muted">+{{ $nearExpiryStocks->count() - 8 }} stok lainnya mendekati expired</small>
-                                </div>
-                            @endif
-                        @endif
-
-                        @if($urgentSuppliers->isEmpty() && $nearExpiryStocks->isEmpty())
-                            <div style="padding:30px;text-align:center;color:#999">
-                                <i class="fa fa-check-circle fa-3x"></i>
-                                <p>Tidak ada notifikasi mendesak</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Retur Barang Stat -->
-                <div class="box box-default">
-                    <div class="box-body" style="padding:10px">
-                        <div class="row">
-                            <div class="col-xs-6 text-center" style="border-right:1px solid #eee">
-                                <div style="font-size:28px;font-weight:bold;color:#d9534f">{{ number_format($refundCount) }}</div>
-                                <small class="text-muted">Total Retur Supplier</small>
-                            </div>
-                            <div class="col-xs-6 text-center">
-                                <div style="font-size:28px;font-weight:bold;color:#f0ad4e">{{ number_format($pendingOrdersCount) }}</div>
-                                <small class="text-muted">Request Order Pending</small>
-                            </div>
-                        </div>
+                    <div class="box-body">
+                        <div id="chartTopProducts" style="min-height:260px"></div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- END CHARTS + NOTIFICATIONS ROW -->
+        <!-- END Baris 2 -->
 
-        <!-- RECENT ORDERS + TOP PRODUCTS ROW -->
+        <!-- Baris 3: PESANAN TERBARU + SLOW MOVING -->
         <div class="row">
-            <!-- Pesanan Terbaru -->
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="box box-default">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-list-alt"></i> Pesanan Terbaru</h3>
@@ -244,49 +152,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Produk Terlaris -->
-            <div class="col-md-5">
-                <div class="box box-success">
-                    <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-star"></i> Produk Terlaris (Outlet)</h3>
-                        <div class="box-tools pull-right">
-                            <span class="label label-success">Top 5</span>
-                        </div>
-                    </div>
-                    <div class="box-body no-padding">
-                        <ul class="products-list product-list-in-box">
-                            @forelse($topProducts as $i => $item)
-                                <li class="item">
-                                    <div class="product-img" style="width:36px;height:36px;background:#5cb85c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:14px;flex-shrink:0">
-                                        {{ $i + 1 }}
-                                    </div>
-                                    <div class="product-info">
-                                        <span class="product-title">{{ $item->product?->name ?? '—' }}</span>
-                                        <span class="product-description">
-                                            <i class="fa fa-check-circle text-green"></i>
-                                            {{ number_format($item->total_qty) }} unit terkirim
-                                        </span>
-                                    </div>
-                                </li>
-                            @empty
-                                <li class="item">
-                                    <div class="product-info text-center text-muted" style="padding:20px">Belum ada data pengiriman</div>
-                                </li>
-                            @endforelse
-                        </ul>
-                    </div>
-                    <div class="box-footer text-center">
-                        <a href="{{ route('delivery-orders.index') }}" class="btn btn-sm btn-default">Lihat Semua Pengiriman</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- END RECENT ORDERS + TOP PRODUCTS -->
-
-        <!-- SLOW MOVING + LOW STOCK ROW -->
-        <div class="row">
-            <!-- Produk Slow Moving -->
             <div class="col-md-6">
                 <div class="box box-default" id="widgetSlowMoving">
                     <div class="box-header with-border">
@@ -324,8 +189,54 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <!-- END Baris 3 -->
 
-            <!-- Low Stock Widget -->
+        <!-- Baris 4: DEADLINE PO + LOW STOCK -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">
+                            <i class="fa fa-calendar-times-o"></i> Deadline PO Supplier
+                            @if($urgentSuppliers->isNotEmpty())
+                                <span class="badge bg-red">{{ $urgentSuppliers->count() }}</span>
+                            @endif
+                        </h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body" style="max-height:300px;overflow-y:auto">
+                        @if($urgentSuppliers->isNotEmpty())
+                            @foreach($urgentSuppliers as $s)
+                                @php $days = \Carbon\Carbon::today()->diffInDays($s->next_deadline, false); @endphp
+                                <div class="callout {{ $days === 0 ? 'callout-danger' : 'callout-warning' }}">
+                                    <p>
+                                        <strong>{{ $s->name }}</strong><br>
+                                        <small>{{ $s->next_deadline->isoFormat('DD MMM YYYY') }}</small>
+                                    </p>
+                                    <div>
+                                        @if($days === 0)
+                                            <span class="label label-danger">HARI INI</span>
+                                        @else
+                                            <span class="label label-warning">H-{{ $days }}</span>
+                                        @endif
+                                        <a href="{{ route('pembelian.create', ['supplier_id' => $s->id]) }}" class="btn btn-xs btn-primary pull-right">
+                                            <i class="fa fa-plus"></i> Buat PO
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center text-muted" style="padding:30px">
+                                <i class="fa fa-check-circle fa-3x"></i>
+                                <p>Tidak ada deadline PO mendesak</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6" id="widgetLowStock">
                 <div class="box box-danger">
                     <div class="box-header with-border">
@@ -377,9 +288,9 @@
                 </div>
             </div>
         </div>
-        <!-- END SLOW MOVING + LOW STOCK -->
+        <!-- END Baris 4 -->
 
-        <!-- NEAR EXPIRY WIDGET (full width) -->
+        <!-- Baris 5: STOK MENDEKATI EXPIRED -->
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-warning collapsed-box">
@@ -441,7 +352,7 @@
                 </div>
             </div>
         </div>
-        <!-- END NEAR EXPIRY -->
+        <!-- END Baris 5 -->
 
     </section>
 
@@ -559,8 +470,8 @@
             legend: { enabled: false }
         });
 
-        // Status order donut chart
-        Highcharts.chart('chartStatusOrder', {
+        // Top products pie chart
+        Highcharts.chart('chartTopProducts', {
             chart: { type: 'pie', backgroundColor: 'transparent' },
             title: { text: null },
             credits: { enabled: false },
@@ -571,7 +482,7 @@
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
-                    innerSize: '50%',
+                    innerSize: '40%',
                     dataLabels: {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f}%',
@@ -580,10 +491,10 @@
                 }
             },
             series: [{
-                name: 'Qty Dipesan',
+                name: 'Unit Terkirim',
                 colorByPoint: true,
                 data: {!! json_encode(
-                    $statusOrderChart->map(fn($i) => [
+                    $topProducts->map(fn($i) => [
                         'name' => $i->product?->name ?? '—',
                         'y'    => (int)$i->total_qty,
                     ])->toArray()

@@ -178,7 +178,7 @@ class Product extends Model
             return "{$boxes} {$this->satuan_besar} {$rem} {$this->satuan}";
         }
 
-        return "1 {$this->satuan_besar}";
+        return "{$qty} {$this->satuan}";
     }
 
     public function getActivitylogOptions(): LogOptions

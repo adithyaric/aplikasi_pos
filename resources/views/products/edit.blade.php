@@ -28,9 +28,9 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="">Kode Produk</label>
+                                <label for="">Barcode</label>
                                 <input type="text" class="form-control" name="code"
-                                    value="{{ old('code', $product->code) }}" placeholder="Masukkan Code">
+                                    value="{{ old('code', $product->code) }}" placeholder="Masukkan Barcode">
                                 @error('code')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}

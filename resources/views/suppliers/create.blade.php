@@ -19,7 +19,7 @@
                             <div class="form-group">
                                 <label>Kode</label>
                                 <input type="text" class="form-control" name="kode_supplier"
-                                    value="{{ old('kode_supplier') }}" placeholder="Masukkan Kode Supplier">
+                                    value="{{ old('kode_supplier', $nextKode) }}">
                                 @error('kode_supplier')<div class="invalid-feedback text-danger">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group">

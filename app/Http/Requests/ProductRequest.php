@@ -44,7 +44,7 @@ class ProductRequest extends FormRequest
     public function messages()
     {
         return [
-            'code.required' => 'Kode produk wajib diisi.',
+            'code.required' => 'Barcode wajib diisi.',
             'name.required' => 'Nama produk wajib diisi.',
             'category_id.required' => 'Kategori produk wajib dipilih.',
             'harga_beli.required' => 'Harga beli wajib diisi.',

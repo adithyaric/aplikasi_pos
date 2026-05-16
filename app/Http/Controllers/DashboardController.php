@@ -56,8 +56,6 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('product_id');
 
-        $adjustedProductIds = $activeAdjustments->keys();
-
         $lowVelocityProducts = Product::select('id', 'code', 'name', 'min_stock')
             ->withSum('stocks', 'qty_available')
             ->where('min_stock', '>', 0)
@@ -83,7 +81,7 @@ class DashboardController extends Controller
 
         // Stat cards
         $totalStock        = (int) Stock::sum('qty_available');
-        $pendingOrdersCount = RequestOrder::whereIn('status', ['pending', 'approved'])->count();
+        $pendingOrdersCount = RequestOrder::where('status', 'pending')->count();
         $deliveredCount    = DeliveryOrder::where('status', 'delivered')->count();
         $refundCount       = RefundPembelian::count();
 
