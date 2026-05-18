@@ -41,7 +41,7 @@ class PembelianController extends Controller
     public function getProductsBySupplier(Supplier $supplier)
     {
         $products = $supplier->products()
-            ->select('products.id', 'code', 'name', 'is_serialized', 'harga_beli')
+            ->select('products.id', 'code', 'name', 'is_serialized', 'harga_beli', 'konversi_qty', 'satuan_besar', 'satuan')
             ->get()
             ->map(function ($product) {
                 $product->stock_count = $product->stocks()->sum('qty_available');
@@ -56,8 +56,14 @@ class PembelianController extends Controller
     {
         $products = Product::select('id', 'code', 'name', 'is_serialized', 'harga_beli', 'min_stock', 'konversi_qty', 'satuan_besar', 'satuan')
             ->withSum('stocks', 'qty_available')
-            ->orderBy('name')
-            ->get()
+            ->orderBy('name');
+
+        if (request()->filled('supplier_id')) {
+            $supplierId = request()->integer('supplier_id');
+            $products->whereHas('suppliers', fn ($query) => $query->where('suppliers.id', $supplierId));
+        }
+
+        $products = $products->get()
             ->map(function ($product) {
                 $currentStock = (int) ($product->stocks_sum_qty_available ?? 0);
                 $effectiveMin = $product->effective_min_stock;   // ← compute once
@@ -74,7 +80,9 @@ class PembelianController extends Controller
     public function index()
     {
         return view('pembelians.index', [
-            'pembelians' => Pembelian::latest()->get(),
+            'pembelians' => Pembelian::with(['supplier', 'pembelianProducts.product', 'pembelianTransaction', 'ownerApprovedBy'])
+                ->latest()
+                ->get(),
         ]);
     }
 
@@ -86,13 +94,17 @@ class PembelianController extends Controller
 
         return view('pembelians.create', [
             'suppliers' => Supplier::get(),
-            'products' => Product::get(),
+            'products' => collect(),
             'code' => $code
         ]);
     }
 
     public function store(PembelianRequest $request)
     {
+        if (auth()->user()->role === 'owner') {
+            abort(403);
+        }
+
         $request->validated();
 
         $pembelian = Pembelian::create([
@@ -102,6 +114,10 @@ class PembelianController extends Controller
             // 'kas_id' => $request->kas_id,
             'total' => $request->total,
             'is_published' => false,
+            'owner_approval_status' => 'pending',
+            'owner_approved_by' => null,
+            'owner_approved_at' => null,
+            'owner_approval_note' => null,
         ]);
 
         $this->updateStock($request, $pembelian);
@@ -143,13 +159,21 @@ class PembelianController extends Controller
             'kas' => Kas::get(),
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
-            'products' => Product::get(),
+            'products' => collect(),
         ]);
     }
 
     public function update(PembelianRequest $request, Pembelian $pembelian)
     {
+        if (auth()->user()->role === 'owner') {
+            abort(403);
+        }
+
         $data = $request->validated();
+        $data['owner_approval_status'] = 'pending';
+        $data['owner_approved_by'] = null;
+        $data['owner_approved_at'] = null;
+        $data['owner_approval_note'] = null;
         $pembelian->update($data);
         $this->updateStock($request, $pembelian);
 
@@ -158,6 +182,11 @@ class PembelianController extends Controller
 
     public function publish(Pembelian $pembelian)
     {
+        if ($pembelian->owner_approval_status !== 'approved') {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO masih menunggu ACC owner.');
+        }
+
         // Prevent double publishing
         if ($pembelian->is_published) {
             return redirect()->route('pembelian.index')
@@ -178,6 +207,11 @@ class PembelianController extends Controller
 
     public function penerimaan(Pembelian $pembelian)
     {
+        if ($pembelian->owner_approval_status !== 'approved') {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO belum disetujui owner, jadi belum bisa diproses ke Pembelian.');
+        }
+
         $pembelian->load(['pembelianProducts.product', 'stocks.product', 'supplier']);
 
         return view('pembelians.penerimaan', compact('pembelian'));
@@ -354,7 +388,7 @@ class PembelianController extends Controller
             'receipt_status' => 'nullable|in:draft,validated,completed',
             'receipt_photo' => 'nullable|image|max:2048',
         ], [
-            'code_gr.string' => 'Kode GR harus berupa teks.',
+            'code_gr.string' => 'Kode pembelian harus berupa teks.',
             'receipt_date.date' => 'Tanggal penerimaan harus berupa tanggal yang valid.',
             'receipt_pic.string' => 'PIC penerimaan harus berupa teks.',
             'receipt_status.in' => 'Status penerimaan harus dipilih antara draft, validated, atau completed.',
@@ -518,6 +552,10 @@ class PembelianController extends Controller
 
     public function destroy(Pembelian $pembelian)
     {
+        if (auth()->user()->role === 'owner') {
+            abort(403);
+        }
+
         $pembelian->stocks()->delete();
         $pembelian->delete();
 
@@ -526,6 +564,10 @@ class PembelianController extends Controller
 
     public function stockDestroy($id)
     {
+        if (auth()->user()->role === 'owner') {
+            abort(403);
+        }
+
         $pembelianProduct = PembelianProduct::find($id);
         $pembelian = $pembelianProduct->pembelian;
         $pembelianProduct->delete();
@@ -548,6 +590,10 @@ class PembelianController extends Controller
 
     public function updatePembayaran(Request $request, Pembelian $pembelian)
     {
+        if (auth()->user()->role === 'owner') {
+            abort(403);
+        }
+
         $currentAmount = $pembelian->pembelianTransaction?->amount ?? 0;
         $maxAmount = $pembelian->total - $currentAmount;
 
@@ -664,5 +710,46 @@ class PembelianController extends Controller
                 'message' => 'Terjadi kesalahan: '.$e->getMessage()
             ], 500);
         }
+    }
+
+    public function approveOwner(Request $request, Pembelian $pembelian)
+    {
+        if (! in_array(auth()->user()->role, ['owner', 'superadmin'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'owner_approval_note' => 'nullable|string',
+        ]);
+
+        $pembelian->update([
+            'owner_approval_status' => 'approved',
+            'owner_approved_by' => auth()->id(),
+            'owner_approved_at' => now(),
+            'owner_approval_note' => $request->owner_approval_note,
+        ]);
+
+        return redirect()->back()->with('toast_success', 'PO berhasil di-ACC owner.');
+    }
+
+    public function rejectOwner(Request $request, Pembelian $pembelian)
+    {
+        if (! in_array(auth()->user()->role, ['owner', 'superadmin'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'owner_approval_note' => 'nullable|string',
+        ]);
+
+        $pembelian->update([
+            'owner_approval_status' => 'rejected',
+            'owner_approved_by' => auth()->id(),
+            'owner_approved_at' => now(),
+            'owner_approval_note' => $request->owner_approval_note,
+            'is_published' => false,
+        ]);
+
+        return redirect()->back()->with('toast_success', 'PO ditolak owner dan dikembalikan ke draft revisi.');
     }
 }

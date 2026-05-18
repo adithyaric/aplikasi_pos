@@ -172,6 +172,46 @@
                                 @enderror
                             </div>
 
+                            <div class="col-md-6 form-group">
+                                <label>Status Produk</label>
+                                <select class="form-control" name="status_produk" id="status-produk-select">
+                                    @foreach ($statusProdukOptions as $statusValue => $statusLabel)
+                                        <option value="{{ $statusValue }}"
+                                            {{ old('status_produk', 'sudah') === $statusValue ? 'selected' : '' }}>
+                                            {{ $statusLabel }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('status_produk')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 form-group" id="status-note-group" style="display:none;">
+                                <label>Catatan Status</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="status-note-display"
+                                        value="{{ old('status_produk_note') }}" readonly
+                                        placeholder="Belum ada catatan tambahan diskon">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" data-toggle="modal"
+                                            data-target="#statusProdukModal">
+                                            Input Catatan
+                                        </button>
+                                    </span>
+                                </div>
+                                <input type="hidden" name="status_produk_note" id="status-note-hidden"
+                                    value="{{ old('status_produk_note') }}">
+                                <span class="help-block">Khusus tambahan diskon, isi nilai/catatan tambahannya.</span>
+                                @error('status_produk_note')
+                                    <div class="invalid-feedback text-danger">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
                             <!-- Multiple Select Supplier -->
                             <div class="col-md-6 form-group">
                                 <label>Supplier</label>
@@ -202,6 +242,29 @@
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>
+
+                    <div class="modal fade" id="statusProdukModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Catatan Tambahan Diskon</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Isi tambahan</label>
+                                        <input type="text" class="form-control" id="status-note-input-modal"
+                                            value="{{ old('status_produk_note') }}"
+                                            placeholder="Contoh: tambah 10.000 atau diskon 5%">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                    <button type="button" class="btn btn-primary" id="btn-save-status-note">Simpan Catatan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div><!-- /.box -->
             </div>
         </div>
@@ -215,6 +278,35 @@
                 placeholder: "Pilih Supplier",
                 allowClear: true
             });
+
+            function toggleStatusNote(forceOpen) {
+                var isTambahanDiskon = $('#status-produk-select').val() === 'tambahan_diskon';
+                $('#status-note-group').toggle(isTambahanDiskon);
+
+                if (!isTambahanDiskon) {
+                    $('#status-note-hidden').val('');
+                    $('#status-note-display').val('');
+                    $('#status-note-input-modal').val('');
+                    return;
+                }
+
+                if (forceOpen || !$('#status-note-hidden').val()) {
+                    $('#statusProdukModal').modal('show');
+                }
+            }
+
+            $('#status-produk-select').on('change', function() {
+                toggleStatusNote(true);
+            });
+
+            $('#btn-save-status-note').on('click', function() {
+                var note = $('#status-note-input-modal').val().trim();
+                $('#status-note-hidden').val(note);
+                $('#status-note-display').val(note);
+                $('#statusProdukModal').modal('hide');
+            });
+
+            toggleStatusNote(false);
         });
     </script>
 @endsection

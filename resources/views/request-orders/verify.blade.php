@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Verifikasi Request Order')
+@section('title', 'Detail Request Order')
 @section('container')
     <section class="content">
         <div class="row">
@@ -8,9 +8,9 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">
                             @if ($requestOrder->items()->whereNotNull('stock_id')->count() == 0)
-                                Assign Stocks - {{ $requestOrder->code }}
+                                Assign & Verifikasi Otomatis - {{ $requestOrder->code }}
                             @else
-                                Verifikasi Request Order - {{ $requestOrder->code }}
+                                Detail Request Order - {{ $requestOrder->code }}
                             @endif
                         </h3>
                     </div>
@@ -46,6 +46,10 @@
                         @if ($requestOrder->items()->whereNotNull('stock_id')->count() == 0)
                             {{-- STEP 1: Assign Stocks --}}
                             <h4>Assign Stocks to Request</h4>
+                            <p class="text-muted">
+                                Saat admin memilih SKU lalu menyimpan, request akan langsung terverifikasi otomatis.
+                                Sisa qty yang tidak dialokasikan akan dianggap tidak terpenuhi.
+                            </p>
                             <form action="{{ route('request-orders.update-stocks', $requestOrder) }}" method="POST"
                                 id="assign-form">
                                 @csrf
@@ -58,7 +62,7 @@
                                                 @if($item->product->konversi_qty && $item->product->satuan_besar)
                                                     <small class="text-muted">({{ $item->product->konversiDisplay($item->qty_requested) }})</small>
                                                 @endif
-                                                - Remaining: <span class="remaining-qty label label-warning">{{ $item->qty_requested }}</span>
+                                                - Belum Dialokasikan: <span class="remaining-qty label label-warning">{{ $item->qty_requested }}</span>
                                             </div>
                                             <div class="panel-body">
                                                 <table class="table table-bordered stock-assignment-table">
@@ -114,110 +118,59 @@
                                     @endforeach
                                 </div>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-save"></i> Save Stock Assignment
+                                    <i class="fa fa-save"></i> Simpan & Verifikasi Otomatis
                                 </button>
                             </form>
                         @else
-                            {{-- STEP 2: Approve Quantities --}}
-                            <h4>Approve Quantities</h4>
-                            <form action="{{ route('request-orders.process-verification', $requestOrder) }}"
-                                method="POST">
-                                @csrf
-                                <table class="table table-bordered table-striped">
-                                    <thead>
+                            <h4>Hasil Verifikasi Otomatis</h4>
+                            <div class="alert alert-success">
+                                Request ini sudah terverifikasi otomatis saat SKU dipilih admin.
+                            </div>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>Produk</td>
+                                        <td>SKU</td>
+                                        <td>Qty Requested</td>
+                                        <td>Qty Approved</td>
+                                        <td>Status</td>
+                                        <td>Notes</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($requestOrder->items as $item)
                                         <tr>
-                                            <td>Produk</td>
-                                            <td>SKU</td>
-                                            <td>Qty Available</td>
-                                            <td>Qty Requested</td>
-                                            <td>Qty Approved</td>
-                                            <td>Status</td>
-                                            <td>Notes</td>
+                                            <td>{{ $item->product->name }}</td>
+                                            <td><small class="text-muted">{{ $item->stock->sku ?? 'N/A' }}</small></td>
+                                            <td>
+                                                {{ $item->qty_requested }}
+                                                @if($item->product->konversi_qty && $item->product->satuan_besar)
+                                                    <br><small class="text-muted">{{ $item->product->konversiDisplay($item->qty_requested) }}</small>
+                                                @endif
+                                            </td>
+                                            <td>{{ $item->qty_approved ?? 0 }}</td>
+                                            <td>
+                                                @if ($item->item_status === 'approved')
+                                                    <span class="label label-success">Approved</span>
+                                                @elseif ($item->item_status === 'partial')
+                                                    <span class="label label-info">Partial</span>
+                                                @elseif ($item->item_status === 'rejected')
+                                                    <span class="label label-danger">Rejected</span>
+                                                @else
+                                                    <span class="label label-default">{{ ucfirst($item->item_status ?? 'pending') }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $item->notes ?? '-' }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($requestOrder->items as $index => $item)
-                                            @php
-                                                $stock = $item->stock;
-                                                $currentReserved = $item->qty_approved ?? 0;
-                                                $availableStock = $stock ? $stock->qty_available : 0;
-                                                $totalAvailable = $availableStock + $currentReserved; // Include currently reserved qty
-                                                $maxQty = min($item->qty_requested, $totalAvailable);
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $item->product->name }}</td>
-                                                <td><small class="text-muted">{{ $stock->sku ?? 'N/A' }}</small></td>
-                                                <td>
-                                                    <span
-                                                        class="label {{ $availableStock >= $item->qty_requested ? 'label-success' : 'label-warning' }}">
-                                                        {{ $availableStock }}
-                                                    </span>
-                                                    @if ($item->qty_approved > 0)
-                                                        <br><small class="text-info">(Reserved:
-                                                            {{ $item->qty_approved }})</small>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    {{ $item->qty_requested }}
-                                                    @if($item->product->konversi_qty && $item->product->satuan_besar)
-                                                        <br><small class="text-muted">{{ $item->product->konversiDisplay($item->qty_requested) }}</small>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control qty-approved"
-                                                        name="items[{{ $index }}][qty_approved]"
-                                                        value="{{ old('items.' . $index . '.qty_approved', $item->qty_approved ?? $maxQty) }}"
-                                                        min="0" max="{{ $maxQty }}"
-                                                        data-max="{{ $maxQty }}"
-                                                        data-available="{{ $totalAvailable }}"
-                                                        data-requested="{{ $item->qty_requested }}" step="1"
-                                                        required @readonly(isset($requestOrder->pickingList))>
-                                                    <small class="text-muted">Max: {{ $maxQty }}</small>
-                                                    <input type="hidden" name="items[{{ $index }}][id]"
-                                                        value="{{ $item->id }}">
-                                                    @error('items.' . $index . '.qty_approved')
-                                                        <span class="text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </td>
-                                                <td>
-                                                    <select class="form-control item-status"
-                                                        name="items[{{ $index }}][item_status]"
-                                                        data-index="{{ $index }}" required @readonly(isset($requestOrder->pickingList))>
-                                                        <option value="approved"
-                                                            {{ old('items.' . $index . '.item_status', $item->item_status) == 'approved' ? 'selected' : '' }}>
-                                                            Approved</option>
-                                                        <option value="partial"
-                                                            {{ old('items.' . $index . '.item_status', $item->item_status) == 'partial' ? 'selected' : '' }}>
-                                                            Partial</option>
-                                                        <option value="rejected"
-                                                            {{ old('items.' . $index . '.item_status', $item->item_status) == 'rejected' ? 'selected' : '' }}>
-                                                            Rejected</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control"
-                                                        name="items[{{ $index }}][notes]"
-                                                        value="{{ old('items.' . $index . '.notes', $item->notes) }}"
-                                                        placeholder="Notes" @readonly(isset($requestOrder->pickingList))>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            @if ($requestOrder->verification_notes)
                                 <div class="form-group">
-                                    <label for="verification_notes">Catatan Verifikasi (opsional)</label>
-                                    <textarea @readonly(isset($requestOrder->pickingList)) class="form-control" name="verification_notes" rows="3">{{ old('verification_notes', $requestOrder->verification_notes) }}</textarea>
+                                    <label>Catatan Verifikasi</label>
+                                    <textarea class="form-control" rows="3" readonly>{{ $requestOrder->verification_notes }}</textarea>
                                 </div>
-                                @if (!isset($requestOrder->pickingList))
-                                <button type="submit" class="btn btn-primary">
-                                    @if ($requestOrder->status == 'pending')
-                                        Proses Verifikasi
-                                    @else
-                                        Update Verifikasi
-                                    @endif
-                                </button>
-                                @endif
-                            </form>
+                            @endif
                         @endif
                         @if($requestOrder->additionalNotes->isNotEmpty())
                             <hr>
@@ -378,12 +331,12 @@ $(document).on('click', '.add-stock-row', function() {
 
                 $('.item-panel').each(function() {
                     const remaining = parseInt($(this).find('.remaining-qty').text());
-                    if (remaining !== 0) {
+                    if (remaining < 0) {
                         hasError = true;
                         Swal.fire({
                             icon: 'error',
                             title: 'Kesalahan',
-                            text: 'Semua kuantitas permintaan harus terisi penuh!',
+                            text: 'Qty alokasi tidak boleh melebihi qty request.',
                         });
                         return false;
                     }
@@ -392,39 +345,6 @@ $(document).on('click', '.add-stock-row', function() {
                 if (hasError) {
                     e.preventDefault();
                     return false;
-                }
-            });
-
-            // Auto-adjust status based on qty_approved (for approval step)
-            $('.qty-approved').on('input', function() {
-                const row = $(this).closest('tr');
-                const qtyApproved = parseInt($(this).val()) || 0;
-                const maxQty = parseInt($(this).attr('max')) || 0;
-                const qtyRequested = parseInt($(this).data('requested')) || 0;
-                const status = row.find('.item-status');
-
-                if (qtyApproved > maxQty) {
-                    $(this).val(maxQty);
-                }
-
-                if (qtyApproved === 0) {
-                    status.val('rejected');
-                } else if (qtyApproved < qtyRequested) {
-                    status.val('partial');
-                } else {
-                    status.val('approved');
-                }
-            });
-
-            $('.item-status').on('change', function() {
-                const row = $(this).closest('tr');
-                const qtyInput = row.find('.qty-approved');
-
-                if ($(this).val() === 'rejected') {
-                    qtyInput.val(0);
-                } else if (qtyInput.val() == 0) {
-                    const maxQty = parseInt(qtyInput.attr('max')) || 0;
-                    qtyInput.val(maxQty);
                 }
             });
         });

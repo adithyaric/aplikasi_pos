@@ -6,7 +6,7 @@
     <section class="content-header">
         <h1>
             Selamat Datang di Gudang, {{ ucfirst(auth()->user()->name) }}!
-            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(in_array(auth()->user()->role, ['admin-gudang', 'superadmin']))
             <small>
                 <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#modalMinStockAdj">
                     <i class="fa fa-sliders"></i> Pengaturan Min Stok
@@ -20,7 +20,34 @@
     </section>
 
     <section class="content">
-
+        @if($isStaffOutletDashboard ?? false)
+        <div class="row">
+            <div class="col-md-6">
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <h3>{{ number_format($outletRequestTotal ?? 0) }}</h3>
+                        <p>Total Jumlah Data Outlet Minta Gudang</p>
+                    </div>
+                    <div class="icon"><i class="fa fa-list-alt"></i></div>
+                    <a href="{{ route('request-orders.index') }}" class="small-box-footer">
+                        Lihat Detail <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="small-box bg-yellow">
+                    <div class="inner">
+                        <h3>{{ number_format($outletRequestPending ?? 0) }}</h3>
+                        <p>Total Outlet Minta Gudang Status Pending</p>
+                    </div>
+                    <div class="icon"><i class="fa fa-clock-o"></i></div>
+                    <a href="{{ route('request-orders.index') }}" class="small-box-footer">
+                        Lihat Detail <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @else
         <!-- Baris 1: STAT CARDS -->
         <div class="row">
             <div class="col-md-6">
@@ -153,6 +180,49 @@
                 </div>
             </div>
             <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-check-square-o"></i> PO Perlu ACC Owner</h3>
+                        <div class="box-tools pull-right">
+                            <span class="badge bg-blue">{{ $pendingOwnerApprovalCount ?? 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Kode PO</th>
+                                    <th>Supplier</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pendingOwnerApprovals as $po)
+                                    <tr>
+                                        <td><strong>{{ $po->code }}</strong></td>
+                                        <td>{{ $po->supplier?->name ?? '—' }}</td>
+                                        <td>{{ $po->created_at->format('d M Y') }}</td>
+                                        <td>
+                                            <a href="{{ route('pembelian.edit', $po->id) }}" class="btn btn-xs btn-primary">
+                                                Buka PO
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted">Tidak ada PO yang menunggu ACC owner</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Baris 3 -->
+
+        <!-- Baris 4: SLOW MOVING + DEADLINE PO -->
+        <div class="row">
+            <div class="col-md-6">
                 <div class="box box-default" id="widgetSlowMoving">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-hourglass-half text-muted"></i> Produk Slow Moving</h3>
@@ -190,9 +260,9 @@
                 </div>
             </div>
         </div>
-        <!-- END Baris 3 -->
+        <!-- END Baris 4 -->
 
-        <!-- Baris 4: DEADLINE PO + LOW STOCK -->
+        <!-- Baris 5: DEADLINE PO + LOW STOCK -->
         <div class="row">
             <div class="col-md-6">
                 <div class="box box-warning">
@@ -353,9 +423,11 @@
             </div>
         </div>
         <!-- END Baris 5 -->
+        @endif
 
     </section>
 
+@if(!($isStaffOutletDashboard ?? false))
 <!-- STOCK ADJUSTMENT MODAL -->
 <div class="modal fade" id="modalMinStockAdj" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -435,9 +507,11 @@
     </div>
 </div>
 <!-- END STOCK ADJUSTMENT MODAL -->
+@endif
 @endsection
 
 @section('page-script')
+    @if(!($isStaffOutletDashboard ?? false))
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/highcharts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/modules/exporting.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/modules/accessibility.min.js"></script>
@@ -576,4 +650,5 @@
             });
         });
     </script>
+    @endif
 @endsection

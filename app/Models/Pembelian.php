@@ -17,6 +17,10 @@ class Pembelian extends Model
         'kas_id',
         'total',
         'is_published',
+        'owner_approval_status',
+        'owner_approved_by',
+        'owner_approved_at',
+        'owner_approval_note',
         'receipt_date',
         'receipt_pic',
         'receipt_status',
@@ -25,6 +29,13 @@ class Pembelian extends Model
 
     protected $casts = [
         'receipt_date' => 'datetime',
+        'owner_approved_at' => 'datetime',
+    ];
+
+    public const OWNER_APPROVAL_STATUSES = [
+        'pending' => 'Menunggu ACC Owner',
+        'approved' => 'Disetujui Owner',
+        'rejected' => 'Ditolak Owner',
     ];
 
     public function outlet()
@@ -62,5 +73,15 @@ class Pembelian extends Model
     public function pembelianTransaction()
     {
         return $this->hasOne(PembelianTransaction::class);
+    }
+
+    public function ownerApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'owner_approved_by');
+    }
+
+    public function getOwnerApprovalLabelAttribute(): string
+    {
+        return self::OWNER_APPROVAL_STATUSES[$this->owner_approval_status] ?? ucfirst((string) $this->owner_approval_status);
     }
 }

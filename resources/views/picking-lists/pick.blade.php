@@ -94,9 +94,6 @@
                                                 <div style="display:flex;gap:4px;align-items:center;">
                                                     <input type="text" class="form-control val-barcode-input"
                                                         placeholder="Scan barcode" style="width:120px;">
-                                                    <button type="button" class="btn btn-warning btn-sm btn-validasi">
-                                                        Validasi
-                                                    </button>
                                                 </div>
                                                 <div class="row-error-msg" style="display:none;color:#a94442;font-size:11px;margin-top:3px;"></div>
                                             </td>
@@ -207,32 +204,27 @@
         );
     });
 
-    // ── per-row validasi ──────────────────────────────────────────────────────
-    // Requires barcode: must be filled and match product code.
-
-    $(document).on('click', '.btn-validasi', function () {
-        var $btn         = $(this);
-        var $row         = $btn.closest('tr');
+    function submitBarcodeValidation($row) {
         var productCode  = $row.data('product-code');
         var barcode      = $row.find('.val-barcode-input').val().trim();
         var qtyPicked    = $row.find('.qty-input').val();
         var qtyMax       = parseInt($row.find('.qty-input').attr('max'));
 
-        // Client-side validation
         if (!barcode) {
             markRowError($row, 'Barcode wajib diisi untuk validasi.');
-            return;
+            return false;
         }
         if (barcode !== productCode) {
             markRowError($row, 'Barcode tidak cocok. Expected: ' + productCode);
-            return;
+            return false;
         }
         if (parseInt(qtyPicked) > qtyMax) {
             markRowError($row, 'Qty melebihi maksimal (' + qtyMax + ').');
-            return;
+            return false;
         }
 
-        $btn.prop('disabled', true).text('...');
+        var $input = $row.find('.val-barcode-input');
+        $input.prop('disabled', true);
 
         $.ajax({
             url:      $row.data('validasi-url'),
@@ -253,9 +245,24 @@
                 markRowError($row, msg);
             },
             complete: function () {
-                $btn.prop('disabled', false).text('Validasi');
+                $input.prop('disabled', false);
             },
         });
+        return true;
+    }
+
+    $(document).on('keydown', '.val-barcode-input', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitBarcodeValidation($(this).closest('tr'));
+        }
+    });
+
+    $(document).on('change', '.val-barcode-input', function () {
+        var value = $(this).val().trim();
+        if (value) {
+            submitBarcodeValidation($(this).closest('tr'));
+        }
     });
 
     // ── bulk update ───────────────────────────────────────────────────────────

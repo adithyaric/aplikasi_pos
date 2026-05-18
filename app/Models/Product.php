@@ -12,6 +12,16 @@ class Product extends Model
     use SoftDeletes;
     use LogsActivity;
 
+    public const STATUS_PRODUK = [
+        'free_produk' => 'Free produk',
+        'tambahan_diskon' => 'Tambahan diskon',
+        'free_tester' => 'Free tester',
+        'listing' => 'Listing',
+        'lunas' => 'Lunas',
+        'belum_lunas' => 'Belum lunas',
+        'sudah' => 'Sudah',
+    ];
+
     protected $fillable = [
         'pic', //picture
         'code',
@@ -26,6 +36,8 @@ class Product extends Model
         'satuan',
         'min_stock',
         'lokasi',
+        'status_produk',
+        'status_produk_note',
         'model', // Add for specific model info
         'is_serialized', // Boolean: true for unique items, false for bulk => now always false
         'harga_beli',
@@ -129,6 +141,11 @@ class Product extends Model
         return $this->hasMany(StockMovement::class);
     }
 
+    public function refundPembelianItems()
+    {
+        return $this->hasMany(RefundPembelianItem::class);
+    }
+
     public function isLowStock(): bool
     {
         return $this->total_available_stock <= $this->effective_min_stock;
@@ -160,6 +177,11 @@ class Product extends Model
         }
 
         return "1 {$this->satuan_besar} = {$this->konversi_qty} {$this->satuan}";
+    }
+
+    public function getStatusProdukLabelAttribute(): string
+    {
+        return self::STATUS_PRODUK[$this->status_produk] ?? ucfirst(str_replace('_', ' ', (string) $this->status_produk));
     }
 
     public function konversiDisplay(int|float $qty): string

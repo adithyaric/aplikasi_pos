@@ -184,6 +184,18 @@
                 autoclose: true
             })
         });
+
+        $(document).on('input', 'input[type="number"]', function() {
+            var value = $(this).val();
+            if (value === '' || value === null) {
+                return;
+            }
+
+            var stripped = String(value).replace(/^0+(?=\d)/, '');
+            if (stripped !== value) {
+                $(this).val(stripped);
+            }
+        });
     </script>
     @yield('page-script')
 </body>

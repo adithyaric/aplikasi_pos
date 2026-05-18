@@ -74,6 +74,8 @@ Route::middleware(['role:admin-gudang|staff-outlet|owner|superadmin'])->group(fu
     Route::resource('/pengeluaran', PengeluaranController::class);
     Route::get('/pembelian/cek-stok-produk', [PembelianController::class, 'getAllProducts'])->name('pembelian.all-products');
     Route::resource('/pembelian', PembelianController::class);
+    Route::post('/pembelian/{pembelian}/owner-approve', [PembelianController::class, 'approveOwner'])->name('pembelian.owner-approve');
+    Route::post('/pembelian/{pembelian}/owner-reject', [PembelianController::class, 'rejectOwner'])->name('pembelian.owner-reject');
     Route::get('/pembelian/{pembelian}/pembayaran/edit', [PembelianController::class, 'editPembayaran'])->name('pembelian.pembayaran.edit');
     Route::put('/pembelian/{pembelian}/pembayaran', [PembelianController::class, 'updatePembayaran'])->name('pembelian.pembayaran.update');
     // Route::post('/pembelian/{pembelian}/publish', [PembelianController::class, 'publish'])->name('pembelian.publish');

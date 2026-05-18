@@ -40,6 +40,14 @@
                         </button>
                         <div class="row" style="margin-top:10px;">
                             <div class="col-xs-12" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <select id="filterStatusProduk" class="form-control input-sm" style="width:auto; min-width:180px;">
+                                    <option value="all" {{ $selectedStatusProduk === 'all' ? 'selected' : '' }}>Filter Status Produk: Semua</option>
+                                    @foreach ($statusProdukOptions as $statusValue => $statusLabel)
+                                        <option value="{{ $statusValue }}" {{ $selectedStatusProduk === $statusValue ? 'selected' : '' }}>
+                                            Filter Status Produk: {{ $statusLabel }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <select id="filterKategori" class="form-control input-sm select2" style="width:auto; min-width:160px;">
                                     <option value="">Semua Kategori</option>
                                 </select>
@@ -147,7 +155,7 @@
                                             $ownerQty       = $value->ownerStocks()->sum('qty');
                                             $reservedQty    = $value->stocks()->sum('qty_reserved');
                                             $availableQty   = $value->stocks()->sum('qty_available');
-                                            $pembelianQty   = $value->stockPembelians()->sum('qty');
+                                            $pembelianQty   = (int) ($value->approved_stock_pembelians_qty ?? 0);
                                             $konversi       = $value->konversi_qty;
                                         @endphp
 
@@ -251,8 +259,8 @@
                 }
             });
 
-            // Populate Lokasi dropdown (column 15) from loaded data
-            table.column(15).data().unique().sort().each(function(val) {
+            // Populate Lokasi dropdown from hidden column
+            table.column(17).data().unique().sort().each(function(val) {
                 if (val && String(val).trim() !== '') {
                     $('#filterLokasi').append($('<option>', { value: val, text: val }));
                 }
@@ -269,7 +277,13 @@
 
             $('#filterLokasi').on('change', function() {
                 var val = $(this).val();
-                table.column(15).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+                table.column(17).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+            });
+
+            $('#filterStatusProduk').on('change', function() {
+                var url = new URL(window.location.href);
+                url.searchParams.set('status_produk', $(this).val());
+                window.location.href = url.toString();
             });
 
             // Price history modal (unchanged)

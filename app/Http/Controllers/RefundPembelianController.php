@@ -122,6 +122,16 @@ class RefundPembelianController extends Controller
     public function store(Request $request)
     {
         $type = $request->input('type');
+        $selectedRows = collect($request->input('selected_rows', []))
+            ->map(fn ($row) => (string) $row)
+            ->filter()
+            ->values();
+        $selectedProducts = collect($request->input('product', []))
+            ->filter(function ($product, $key) use ($selectedRows) {
+                return $selectedRows->isEmpty() || $selectedRows->contains((string) $key);
+            })
+            ->values()
+            ->all();
 
         $rules = [
             'code'    => 'required|string|unique:refund_pembelians,code',
@@ -159,6 +169,10 @@ class RefundPembelianController extends Controller
             $isOutlet = $request->type === 'outlet_ke_gudang';
             $total    = 0;
 
+            if (empty($selectedProducts)) {
+                throw new \Exception('Pilih minimal satu baris retur yang dicentang.');
+            }
+
             $refundPembelian = RefundPembelian::create([
                 'code'              => $request->code,
                 'tanggal'           => $request->tanggal,
@@ -171,7 +185,7 @@ class RefundPembelianController extends Controller
                 'total'             => 0,
             ]);
 
-            foreach ($request->product as $product) {
+            foreach ($selectedProducts as $product) {
 
                 if (! $isOutlet) {
                     // ── Gudang ke Supplier ──────────────────────────────────────
@@ -197,7 +211,7 @@ class RefundPembelianController extends Controller
                         'qty_in'         => 0,
                         'qty_out'        => $product['qty'],
                         'balance'        => $stock->qty,
-                        'notes'          => "Retur ke supplier - {$refundPembelian->code} - SKU: {$stock->sku}",
+                        'notes'          => "Retur ke supplier - {$refundPembelian->code} - SKU: {$stock->sku} - Alasan: {$product['alasan']}",
                     ]);
 
                     RefundPembelianItem::create([
@@ -235,7 +249,7 @@ class RefundPembelianController extends Controller
                         'qty_in'         => $product['qty'],
                         'qty_out'        => 0,
                         'balance'        => $stock->qty,
-                        'notes'          => "Retur outlet ke gudang - {$refundPembelian->code} - SKU: {$stock->sku}",
+                        'notes'          => "Retur outlet ke gudang - {$refundPembelian->code} - SKU: {$stock->sku} - Alasan: {$product['alasan']}",
                     ]);
 
                     RefundPembelianItem::create([
@@ -402,7 +416,7 @@ class RefundPembelianController extends Controller
                     'qty_in'         => $item->qty,
                     'qty_out'        => 0,
                     'balance'        => $newBalance,
-                    'notes'          => "Terima retur barang - {$refundPembelian->code} - SKU: {$item->sku}",
+                    'notes'          => "Terima retur barang - {$refundPembelian->code} - SKU: {$item->sku} - Alasan: {$item->alasan}",
                 ]);
                 // } else {
                 //     $uangTotal += $item->qty * $item->harga;

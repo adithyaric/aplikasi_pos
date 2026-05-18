@@ -1,10 +1,10 @@
 @extends('layouts.master')
 
-@section('title', 'Penerimaan Barang (GR)')
+@section('title', 'Penerimaan Barang (Pembelian)')
 
 @section('container')
     <section class="content-header">
-        <h1>Penerimaan Barang <small>Goods Receipt</small></h1>
+        <h1>Penerimaan Barang <small>Pembelian</small></h1>
     </section>
 
     <section class="content">
@@ -23,11 +23,12 @@
                                 <tr>
                                     <th width="40">No</th>
                                     <th>Kode PO</th>
-                                    <th>Kode GR</th>
+                                    <th>Kode Pembelian</th>
                                     <th>Supplier</th>
                                     <th>Items</th>
                                     <th>Total PO</th>
                                     <th width="130">Status Penerimaan</th>
+                                    <th width="130">Status PO</th>
                                     <th>Tgl Terima</th>
                                     <th>PIC</th>
                                     <th width="180">Aksi</th>
@@ -76,6 +77,14 @@
                                             </span>
                                         </td>
                                         <td>
+                                            <span class="label label-{{ $value->owner_approval_status === 'approved' ? 'success' : ($value->owner_approval_status === 'rejected' ? 'danger' : 'warning') }}">
+                                                {{ strtoupper($value->owner_approval_status ?? 'pending') }}
+                                            </span>
+                                            @if ($value->ownerApprovedBy)
+                                                <br><small>{{ $value->ownerApprovedBy->name }}</small>
+                                            @endif
+                                        </td>
+                                        <td>
                                             {{ $value->receipt_date ? \Carbon\Carbon::parse($value->receipt_date)->format('d/m/Y H:i') : '-' }}
                                         </td>
                                         <td>{{ $value->receipt_pic ?? '-' }}</td>
@@ -83,15 +92,15 @@
                                             <a href="{{ route('pembelian.penerimaan', $value) }}"
                                                class="btn btn-xs btn-{{ $receiptStatus === 'completed' ? 'default' : 'primary' }}">
                                                 <i class="fa fa-{{ $receiptStatus === 'completed' ? 'eye' : 'edit' }}"></i>
-                                                {{ $receiptStatus === 'completed' ? 'Detail' : 'Input GR' }}
+                                                {{ $receiptStatus === 'completed' ? 'Detail' : 'Input Pembelian' }}
                                             </a>
                                             {{-- @if($value->stocks->count()) --}}
                                                 <a href="{{ route('laporan.penerimaan', [$value->id, 'po']) }}"
-                                                   class="btn btn-xs btn-success" title="Export GR">
-                                                    <i class="fa fa-file-excel-o"></i> GR
+                                                   class="btn btn-xs btn-success" title="Export Pembelian">
+                                                    <i class="fa fa-file-excel-o"></i> Pembelian
                                                 </a>
-                                                <a href="{{ route('laporan.pdf.penerimaan-single', $value->id) }}" target="_blank" class="btn btn-xs btn-danger" title="Export PDF GR">
-                                                    <i class="fa fa-file-pdf-o"></i> GR
+                                                <a href="{{ route('laporan.pdf.penerimaan-single', $value->id) }}" target="_blank" class="btn btn-xs btn-danger" title="Export PDF Pembelian">
+                                                    <i class="fa fa-file-pdf-o"></i> Pembelian
                                                 </a>
                                             {{-- @endif --}}
                                         </td>

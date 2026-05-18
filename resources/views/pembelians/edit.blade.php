@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Edit Pembelian')
+@section('title', 'Edit PO')
 
 @section('container')
     <section class="content">
@@ -10,7 +10,7 @@
                 <!-- general form elements -->
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Edit Pembelian</h3>
+                        <h3 class="box-title">Edit PO</h3>
                     </div><!-- /.box-header -->
                     <!-- form start -->
                     <form action="{{ route('pembelian.update', $pembelian->id) }}" method="POST"
@@ -19,9 +19,9 @@
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="">Kode Pembelian</label>
+                                <label for="">Kode PO</label>
                                 <input type="text" class="form-control" name="code"
-                                    value="{{ old('code', $pembelian->code) }}" placeholder="Masukkan Kode Pembelian">
+                                    value="{{ old('code', $pembelian->code) }}" placeholder="Masukkan Kode PO">
                                 @error('code')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
@@ -46,6 +46,38 @@
                                     </div>
                                 @enderror
                             </div>
+                            <div class="alert alert-info">
+                                <strong>Status ACC Owner:</strong>
+                                <span class="label label-{{ $pembelian->owner_approval_status === 'approved' ? 'success' : ($pembelian->owner_approval_status === 'rejected' ? 'danger' : 'warning') }}">
+                                    {{ strtoupper($pembelian->owner_approval_status ?? 'pending') }}
+                                </span>
+                                @if ($pembelian->ownerApprovedBy)
+                                    <br><small>Diproses oleh {{ $pembelian->ownerApprovedBy->name }} pada {{ $pembelian->owner_approved_at?->format('d-m-Y H:i') }}</small>
+                                @endif
+                                @if ($pembelian->owner_approval_note)
+                                    <br><small>Catatan owner: {{ $pembelian->owner_approval_note }}</small>
+                                @endif
+                            </div>
+                            @if (in_array(auth()->user()->role, ['owner', 'superadmin']) && $pembelian->owner_approval_status === 'pending')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Catatan Owner (opsional)</label>
+                                            <input type="text" class="form-control" id="owner-approval-note"
+                                                placeholder="Catatan ACC owner">
+                                        </div>
+                                        <button type="button" class="btn btn-success btn-block" id="btn-owner-approve">ACC Owner</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Catatan Revisi Owner (opsional)</label>
+                                            <input type="text" class="form-control" id="owner-reject-note"
+                                                placeholder="Alasan ditolak / revisi">
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-block" id="btn-owner-reject">Tolak Owner</button>
+                                    </div>
+                                </div>
+                            @endif
                             <hr>
                             <table class="table table-bordered table-striped" id="example">
                                 <thead>
@@ -111,7 +143,9 @@
 
                         <div class="box-footer">
                             <a href="{{ route('pembelian.index') }}" class="btn btn-default">Kembali</a>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            @if (auth()->user()->role !== 'owner')
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            @endif
                         </div>
 
                         <!-- Modal Cek Barang -->
@@ -153,6 +187,14 @@
                             </div>
                         </div>
                     </form>
+                    <form id="owner-approve-form" action="{{ route('pembelian.owner-approve', $pembelian->id) }}" method="POST" style="display:none;">
+                        @csrf
+                        <input type="hidden" name="owner_approval_note" id="owner-approve-note-hidden">
+                    </form>
+                    <form id="owner-reject-form" action="{{ route('pembelian.owner-reject', $pembelian->id) }}" method="POST" style="display:none;">
+                        @csrf
+                        <input type="hidden" name="owner_approval_note" id="owner-reject-note-hidden">
+                    </form>
                 </div><!-- /.box -->
             </div>
         </div>
@@ -163,6 +205,52 @@
     <script>
         let currentProducts = null;
         let productIndex = {{ count($pembelian->pembelianProducts) }};
+        let supplierRequest = null;
+        let selectedSupplierId = $('[name="supplier_id"]').val() || null;
+
+        function buildProductRow(index) {
+            return `
+                <tr>
+                    <td>
+                        <select required class="form-control select2 product" name="product[${index}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                            <option value="" disabled selected>Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" required value="1" min="1" class="form-control qty" name="product[${index}][qty]">
+                        <span class="konversi-display"></span>
+                    </td>
+                    <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${index}][harga_beli]"></td>
+                    <td><input type="text" required class="form-control subtotal" name="product[${index}][subtotal]" readonly></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                </tr>`;
+        }
+
+        function initializeProductRow($row) {
+            $row.find('.numeral-mask').mask("#,##0", { reverse: true });
+            $row.find('.select2').select2();
+
+            if (currentProducts) {
+                populateProductSelects(currentProducts, $row.find('.product'));
+            }
+
+            updateSubtotalAndTotal();
+        }
+
+        function resetCekBarangModal() {
+            $('#checkAll').prop('checked', false);
+            if (cekBarangTable) {
+                cekBarangTable.destroy();
+                cekBarangTable = null;
+            }
+            $('#cekBarangBody').empty();
+        }
+
+        function resetProductRowsForSupplierChange() {
+            productIndex = 0;
+            $('#product-repeater').html(buildProductRow(0));
+            initializeProductRow($('#product-repeater tr:first'));
+        }
 
         // Function to populate product selects with given products
         function populateProductSelects(products, target = '.product') {
@@ -192,25 +280,59 @@
             updateSubtotalAndTotal();
         }
 
-        // Muat semua produk saat halaman selesai dimuat (tanpa filter supplier)
-        $(document).ready(function() {
-            $.get('{{ route("pembelian.all-products") }}')
+        function loadProductsForSupplier(supplierId) {
+            currentProducts = [];
+            resetCekBarangModal();
+            populateProductSelects([]);
+
+            if (!supplierId) {
+                return;
+            }
+
+            if (supplierRequest) {
+                supplierRequest.abort();
+                supplierRequest = null;
+            }
+
+            supplierRequest = $.get('{{ route("pembelian.all-products") }}', { supplier_id: supplierId })
                 .done(function(products) {
+                    if (String($('[name="supplier_id"]').val() || '') !== String(supplierId)) {
+                        return;
+                    }
+
                     currentProducts = products;
                     populateProductSelects(products);
-                    // Trigger change untuk mengambil harga beli yang tersimpan
                     $('.product').each(function() {
                         $(this).trigger('change');
                     });
                 })
                 .fail(function() {
-                    alert('Gagal memuat daftar produk. Silakan refresh halaman.');
+                    alert('Gagal memuat daftar produk supplier. Silakan refresh halaman.');
+                })
+                .always(function() {
+                    supplierRequest = null;
                 });
+        }
 
-            // Trigger input mask untuk perhitungan awal
+        // Muat produk berdasarkan supplier saat halaman selesai dimuat
+        $(document).ready(function() {
+            loadProductsForSupplier($('[name="supplier_id"]').val());
+
             $('.harga_beli').each(function() {
                 $(this).trigger('input');
             });
+        });
+
+        $('[name="supplier_id"]').on('change', function() {
+            var nextSupplierId = $(this).val() || null;
+
+            if (String(selectedSupplierId || '') !== String(nextSupplierId || '')) {
+                currentProducts = [];
+                resetProductRowsForSupplierChange();
+            }
+
+            selectedSupplierId = nextSupplierId;
+            loadProductsForSupplier(selectedSupplierId);
         });
 
         // Helper: format number with thousand separators (Indonesian style)
@@ -221,28 +343,8 @@
 
         function addBahanBaku() {
             productIndex++;
-            let productTemplate = `
-                <tr>
-                    <td>
-                        <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
-                            <option value="" disabled selected>Pilih Produk</option>
-                        </select>
-                    </td>
-                    <td><input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]"></td>
-                    <td><input type="text" required value="0" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
-                    <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
-                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
-                </tr>`;
-            $('#product-repeater').append(productTemplate);
-
-            let $newRow = $('#product-repeater tr:last');
-            $newRow.find('.numeral-mask').mask("#,##0", { reverse: true });
-            $newRow.find('.select2').select2();
-
-            if (currentProducts) {
-                populateProductSelects(currentProducts, $newRow.find('.product'));
-            }
-            updateSubtotalAndTotal();
+            $('#product-repeater').append(buildProductRow(productIndex));
+            initializeProductRow($('#product-repeater tr:last'));
         }
 
         $(document).on('change', '.qty, .harga_beli', function() {
@@ -264,7 +366,7 @@
 
         function updateSubtotalAndTotal() {
             let total = 0;
-            $('tbody tr').each(function() {
+            $('#product-repeater tr').each(function() {
                 let $row = $(this);
                 let qty = $row.find('.qty').val();
                 let $hargaInput = $row.find('.harga_beli');
@@ -328,9 +430,15 @@
         let cekBarangTable = null;
 
         $('#modalCekBarang').on('show.bs.modal', function (e) {
+            if (!$('[name="supplier_id"]').val()) {
+                e.preventDefault();
+                alert('Pilih supplier terlebih dahulu.');
+                return;
+            }
+
             if (!currentProducts || currentProducts.length === 0) {
                 e.preventDefault();
-                alert('Data produk belum dimuat. Coba muat ulang halaman.');
+                alert('Produk supplier belum tersedia. Coba pilih supplier atau muat ulang halaman.');
                 return;
             }
 
@@ -464,6 +572,16 @@
             });
 
             $('#modalCekBarang').modal('hide');
+        });
+
+        $('#btn-owner-approve').on('click', function() {
+            $('#owner-approve-note-hidden').val($('#owner-approval-note').val().trim());
+            $('#owner-approve-form').trigger('submit');
+        });
+
+        $('#btn-owner-reject').on('click', function() {
+            $('#owner-reject-note-hidden').val($('#owner-reject-note').val().trim());
+            $('#owner-reject-form').trigger('submit');
         });
     </script>
 @endsection

@@ -12,9 +12,11 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <a href="{{ route('pembelian.create') }}" class="btn btn-md bg-green">
-                            <i class="fa fa-plus"></i> Buat PO Baru
-                        </a>
+                        @if (auth()->user()->role !== 'owner')
+                            <a href="{{ route('pembelian.create') }}" class="btn btn-md bg-green">
+                                <i class="fa fa-plus"></i> Buat PO Baru
+                            </a>
+                        @endif
                         {{-- <a href="{{ route('refundPembelian.index') }}" class="btn btn-md bg-green"> --}}
                             {{-- <i class="fa fa-refresh"></i> Refund PO --}}
                         {{-- </a> --}}
@@ -29,6 +31,7 @@
                                     <th>Items</th>
                                     <th>Total</th>
                                     <th width="120">Status PO</th>
+                                    <th width="150">ACC Owner</th>
                                     <th width="120">Status Bayar</th>
                                     <th width="200">Aksi</th>
                                 </tr>
@@ -71,6 +74,14 @@
                                             @endif
                                         </td>
                                         <td>
+                                            <span class="label label-{{ $value->owner_approval_status === 'approved' ? 'success' : ($value->owner_approval_status === 'rejected' ? 'danger' : 'warning') }}">
+                                                {{ strtoupper($value->owner_approval_status ?? 'pending') }}
+                                            </span>
+                                            @if ($value->ownerApprovedBy)
+                                                <br><small>{{ $value->ownerApprovedBy->name }}</small>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <span class="label label-{{ $payBadge }}">
                                                 {{ strtoupper($payStatus) }}
                                             </span>
@@ -85,6 +96,21 @@
                                                 title="Pembayaran">
                                                 <i class="fa fa-credit-card"></i> Pembayaran
                                             </a>
+
+                                            @if (in_array(auth()->user()->role, ['owner', 'superadmin']) && $value->owner_approval_status === 'pending')
+                                                <form action="{{ route('pembelian.owner-approve', $value->id) }}" method="post" style="display:inline">
+                                                    @csrf
+                                                    <button class="btn btn-xs btn-success" title="ACC Owner">
+                                                        <i class="fa fa-check"></i> ACC
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('pembelian.owner-reject', $value->id) }}" method="post" style="display:inline">
+                                                    @csrf
+                                                    <button class="btn btn-xs btn-danger" title="Tolak Owner">
+                                                        <i class="fa fa-times"></i> Tolak
+                                                    </button>
+                                                </form>
+                                            @endif
 
                                             @if (!$value->is_published)
                                                 <a href="{{ route('pembelian.edit', $value->id) }}"

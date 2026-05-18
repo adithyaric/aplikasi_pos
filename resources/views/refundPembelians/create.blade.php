@@ -11,7 +11,7 @@
                         <h3 class="box-title">Tambah Retur Pembelian</h3>
                     </div>
 
-                    <form action="{{ route('refundPembelian.store') }}" method="POST">
+                    <form action="{{ route('refundPembelian.store') }}" method="POST" id="refund-form">
                         @csrf
 
                         {{-- Hidden type field, updated when tab changes --}}
@@ -200,7 +200,7 @@
                         <div class="box-footer">
                             <a href="{{ route('refundPembelian.index') }}" class="btn btn-default">Kembali</a>
                             <button type="submit" class="btn btn-primary" id="btn-submit">
-                                <i class="fa fa-save"></i> Simpan
+                                <i class="fa fa-save"></i> Simpan Terpilih
                             </button>
                         </div>
                     </form>
@@ -243,6 +243,58 @@
         // ── Submit guard ──────────────────────────────────────────────────────────
         function checkSubmit() {
             $('#btn-submit').prop('disabled', false);
+        }
+
+        function setRowSelectionState($row, isSelected) {
+            $row.find('input, select, textarea').not('.row-check-supplier, .row-check-outlet').each(function() {
+                var $input = $(this);
+
+                if ($input.data('original-required') === undefined) {
+                    $input.data('original-required', $input.prop('required'));
+                }
+
+                if ($input.is('[type="hidden"]')) {
+                    $input.prop('disabled', !isSelected);
+                    return;
+                }
+
+                if ($input.data('original-required')) {
+                    $input.prop('required', isSelected);
+                } else {
+                    $input.prop('required', false);
+                }
+            });
+        }
+
+        function syncSelectionRowState($checkbox) {
+            setRowSelectionState($checkbox.closest('tr'), $checkbox.is(':checked'));
+        }
+
+        function prepareRowsForSubmit() {
+            $('#supplier-repeater tr, #outlet-repeater tr').each(function() {
+                var $row = $(this);
+                var $checkbox = $row.find('.row-check-supplier, .row-check-outlet').first();
+                var isSelected = $checkbox.is(':checked');
+                var isActiveTypeRow =
+                    ($('#type').val() === 'gudang_ke_supplier' && $checkbox.hasClass('row-check-supplier')) ||
+                    ($('#type').val() === 'outlet_ke_gudang' && $checkbox.hasClass('row-check-outlet'));
+
+                $row.find('input, select, textarea').not('.row-check-supplier, .row-check-outlet').each(function() {
+                    var $input = $(this);
+
+                    if ($input.data('original-required') === undefined) {
+                        $input.data('original-required', $input.prop('required'));
+                    }
+
+                    if ($input.is('[type="hidden"]')) {
+                        $input.prop('disabled', !(isSelected && isActiveTypeRow));
+                        return;
+                    }
+
+                    $input.prop('disabled', !(isSelected && isActiveTypeRow));
+                    $input.prop('required', !!($input.data('original-required') && isSelected && isActiveTypeRow));
+                });
+            });
         }
 
         // ── Remove row (individual) ───────────────────────────────────────────────
@@ -330,7 +382,7 @@
                 var id = String($chk.data('stock-id'));
                 if (id && id !== 'undefined') {
                     checked ? supplierSelected.add(id) : supplierSelected.delete(id);
-                    $chk.prop('checked', checked);
+                    $chk.prop('checked', checked).trigger('change');
                 }
             });
             updateSupplierBulkBar();
@@ -341,6 +393,7 @@
         $(document).on('change', '.row-check-supplier', function() {
             var id = String($(this).data('stock-id'));
             this.checked ? supplierSelected.add(id) : supplierSelected.delete(id);
+            syncSelectionRowState($(this));
             updateSupplierBulkBar();
             syncChkAllSupplier();
         });
@@ -379,7 +432,7 @@
                 var id = String($chk.data('stock-id'));
                 if (id && id !== 'undefined') {
                     checked ? outletSelected.add(id) : outletSelected.delete(id);
-                    $chk.prop('checked', checked);
+                    $chk.prop('checked', checked).trigger('change');
                 }
             });
             updateOutletBulkBar();
@@ -390,6 +443,7 @@
         $(document).on('change', '.row-check-outlet', function() {
             var id = String($(this).data('stock-id'));
             this.checked ? outletSelected.add(id) : outletSelected.delete(id);
+            syncSelectionRowState($(this));
             updateOutletBulkBar();
             syncChkAllOutlet();
         });
@@ -461,7 +515,7 @@
                     var row = `
                     <tr>
                         <td class="text-center">
-                            <input type="checkbox" class="row-check-supplier" data-stock-id="${item.stock_id}" style="cursor:pointer">
+                            <input type="checkbox" class="row-check-supplier" data-row-key="${i}" data-stock-id="${item.stock_id}" style="cursor:pointer">
                         </td>
                         <td>
                             ${item.product_name}
@@ -490,6 +544,7 @@
                         </td>
                     </tr>`;
                     $('#supplier-repeater').append(row);
+                    setRowSelectionState($('#supplier-repeater tr:last'), false);
                 });
 
                 applyMask();
@@ -508,6 +563,7 @@
                     drawCallback: function() {
                         $('#supplier-repeater .row-check-supplier').each(function() {
                             $(this).prop('checked', supplierSelected.has(String($(this).data('stock-id'))));
+                            syncSelectionRowState($(this));
                         });
                         syncChkAllSupplier();
                     }
@@ -554,7 +610,7 @@
                     var row = `
                     <tr>
                         <td class="text-center">
-                            <input type="checkbox" class="row-check-outlet" data-stock-id="${item.stock_id}" style="cursor:pointer">
+                            <input type="checkbox" class="row-check-outlet" data-row-key="${i}" data-stock-id="${item.stock_id}" style="cursor:pointer">
                         </td>
                         <td>
                             ${item.product_name}
@@ -580,6 +636,7 @@
                         </td>
                     </tr>`;
                     $('#outlet-repeater').append(row);
+                    setRowSelectionState($('#outlet-repeater tr:last'), false);
                 });
 
                 $('#outlet-product-area').show();
@@ -597,6 +654,7 @@
                     drawCallback: function() {
                         $('#outlet-repeater .row-check-outlet').each(function() {
                             $(this).prop('checked', outletSelected.has(String($(this).data('stock-id'))));
+                            syncSelectionRowState($(this));
                         });
                         syncChkAllOutlet();
                     }
@@ -619,6 +677,36 @@
             } else if (oid) {
                 $('#outlet_id').trigger('change');
             }
+        });
+
+        $('#refund-form').on('submit', function(e) {
+            var $form = $(this);
+            var type = $('#type').val();
+            var selected = [];
+
+            $form.find('input[name="selected_rows[]"]').remove();
+
+            if (type === 'gudang_ke_supplier') {
+                $('#supplier-repeater .row-check-supplier:checked').each(function() {
+                    selected.push($(this).data('row-key'));
+                });
+            } else {
+                $('#outlet-repeater .row-check-outlet:checked').each(function() {
+                    selected.push($(this).data('row-key'));
+                });
+            }
+
+            if (selected.length === 0) {
+                e.preventDefault();
+                alert('Pilih minimal satu baris retur yang dicentang.');
+                return false;
+            }
+
+            selected.forEach(function(key) {
+                $form.append('<input type="hidden" name="selected_rows[]" value="' + key + '">');
+            });
+
+            prepareRowsForSubmit();
         });
     </script>
 @endsection

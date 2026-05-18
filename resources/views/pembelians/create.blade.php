@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Tambah Pembelian')
+@section('title', 'Tambah PO')
 
 @section('container')
     <section class="content">
@@ -10,16 +10,16 @@
                 <!-- general form elements -->
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Tambah Pembelian</h3>
+                        <h3 class="box-title">Tambah PO</h3>
                     </div><!-- /.box-header -->
                     <!-- form start -->
                     <form action="{{ route('pembelian.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="">Kode Pembelian</label>
+                                <label for="">Kode PO</label>
                                 <input type="text" class="form-control" name="code" value="{{ old('code', $code) }}"
-                                    placeholder="Masukkan Kode Pembelian">
+                                    placeholder="Masukkan Kode PO">
                                 @error('code')
                                     <div class="invalid-feedback text-danger">
                                         {{ $message }}
@@ -153,7 +153,10 @@
     <script>
         let currentProducts = null;
         let productIndex = 0;
+        let supplierRequest = null;
+        let selectedSupplierId = $('[name="supplier_id"]').val() || null;
 
+        //TODO use product's konversiDisplay instead
         function konversiDisplay(qty, konversiQty, satuanBesar, satuan) {
             satuan = satuan || 'PCS';
             qty = parseInt(qty) || 0;
@@ -162,12 +165,56 @@
             var rem = qty % konversiQty;
             if (rem === 0) return boxes + ' ' + satuanBesar;
             if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
-            return '1 ' + satuanBesar;
+            return qty + ' ' + satuan;
         }
         function fmtQtyK(qty, p) {
             if (!p) return qty;
             var k = konversiDisplay(qty, p.konversi_qty, p.satuan_besar, p.satuan);
             return qty + (k ? ' <span class="label label-info">' + k + '</span>' : '');
+        }
+
+        function buildProductRow(index) {
+            return `
+                <tr>
+                    <td>
+                        <select required class="form-control select2 product" name="product[${index}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
+                            <option value="" disabled selected>Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" required value="1" min="1" class="form-control qty" name="product[${index}][qty]">
+                        <span class="konversi-display"></span>
+                    </td>
+                    <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${index}][harga_beli]"></td>
+                    <td><input type="text" required class="form-control subtotal" name="product[${index}][subtotal]" readonly></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
+                </tr>`;
+        }
+
+        function initializeProductRow($row) {
+            $row.find('.numeral-mask').mask("#,##0", { reverse: true });
+            $row.find('.select2').select2();
+
+            if (currentProducts) {
+                populateProductSelects(currentProducts, $row.find('.product'));
+            }
+
+            updateSubtotalAndTotal();
+        }
+
+        function resetCekBarangModal() {
+            $('#checkAll').prop('checked', false);
+            if (cekBarangTable) {
+                cekBarangTable.destroy();
+                cekBarangTable = null;
+            }
+            $('#cekBarangBody').empty();
+        }
+
+        function resetProductRowsForSupplierChange() {
+            productIndex = 0;
+            $('#product-repeater').html(buildProductRow(0));
+            initializeProductRow($('#product-repeater tr:first'));
         }
 
 
@@ -205,33 +252,8 @@
 
         function addBahanBaku() {
             productIndex++;
-            let productTemplate = `
-                <tr>
-                    <td>
-                        <select required class="form-control select2 product" name="product[${productIndex}][product_id]" data-placeholder="Pilih Product" style="width:100%;">
-                            <option value="" disabled selected>Pilih Produk</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" required value="1" min="1" class="form-control qty" name="product[${productIndex}][qty]">
-                        <span class="konversi-display"></span>
-                    </td>
-                    <td><input required type="text" class="form-control harga_beli numeral-mask" name="product[${productIndex}][harga_beli]"></td>
-                    <td><input type="text" required class="form-control subtotal" name="product[${productIndex}][subtotal]" readonly></td>
-                    <td><button class="btn btn-sm btn-danger" onclick="removeBahanBaku(this)" type="button">Remove</button></td>
-                </tr>`;
-            $('#product-repeater').append(productTemplate);
-
-            let $newRow = $('#product-repeater tr:last');
-            // Reinitialize mask on new harga_beli
-            $newRow.find('.numeral-mask').mask("#,##0", { reverse: true });
-            $newRow.find('.select2').select2();
-
-            if (currentProducts) {
-                populateProductSelects(currentProducts, $newRow.find('.product'));
-            }
-
-            updateSubtotalAndTotal();
+            $('#product-repeater').append(buildProductRow(productIndex));
+            initializeProductRow($('#product-repeater tr:last'));
         }
 
         $(document).on('change', '.qty, .harga_beli', function() {
@@ -325,24 +347,60 @@
             updateKonversiDisplay($(this).closest('tr'));
         });
 
-        // Handle product change on page load for existing rows
-        $(document).ready(function() {
-            // Load all products on page load (no supplier filter)
-            $.get('{{ route("pembelian.all-products") }}')
+        function loadProductsForSupplier(supplierId) {
+            currentProducts = [];
+            resetCekBarangModal();
+            populateProductSelects([]);
+
+            if (!supplierId) {
+                return;
+            }
+
+            if (supplierRequest) {
+                supplierRequest.abort();
+                supplierRequest = null;
+            }
+
+            supplierRequest = $.get('{{ route("pembelian.all-products") }}', { supplier_id: supplierId })
                 .done(function(products) {
+                    if (String($('[name="supplier_id"]').val() || '') !== String(supplierId)) {
+                        return;
+                    }
+
                     currentProducts = products;
                     populateProductSelects(products);
+
+                    $('.product').each(function() {
+                        $(this).trigger('change');
+                    });
                 })
                 .fail(function() {
-                    alert('Gagal memuat daftar produk. Silakan refresh halaman.');
+                    alert('Gagal memuat daftar produk supplier. Silakan refresh halaman.');
+                })
+                .always(function() {
+                    supplierRequest = null;
                 });
+        }
 
-            $('.product').each(function() {
-                $(this).trigger('change');
-            });
+        // Handle product change on page load for existing rows
+        $(document).ready(function() {
+            loadProductsForSupplier(selectedSupplierId);
+
             $('.harga_beli').each(function() {
                 $(this).trigger('input');
             });
+        });
+
+        $('[name="supplier_id"]').on('change', function() {
+            var nextSupplierId = $(this).val() || null;
+
+            if (String(selectedSupplierId || '') !== String(nextSupplierId || '')) {
+                currentProducts = [];
+                resetProductRowsForSupplierChange();
+            }
+
+            selectedSupplierId = nextSupplierId;
+            loadProductsForSupplier(selectedSupplierId);
         });
 
         $('#kas').prop('disabled', true);
@@ -366,9 +424,15 @@
         let cekBarangTable = null;
 
         $('#modalCekBarang').on('show.bs.modal', function (e) {
+            if (!$('[name="supplier_id"]').val()) {
+                e.preventDefault();
+                alert('Pilih supplier terlebih dahulu.');
+                return;
+            }
+
             if (!currentProducts || currentProducts.length === 0) {
                 e.preventDefault();
-                alert('Data produk belum dimuat. Coba muat ulang halaman.');
+                alert('Produk supplier belum tersedia. Coba pilih supplier atau muat ulang halaman.');
                 return;
             }
 

@@ -51,10 +51,12 @@
                                     <td>
                                         @if ($value->status == 'pending')
                                             <span class="label label-warning">Pending</span>
-                                        @elseif ($value->status == 'verified')
-                                            <span class="label label-success">Verified</span>
-                                        @elseif ($value->status == 'cancelled')
-                                            <span class="label label-danger">Cancelled</span>
+                                        @elseif ($value->status == 'approved')
+                                            <span class="label label-success">Approved</span>
+                                        @elseif ($value->status == 'partial')
+                                            <span class="label label-info">Partial</span>
+                                        @elseif ($value->status == 'rejected')
+                                            <span class="label label-danger">Rejected</span>
                                         @else
                                             <span class="label label-default">{{ $value->status }}</span>
                                         @endif
@@ -98,7 +100,7 @@
                                         @if (auth()->user()->role == 'staff-outlet')
                                         <a class="btn-xs btn btn-default" href="{{ route('request-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @else
-                                        <a class="btn-xs btn btn-default" href="{{ route('request-orders.verify', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
+                                        <a class="btn-xs btn btn-default" href="{{ route('request-orders.show', $value->id) }}"><i class="fa fa-eye"></i> Detail</a>
                                         @endif
                                         <a class=" btn-xs btn btn-success" href="{{ route('laporan.request-order', $value->id) }}"><i class="fa fa-file-excel-o"></i> Export</a>
                                     </td>

@@ -140,16 +140,18 @@ class RequestOrderController extends Controller
 
     public function verify(RequestOrder $requestOrder)
     {
-        $requestOrder->load(['items.product.stocks', 'additionalNotes']);
-
-        return view('request-orders.verify', compact('requestOrder'));
+        return redirect()->route('request-orders.show', $requestOrder);
     }
 
     public function show($id)
     {
-        $requestOrder = RequestOrder::with(['items.product.stocks', 'additionalNotes'])->findOrFail($id);
+        $requestOrder = RequestOrder::with(['items.product.stocks', 'items.stock', 'requestedBy', 'verifiedBy', 'additionalNotes'])->findOrFail($id);
 
-        return view('request-orders.show', compact('requestOrder'));
+        if (auth()->user()->role === 'staff-outlet') {
+            return view('request-orders.show', compact('requestOrder'));
+        }
+
+        return view('request-orders.verify', compact('requestOrder'));
     }
 
     public function processVerification(Request $request, RequestOrder $requestOrder)
@@ -326,13 +328,14 @@ class RequestOrderController extends Controller
         try {
             // Group by item_id
             $grouped = collect($request->stock_assignments)->groupBy('item_id');
+            $hasPartial = false;
 
             foreach ($grouped as $itemId => $assignments) {
                 $originalItem = RequestOrderItem::find($itemId);
                 $totalQty = $assignments->sum('qty');
 
-                if ($totalQty != $originalItem->qty_requested) {
-                    throw new \Exception("Product {$originalItem->product->name}: Total assigned qty ({$totalQty}) must equal requested qty ({$originalItem->qty_requested})");
+                if ($totalQty > $originalItem->qty_requested) {
+                    throw new \Exception("Product {$originalItem->product->name}: Total assigned qty ({$totalQty}) tidak boleh melebihi qty request ({$originalItem->qty_requested})");
                 }
 
                 // Delete original item (will be replaced by split items)
@@ -351,18 +354,40 @@ class RequestOrderController extends Controller
                         'product_id' => $originalItem->product_id,
                         'stock_id' => $assignment['stock_id'],
                         'qty_requested' => $assignment['qty'],
+                        'qty_approved' => $assignment['qty'],
+                        'item_status' => 'approved',
                         'notes' => $originalItem->notes,
+                    ]);
+
+                    $stock->reserve($assignment['qty']);
+                }
+
+                if ($totalQty < $originalItem->qty_requested) {
+                    $hasPartial = true;
+
+                    RequestOrderItem::create([
+                        'request_order_id' => $requestOrder->id,
+                        'product_id' => $originalItem->product_id,
+                        'stock_id' => null,
+                        'qty_requested' => $originalItem->qty_requested - $totalQty,
+                        'qty_approved' => 0,
+                        'item_status' => 'rejected',
+                        'notes' => trim(($originalItem->notes ? $originalItem->notes.' | ' : '').'Sisa qty belum teralokasi saat verifikasi otomatis.'),
                     ]);
                 }
             }
 
+            $requestOrder->update([
+                'status' => $hasPartial ? 'partial' : 'approved',
+                'verified_by' => auth()->id(),
+                'verified_date' => now(),
+                'verification_notes' => 'Terverifikasi otomatis saat admin memilih SKU/stok.',
+            ]);
+
             DB::commit();
 
-            // return redirect()->route('request-orders.verify', $requestOrder)
-            //     ->with('toast_success', 'Stocks assigned successfully. Now you can approve.');
-
-            return redirect()->route('request-orders.index')
-                ->with('toast_success', 'Stocks assigned successfully. Now you can approve.');
+            return redirect()->route('request-orders.show', $requestOrder)
+                ->with('toast_success', 'Stock assignment berhasil disimpan dan request otomatis terverifikasi.');
         } catch (\Exception $e) {
             DB::rollBack();
 

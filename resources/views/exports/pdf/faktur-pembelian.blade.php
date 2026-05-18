@@ -63,7 +63,7 @@
         <td><span class="badge {{ $badgeClass }}">{{ strtoupper($status) }}</span></td>
     </tr>
     <tr>
-        <td class="label">No GR</td>
+        <td class="label">No Pembelian</td>
         <td class="colon">:</td>
         <td>{{ $pembelian->code_gr ?? '-' }}</td>
         <td class="label">Tgl Pembayaran</td>

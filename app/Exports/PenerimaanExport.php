@@ -121,7 +121,7 @@ class PenerimaanExport implements FromCollection, WithHeadings, WithMapping, Wit
                 ? Carbon::parse($this->pembelian->receipt_date)->isoFormat('DD MMMM YYYY')
                 : '-');
         } else {
-            $sheet->setCellValue('B10', 'Goods Receipt :');
+            $sheet->setCellValue('B10', 'Pembelian :');
             $sheet->setCellValue('D10', $this->pembelian->code_gr ?? '-');
             $sheet->setCellValue('B11', 'Tanggal :');
             $sheet->setCellValue('D11', $this->pembelian->receipt_date

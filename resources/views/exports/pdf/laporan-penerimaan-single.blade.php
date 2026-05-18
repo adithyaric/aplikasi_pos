@@ -25,7 +25,7 @@
 
 @include('exports.pdf._header')
 
-<div class="report-title">DOKUMEN PENERIMAAN BARANG (GR)</div>
+<div class="report-title">DOKUMEN PENERIMAAN BARANG (PEMBELIAN)</div>
 
 @php
     $receiptStatus = $pembelian->receipt_status ?? 'draft';
@@ -46,7 +46,7 @@
         <td><span class="badge {{ $badgeClass }}">{{ strtoupper($receiptStatus) }}</span></td>
     </tr>
     <tr>
-        <td class="label">No GR</td>
+        <td class="label">No Pembelian</td>
         <td class="colon">:</td>
         <td><strong>{{ $pembelian->code_gr ?? '-' }}</strong></td>
         <td class="label">Tgl Terima</td>

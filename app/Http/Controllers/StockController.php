@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\StockOpnameTemplateExport;
 use App\Models\Product;
+use App\Models\RefundPembelian;
+use App\Models\RefundPembelianItem;
 use App\Models\Stock;
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
@@ -148,13 +150,7 @@ class StockController extends Controller
             $stokAkhir = $stokAwal + $masuk - $keluar;
             $nilai = $stokAkhir * $currentPrice;
 
-            $keterangan = $movement->notes ?? '-';
-            if ($movement->type === 'adjustment') {
-                $adj = StockAdjustment::find($movement->reference_id);
-                if ($adj && $adj->stock_id === $stock->id && ! empty($adj->keterangan)) {
-                    $keterangan = $adj->keterangan;
-                }
-            }
+            $keterangan = $this->buildKartuKeterangan($movement, $stock);
 
             $result[] = [
                 'tanggal' => $date,
@@ -183,6 +179,62 @@ class StockController extends Controller
             ],
             'transactions' => $result
         ]);
+    }
+
+    protected function buildKartuKeterangan(StockMovement $movement, Stock $stock): string
+    {
+        $parts = [];
+
+        $this->appendKeteranganPart($parts, $movement->notes);
+
+        if ($movement->reference_type === StockAdjustment::class) {
+            $adjustment = StockAdjustment::find($movement->reference_id);
+
+            if ($adjustment && $adjustment->stock_id === $stock->id) {
+                $this->appendKeteranganPart($parts, $adjustment->keterangan);
+                $this->appendKeteranganPart($parts, $adjustment->reason);
+            }
+        }
+
+        if ($movement->reference_type === RefundPembelian::class) {
+            $refundItem = RefundPembelianItem::where('refund_pembelian_id', $movement->reference_id)
+                ->where('product_id', $movement->product_id)
+                ->where(function ($query) use ($stock) {
+                    $query->where('stock_id', $stock->id)
+                        ->orWhere('sku', $stock->sku);
+                })
+                ->latest('id')
+                ->first();
+
+            if ($refundItem && ! empty($refundItem->alasan)) {
+                $this->appendKeteranganPart($parts, 'Alasan retur: '.$refundItem->alasan);
+            }
+        }
+
+        return ! empty($parts) ? implode(' | ', $parts) : '-';
+    }
+
+    protected function appendKeteranganPart(array &$parts, ?string $value): void
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return;
+        }
+
+        $normalizedValue = mb_strtolower($value);
+
+        foreach ($parts as $part) {
+            $normalizedPart = mb_strtolower($part);
+
+            if ($normalizedPart === $normalizedValue
+                || str_contains($normalizedPart, $normalizedValue)
+                || str_contains($normalizedValue, $normalizedPart)) {
+                return;
+            }
+        }
+
+        $parts[] = $value;
     }
 
     //opname

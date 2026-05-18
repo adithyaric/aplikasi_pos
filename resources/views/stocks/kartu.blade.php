@@ -114,7 +114,7 @@
             var rem = qty % konversiQty;
             if (rem === 0) return boxes + ' ' + satuanBesar;
             if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
-            return '1 ' + satuanBesar;
+            return qty + ' ' + satuan;
         }
 
         $(document).ready(function() {
@@ -190,6 +190,7 @@
                     return;
                 }
 
+                //TODO fix, use the Product's konversiDisplay instead
                 function fmtQty(qty) {
                     var k = konversiDisplay(qty, meta.konversi_qty, meta.satuan_besar, meta.satuan);
                     return qty + (k ? ' <span class="label label-info">' + k + '</span>' : '');

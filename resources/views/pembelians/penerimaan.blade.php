@@ -129,7 +129,7 @@
                                 <i class="fa fa-lock"></i> Items sudah tersimpan dan tidak bisa diubah.
                                 @if($pembelian->stocks->count())
                                     <a href="{{ route('laporan.penerimaan', [$pembelian->id, 'po']) }}" class="btn btn-info btn-xs pull-right">
-                                        <i class="fa fa-file-excel-o"></i> Export GR
+                                        <i class="fa fa-file-excel-o"></i> Export Pembelian
                                     </a>
                                 @endif
                             </div>
@@ -155,9 +155,9 @@
                                 </div>
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label>Nomor Goods Receipt <span class="text-danger">*</span></label>
+                                        <label>Nomor Pembelian <span class="text-danger">*</span></label>
                                         <input type="text" name="code_gr" class="form-control"
-                                            value="{{ old('code_gr', $pembelian->code_gr ?? str_replace('PO', 'GR', $pembelian->code)) }}"
+                                            value="{{ old('code_gr', $pembelian->code_gr ?? str_replace('PO', 'PEMBELIAN', $pembelian->code)) }}"
                                             required>
                                     </div>
                                     <div class="form-group">

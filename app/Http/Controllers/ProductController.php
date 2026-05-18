@@ -21,6 +21,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $statusFilter = $request->input('status_produk', 'sudah');
         $products = Product::query();
 
         if ($request->search) {
@@ -39,7 +40,16 @@ class ProductController extends Controller
             $products = $products->where('outlet_id', $request->outlet_id);
         }
 
+        if ($statusFilter !== 'all') {
+            $products = $products->where('status_produk', $statusFilter);
+        }
+
         $products = $products->orderBy('code')
+            ->withSum([
+                'stockPembelians as approved_stock_pembelians_qty' => function ($query) {
+                    $query->whereHas('pembelian', fn ($pembelian) => $pembelian->where('owner_approval_status', 'approved'));
+                },
+            ], 'qty')
             ->with(['category', 'stocks' => function ($query) {
                 $query->where('qty', '>', 0)
                     ->orderBy('status')
@@ -52,7 +62,11 @@ class ProductController extends Controller
             return ProductResource::collection($products);
         }
 
-        return view('products.index', ['products' => $products->get()]);
+        return view('products.index', [
+            'products' => $products->get(),
+            'statusProdukOptions' => Product::STATUS_PRODUK,
+            'selectedStatusProduk' => $statusFilter,
+        ]);
     }
 
     public function create()
@@ -61,12 +75,16 @@ class ProductController extends Controller
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'categories' => Category::get(),
+            'statusProdukOptions' => Product::STATUS_PRODUK,
         ]);
     }
 
     public function store(ProductRequest $request)
     {
         $data = $request->validated();
+        if (($data['status_produk'] ?? 'sudah') !== 'tambahan_diskon') {
+            $data['status_produk_note'] = null;
+        }
 
         // Handle file upload
         if ($request->hasFile('pic')) {
@@ -115,6 +133,7 @@ class ProductController extends Controller
             'outlets' => Outlet::get(),
             'suppliers' => Supplier::get(),
             'categories' => Category::get(),
+            'statusProdukOptions' => Product::STATUS_PRODUK,
             // optional: selected supplier IDs for form
             'selectedSuppliers' => $product->suppliers->pluck('id')->toArray(),
         ]);
@@ -123,6 +142,9 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         $data = $request->validated();
+        if (($data['status_produk'] ?? 'sudah') !== 'tambahan_diskon') {
+            $data['status_produk_note'] = null;
+        }
         if ($request->hasFile('pic')) {
             // Delete the old image file
             if ($product->pic) {

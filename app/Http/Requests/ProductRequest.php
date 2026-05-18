@@ -6,6 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProductRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'status_produk' => $this->input('status_produk', 'sudah'),
+            'status_produk_note' => $this->filled('status_produk_note')
+                ? trim((string) $this->input('status_produk_note'))
+                : null,
+        ]);
+    }
+
     public function authorize()
     {
         return true;
@@ -33,6 +43,8 @@ class ProductRequest extends FormRequest
             'konversi_qty' => 'nullable|numeric|min:0.01',
             'min_stock' => 'nullable|integer|min:0',
             'lokasi' => 'nullable|string',
+            'status_produk' => 'required|in:free_produk,tambahan_diskon,free_tester,listing,lunas,belum_lunas,sudah',
+            'status_produk_note' => 'nullable|required_if:status_produk,tambahan_diskon|string|max:255',
             'supplier_ids' => 'nullable|array',
             'supplier_ids.*' => 'exists:suppliers,id',
         ];
@@ -53,6 +65,10 @@ class ProductRequest extends FormRequest
             'min_stock.integer' => 'Minimal stok harus berupa angka.',
             'min_stock.min' => 'Minimal stok tidak boleh kurang dari 0.',
             'lokasi.string' => 'Lokasi harus berupa teks.',
+            'status_produk.required' => 'Status produk wajib dipilih.',
+            'status_produk.in' => 'Status produk yang dipilih tidak valid.',
+            'status_produk_note.required_if' => 'Tambahan diskon wajib diisi saat status produk adalah Tambahan diskon.',
+            'status_produk_note.string' => 'Catatan status produk harus berupa teks.',
             'supplier_ids.array' => 'Supplier harus berupa array.',
             'supplier_ids.*.exists' => 'Supplier yang dipilih tidak valid.',
         ];

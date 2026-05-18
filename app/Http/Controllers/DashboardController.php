@@ -19,6 +19,18 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
+
+        if ($user->role === 'staff-outlet') {
+            $requestOrdersBase = RequestOrder::where('owner_id', $user->outlet_id);
+
+            return view('dashboard.index', [
+                'isStaffOutletDashboard' => true,
+                'outletRequestTotal' => (clone $requestOrdersBase)->count(),
+                'outletRequestPending' => (clone $requestOrdersBase)->where('status', 'pending')->count(),
+            ]);
+        }
+
         $urgentSuppliers = Supplier::whereNotNull('deadline_days')
             ->whereNotNull('deadline_interval_weeks')
             ->with(['pembelians' => fn ($q) => $q->where('created_at', '>=', now()->subWeeks(4))])
@@ -84,6 +96,11 @@ class DashboardController extends Controller
         $pendingOrdersCount = RequestOrder::where('status', 'pending')->count();
         $deliveredCount    = DeliveryOrder::where('status', 'delivered')->count();
         $refundCount       = RefundPembelian::count();
+        $pendingOwnerApprovals = Pembelian::with(['supplier'])
+            ->where('owner_approval_status', 'pending')
+            ->latest()
+            ->limit(5)
+            ->get();
 
         // Top 5 products by available stock (inventory chart)
         $inventoryChart = Stock::selectRaw('product_id, SUM(qty_available) as total_qty')
@@ -154,6 +171,7 @@ class DashboardController extends Controller
             });
 
         return view('dashboard.index', [
+            'isStaffOutletDashboard' => false,
             'products'           => Product::count(),
             'stocks'             => Stock::sum('qty'),
             'penjualans'         => Penjualan::count(),
@@ -165,6 +183,7 @@ class DashboardController extends Controller
             'deliveredCount'     => $deliveredCount,
             'refundCount'        => $refundCount,
             'lowStockCount'      => $lowVelocityProducts->count(),
+            'pendingOwnerApprovalCount' => $pendingOwnerApprovals->count(),
             // Charts
             'inventoryChart'     => $inventoryChart,
             'statusOrderChart'   => $statusOrderChart,
@@ -177,6 +196,7 @@ class DashboardController extends Controller
             'nearExpiryStocks'   => $nearExpiryStocks,
             'lowVelocityProducts' => $lowVelocityProducts,
             'adjustmentProducts' => $adjustmentProducts,
+            'pendingOwnerApprovals' => $pendingOwnerApprovals,
         ]);
     }
 

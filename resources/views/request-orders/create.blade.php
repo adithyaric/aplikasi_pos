@@ -152,6 +152,7 @@
         let rowIndex = {{ isset($requestOrder) ? count($requestOrder->items) : 1 }};
         let categories = @json($categories);
 
+        //TODO use product's konversiDisplay instead
         function konversiDisplay(qty, konversiQty, satuanBesar, satuan) {
             satuan = satuan || 'PCS';
             qty = parseInt(qty) || 0;
@@ -160,7 +161,7 @@
             var rem = qty % konversiQty;
             if (rem === 0) return boxes + ' ' + satuanBesar;
             if (boxes > 0) return boxes + ' ' + satuanBesar + ' ' + rem + ' ' + satuan;
-            return '1 ' + satuanBesar;
+            return qty + ' ' + satuan;
         }
 
 function populateProductSelect($select, selectedId = null) {
