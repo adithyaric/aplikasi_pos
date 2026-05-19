@@ -147,3 +147,6 @@
         </div>
     </section>
 @endsection
+@section('page-script')
+    @include('delivery-orders._send-modal-script')
+@endsection
