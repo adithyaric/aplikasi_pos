@@ -154,6 +154,11 @@ class PembelianController extends Controller
 
     public function edit(Pembelian $pembelian)
     {
+        if (! $pembelian->canBeEditedBy(auth()->user())) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO ini belum bisa diedit. Admin gudang hanya bisa edit setelah ACC, sedangkan owner dan superadmin bisa edit kapan saja sebelum published.');
+        }
+
         return view('pembelians.edit', [
             'pembelian' => $pembelian,
             'kas' => Kas::get(),
@@ -165,15 +170,12 @@ class PembelianController extends Controller
 
     public function update(PembelianRequest $request, Pembelian $pembelian)
     {
-        if (auth()->user()->role === 'owner') {
-            abort(403);
+        if (! $pembelian->canBeEditedBy(auth()->user())) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO ini belum bisa diedit. Admin gudang hanya bisa edit setelah ACC, sedangkan owner dan superadmin bisa edit kapan saja sebelum published.');
         }
 
         $data = $request->validated();
-        $data['owner_approval_status'] = 'pending';
-        $data['owner_approved_by'] = null;
-        $data['owner_approved_at'] = null;
-        $data['owner_approval_note'] = null;
         $pembelian->update($data);
         $this->updateStock($request, $pembelian);
 
@@ -207,11 +209,6 @@ class PembelianController extends Controller
 
     public function penerimaan(Pembelian $pembelian)
     {
-        if ($pembelian->owner_approval_status !== 'approved') {
-            return redirect()->route('pembelian.index')
-                ->with('toast_error', 'PO belum disetujui owner, jadi belum bisa diproses ke Pembelian.');
-        }
-
         $pembelian->load(['pembelianProducts.product', 'stocks.product', 'supplier']);
 
         return view('pembelians.penerimaan', compact('pembelian'));
@@ -552,8 +549,9 @@ class PembelianController extends Controller
 
     public function destroy(Pembelian $pembelian)
     {
-        if (auth()->user()->role === 'owner') {
-            abort(403);
+        if (auth()->user()->role === 'owner' || ! $pembelian->canBeEditedBy(auth()->user())) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO ini belum bisa dihapus.');
         }
 
         $pembelian->stocks()->delete();
@@ -564,12 +562,17 @@ class PembelianController extends Controller
 
     public function stockDestroy($id)
     {
-        if (auth()->user()->role === 'owner') {
-            abort(403);
+        $pembelianProduct = PembelianProduct::find($id);
+        if (! $pembelianProduct) {
+            return redirect()->route('pembelian.index')->with('toast_error', 'Item PO tidak ditemukan.');
         }
 
-        $pembelianProduct = PembelianProduct::find($id);
         $pembelian = $pembelianProduct->pembelian;
+        if (! $pembelian->canBeEditedBy(auth()->user())) {
+            return redirect()->route('pembelian.index')
+                ->with('toast_error', 'PO ini belum bisa diedit.');
+        }
+
         $pembelianProduct->delete();
 
         $pembelian->update(

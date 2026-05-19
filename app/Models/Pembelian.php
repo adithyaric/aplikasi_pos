@@ -84,4 +84,26 @@ class Pembelian extends Model
     {
         return self::OWNER_APPROVAL_STATUSES[$this->owner_approval_status] ?? ucfirst((string) $this->owner_approval_status);
     }
+
+    public function isOwnerApproved(): bool
+    {
+        return $this->owner_approval_status === 'approved';
+    }
+
+    public function canBeEditedBy(?User $user): bool
+    {
+        if (! $user || $this->is_published) {
+            return false;
+        }
+
+        if (in_array($user->role, ['superadmin', 'owner'], true)) {
+            return true;
+        }
+
+        if ($user->role === 'admin-gudang') {
+            return $this->isOwnerApproved();
+        }
+
+        return false;
+    }
 }

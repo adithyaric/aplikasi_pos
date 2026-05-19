@@ -204,8 +204,8 @@
                                         <td>{{ $po->supplier?->name ?? '—' }}</td>
                                         <td>{{ $po->created_at->format('d M Y') }}</td>
                                         <td>
-                                            <a href="{{ route('pembelian.edit', $po->id) }}" class="btn btn-xs btn-primary">
-                                                Buka PO
+                                            <a href="{{ $po->canBeEditedBy(auth()->user()) ? route('pembelian.edit', $po->id) : route('pembelian.show', $po->id) }}" class="btn btn-xs btn-primary">
+                                                {{ $po->canBeEditedBy(auth()->user()) ? 'Buka PO' : 'Lihat PO' }}
                                             </a>
                                         </td>
                                     </tr>

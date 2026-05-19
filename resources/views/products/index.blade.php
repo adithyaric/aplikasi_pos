@@ -244,23 +244,31 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
+            var categoryColumnIndex = 3;
+            var lokasiColumnIndex = 15;
+
             // Destroy master-layout's auto-init so we can add hidden column config
             if ($.fn.DataTable.isDataTable('#example1')) {
                 $('#example1').DataTable().destroy();
             }
             var table = $('#example1').DataTable({
-                columnDefs: [{ visible: false, targets: [15] }]
+                columnDefs: [{ visible: false, targets: [lokasiColumnIndex] }]
+            });
+
+            $('#filterKategori, #filterLokasi').select2({
+                allowClear: true,
+                width: 'style'
             });
 
             // Populate Kategori dropdown (column 3) from loaded data
-            table.column(3).data().unique().sort().each(function(val) {
+            table.column(categoryColumnIndex).data().unique().sort().each(function(val) {
                 if (val && String(val).trim() !== '') {
                     $('#filterKategori').append($('<option>', { value: val, text: val }));
                 }
             });
 
             // Populate Lokasi dropdown from hidden column
-            table.column(17).data().unique().sort().each(function(val) {
+            table.column(lokasiColumnIndex).data().unique().sort().each(function(val) {
                 if (val && String(val).trim() !== '') {
                     $('#filterLokasi').append($('<option>', { value: val, text: val }));
                 }
@@ -272,12 +280,12 @@
 
             $('#filterKategori').on('change', function() {
                 var val = $(this).val();
-                table.column(3).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+                table.column(categoryColumnIndex).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
             });
 
             $('#filterLokasi').on('change', function() {
                 var val = $(this).val();
-                table.column(17).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
+                table.column(lokasiColumnIndex).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
             });
 
             $('#filterStatusProduk').on('change', function() {

@@ -262,7 +262,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                                    <button type="button" class="btn btn-primary" id="btn-save-status-note">Simpan Catatan</button>
+                                    <button type="button" class="btn btn-primary" id="btn-save-status-note" data-dismiss="modal">Simpan Catatan</button>
                                 </div>
                             </div>
                         </div>
@@ -280,6 +280,7 @@
                 placeholder: "Pilih Supplier",
                 allowClear: true
             });
+            var statusProdukModal = $('#statusProdukModal');
 
             function toggleStatusNote(forceOpen) {
                 var isTambahanDiskon = $('#status-produk-select').val() === 'tambahan_diskon';
@@ -293,7 +294,7 @@
                 }
 
                 if (forceOpen || !$('#status-note-hidden').val()) {
-                    $('#statusProdukModal').modal('show');
+                    statusProdukModal.modal('show');
                 }
             }
 
@@ -305,7 +306,7 @@
                 var note = $('#status-note-input-modal').val().trim();
                 $('#status-note-hidden').val(note);
                 $('#status-note-display').val(note);
-                $('#statusProdukModal').modal('hide');
+                statusProdukModal.modal('hide');
             });
 
             toggleStatusNote(false);

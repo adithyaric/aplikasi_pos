@@ -112,21 +112,23 @@
                                                 </form>
                                             @endif
 
-                                            @if (!$value->is_published)
+                                            @if ($value->canBeEditedBy(auth()->user()))
                                                 <a href="{{ route('pembelian.edit', $value->id) }}"
                                                     class="btn btn-xs btn-warning" title="Edit">
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
-                                                <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
-                                                    style="display:inline">
-                                                    @method('delete')
-                                                    @csrf
-                                                    <button class="btn btn-xs btn-danger"
-                                                        onclick="return confirm('Hapus PO {{ $value->code }}?')"
-                                                        title="Hapus">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if (auth()->user()->role !== 'owner')
+                                                    <form action="{{ route('pembelian.destroy', $value->id) }}" method="post"
+                                                        style="display:inline">
+                                                        @method('delete')
+                                                        @csrf
+                                                        <button class="btn btn-xs btn-danger"
+                                                            onclick="return confirm('Hapus PO {{ $value->code }}?')"
+                                                            title="Hapus">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             @endif
 
                                             {{-- Export PO --}}

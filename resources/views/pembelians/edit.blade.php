@@ -143,7 +143,7 @@
 
                         <div class="box-footer">
                             <a href="{{ route('pembelian.index') }}" class="btn btn-default">Kembali</a>
-                            @if (auth()->user()->role !== 'owner')
+                            @if ($pembelian->canBeEditedBy(auth()->user()))
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             @endif
                         </div>

@@ -14,7 +14,7 @@
                     <div class="box-header">
                         <p class="text-muted">
                             <i class="fa fa-info-circle"></i>
-                            Pilih PO untuk melakukan input penerimaan barang dari supplier.
+                            Pilih PO untuk melakukan input penerimaan barang dari supplier tanpa perlu menunggu ACC pembelian.
                         </p>
                     </div>
                     <div class="box-body table-responsive text-nowrap">
