@@ -59,6 +59,37 @@
                             @endif
                         </table>
 
+                        @if ($requestOrder->deliveryOrder)
+                            <hr>
+                            <h4>Delivery Order</h4>
+                            <table class="table table-bordered" style="max-width:700px;">
+                                <tr>
+                                    <th style="width: 150px;">Kode DO</th>
+                                    <td>{{ $requestOrder->deliveryOrder->code }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status DO</th>
+                                    <td>
+                                        @if ($requestOrder->deliveryOrder->status === 'draft')
+                                            <span class="label label-default">Draft</span>
+                                        @elseif ($requestOrder->deliveryOrder->status === 'sent')
+                                            <span class="label label-info">Sent</span>
+                                        @elseif ($requestOrder->deliveryOrder->status === 'delivered')
+                                            <span class="label label-success">Delivered</span>
+                                        @elseif ($requestOrder->deliveryOrder->status === 'completed')
+                                            <span class="label label-primary">Completed</span>
+                                        @else
+                                            <span class="label label-default">{{ ucfirst($requestOrder->deliveryOrder->status) }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Tanggal Kirim</th>
+                                    <td>{{ $requestOrder->deliveryOrder->delivery_date?->format('d-m-Y') ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        @endif
+
                         <hr>
                         <h4>Items</h4>
                         <table class="table table-bordered table-striped">
@@ -132,9 +163,81 @@
 
                     <div class="box-footer">
                         <a href="{{ route('request-orders.index') }}" class="btn btn-default">Kembali</a>
+                        @if ($requestOrder->deliveryOrder)
+                            <a href="{{ route('delivery-orders.show', $requestOrder->deliveryOrder->id) }}" class="btn btn-info">
+                                <i class="fa fa-truck"></i> Detail DO
+                            </a>
+                            @if (in_array($requestOrder->deliveryOrder->status, ['draft', 'sent']))
+                                <button class="btn btn-success" data-toggle="modal"
+                                    data-target="#sendModal{{ $requestOrder->deliveryOrder->id }}">
+                                    <i class="fa fa-paper-plane-o"></i> Kirim DO
+                                </button>
+                                @include('delivery-orders._send-modal', ['do' => $requestOrder->deliveryOrder])
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </section>
+@endsection
+@section('page-script')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(function() {
+            $(document).on('click', '.btn-confirm-send', function() {
+                var formId = $(this).data('form-id');
+                var $form = $('#' + formId);
+                var code = $form.data('delivery-code');
+                var errors = [];
+
+                $form.find('.sample-error').text('').hide();
+                $form.find('.qty-sample-input').css('border-color', '');
+
+                $form.find('.qty-sample-input').each(function() {
+                    var $input = $(this);
+                    var required = parseInt($input.data('required'));
+                    var kategori = $input.data('kategori');
+                    var val = $input.val().trim();
+                    var $errDiv = $input.next('.sample-error');
+
+                    if (val === '') {
+                        $errDiv.text('Qty sample wajib diisi.').show();
+                        $input.css('border-color', '#a94442');
+                        errors.push('"' + kategori + '": wajib diisi');
+                    } else if (parseInt(val) !== required) {
+                        $errDiv.text('Harus tepat ' + required + ' (diisi: ' + val + ').').show();
+                        $input.css('border-color', '#a94442');
+                        errors.push('"' + kategori + '": harus tepat ' + required);
+                    }
+                });
+
+                if (errors.length > 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Validasi Gagal',
+                        html: '<ul style="margin-top:8px">' + errors.map(function(e) {
+                            return '<li style="text-align:left">' + e + '</li>';
+                        }).join('') + '</ul>',
+                        confirmButtonText: 'OK',
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Konfirmasi Pengiriman',
+                    text: 'Kirim delivery order ' + code + '?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Kirim',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#5cb85c',
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $form.trigger('submit');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

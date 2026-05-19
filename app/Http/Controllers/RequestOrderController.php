@@ -145,7 +145,17 @@ class RequestOrderController extends Controller
 
     public function show($id)
     {
-        $requestOrder = RequestOrder::with(['items.product.stocks', 'items.stock', 'requestedBy', 'verifiedBy', 'additionalNotes'])->findOrFail($id);
+        $requestOrder = RequestOrder::with([
+            'items.product.stocks',
+            'items.stock',
+            'requestedBy',
+            'verifiedBy',
+            'additionalNotes',
+            'deliveryOrder.owner',
+            'deliveryOrder.requestOrder.additionalNotes',
+            'deliveryOrder.items.product',
+            'deliveryOrder.items.stock',
+        ])->findOrFail($id);
 
         if (auth()->user()->role === 'staff-outlet') {
             return view('request-orders.show', compact('requestOrder'));
