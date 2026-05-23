@@ -38,9 +38,12 @@
                         <button class="btn btn-sm bg-orange" data-toggle="modal" data-target="#modalImportMinStock">
                             <i class="fa fa-upload"></i> Import Min Stock
                         </button>
-                        <div class="row" style="margin-top:10px;">
+                        <form method="GET" action="{{ route('product.index') }}" class="row" style="margin-top:10px;">
                             <div class="col-xs-12" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                                <select id="filterStatusProduk" class="form-control input-sm" style="width:auto; min-width:180px;">
+                                <input type="text" name="search" value="{{ $search }}" class="form-control input-sm"
+                                    style="width:220px;" placeholder="Cari kode, nama, brand, model">
+                                <select name="status_produk" id="filterStatusProduk" class="form-control input-sm"
+                                    style="width:auto; min-width:180px;">
                                     <option value="all" {{ $selectedStatusProduk === 'all' ? 'selected' : '' }}>Filter Status Produk: Semua</option>
                                     @foreach ($statusProdukOptions as $statusValue => $statusLabel)
                                         <option value="{{ $statusValue }}" {{ $selectedStatusProduk === $statusValue ? 'selected' : '' }}>
@@ -48,14 +51,30 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <select id="filterKategori" class="form-control input-sm select2" style="width:auto; min-width:160px;">
+                                <select name="category_id" id="filterKategori" class="form-control input-sm select2"
+                                    style="width:auto; min-width:180px;">
                                     <option value="">Semua Kategori</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}" {{ (string) $selectedCategoryId === (string) $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
-                                <select id="filterLokasi" class="form-control input-sm select2" style="width:auto; min-width:160px;">
+                                <select name="lokasi" id="filterLokasi" class="form-control input-sm select2"
+                                    style="width:auto; min-width:160px;">
                                     <option value="">Semua Lokasi</option>
+                                    @foreach ($locations as $location)
+                                        <option value="{{ $location }}" {{ $selectedLokasi === $location ? 'selected' : '' }}>
+                                            {{ $location }}
+                                        </option>
+                                    @endforeach
                                 </select>
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-search"></i> Filter
+                                </button>
+                                <a href="{{ route('product.index') }}" class="btn btn-sm btn-default">Reset</a>
                             </div>
-                        </div>
+                        </form>
                     </div><!-- /.box-header -->
 
                     {{-- Modal Import --}}
@@ -119,7 +138,7 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive text-nowrap">
-                        <table id="example1" class="table table-bordered table-striped">
+                        <table id="products-table" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <td>No</td>
@@ -146,17 +165,16 @@
                             <tbody>
                                 @foreach ($products as $value)
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ ($products->firstItem() ?? 1) + $loop->index }}</td>
                                         <td>{{ $value->code }}</td>
                                         {{-- <td>{{ $value->outlet?->name }}</td> --}}
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->category?->name }}</td>
                                         @php
-                                            $ownerQty       = $value->ownerStocks()->sum('qty');
-                                            $reservedQty    = $value->stocks()->sum('qty_reserved');
-                                            $availableQty   = $value->stocks()->sum('qty_available');
-                                            $pembelianQty   = (int) ($value->approved_stock_pembelians_qty ?? 0);
-                                            $konversi       = $value->konversi_qty;
+                                            $ownerQty = (int) ($value->owner_stock_qty ?? 0);
+                                            $reservedQty = (int) ($value->reserved_stock_qty ?? 0);
+                                            $availableQty = (int) ($value->available_stock_qty ?? 0);
+                                            $pembelianQty = (int) ($value->approved_stock_pembelians_qty ?? 0);
                                         @endphp
 
                                         <td>
@@ -184,8 +202,8 @@
                                         </td>
                                         {{-- <td>@currency($value->harga_jual)</td> --}}
                                         <td>
-                                            @if ($value->stocks()->sum('qty_available') < $value->min_stock)
-                                            habis, stock tinggal {{ $value->stocks()->sum('qty_available') }}
+                                            @if ($availableQty < $value->min_stock)
+                                            habis, stock tinggal {{ $availableQty }}
                                             @else
                                             aman
                                             @endif
@@ -235,6 +253,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div style="margin-top: 15px;">
+                            {{ $products->links() }}
+                        </div>
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->
             </div><!-- /.col -->
@@ -244,54 +265,9 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
-            var categoryColumnIndex = 3;
-            var lokasiColumnIndex = 15;
-
-            // Destroy master-layout's auto-init so we can add hidden column config
-            if ($.fn.DataTable.isDataTable('#example1')) {
-                $('#example1').DataTable().destroy();
-            }
-            var table = $('#example1').DataTable({
-                columnDefs: [{ visible: false, targets: [lokasiColumnIndex] }]
-            });
-
             $('#filterKategori, #filterLokasi').select2({
                 allowClear: true,
                 width: 'style'
-            });
-
-            // Populate Kategori dropdown (column 3) from loaded data
-            table.column(categoryColumnIndex).data().unique().sort().each(function(val) {
-                if (val && String(val).trim() !== '') {
-                    $('#filterKategori').append($('<option>', { value: val, text: val }));
-                }
-            });
-
-            // Populate Lokasi dropdown from hidden column
-            table.column(lokasiColumnIndex).data().unique().sort().each(function(val) {
-                if (val && String(val).trim() !== '') {
-                    $('#filterLokasi').append($('<option>', { value: val, text: val }));
-                }
-            });
-
-            function escReg(val) {
-                return val.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            }
-
-            $('#filterKategori').on('change', function() {
-                var val = $(this).val();
-                table.column(categoryColumnIndex).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
-            });
-
-            $('#filterLokasi').on('change', function() {
-                var val = $(this).val();
-                table.column(lokasiColumnIndex).search(val ? '^' + escReg(val) + '$' : '', true, false).draw();
-            });
-
-            $('#filterStatusProduk').on('change', function() {
-                var url = new URL(window.location.href);
-                url.searchParams.set('status_produk', $(this).val());
-                window.location.href = url.toString();
             });
 
             // Price history modal (unchanged)

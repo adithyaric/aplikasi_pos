@@ -77,12 +77,12 @@
                         <li class="dropdown notifications-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-bell-o"></i>
-                                @if(isset($lowStockProducts) && $lowStockProducts->count() > 0)
-                                    <span class="label label-danger">{{ $lowStockProducts->count() }}</span>
+                                @if(isset($lowStockCount) && $lowStockCount > 0)
+                                    <span class="label label-danger">{{ $lowStockCount }}</span>
                                 @endif
                             </a>
                             <ul class="dropdown-menu" style="width: 400px;">
-                                <li class="header">{{ isset($lowStockProducts) ? $lowStockProducts->count() : 0 }} produk hampir habis</li>
+                                <li class="header">{{ $lowStockCount ?? 0 }} produk hampir habis</li>
                                 <li>
                                     <ul class="menu" style="max-height:300px;overflow-y:auto;">
                                         @if(isset($lowStockProducts))
@@ -90,7 +90,7 @@
                                                 <li>
                                                     <a href="{{ route('product.index') }}">
                                                         <i class="fa fa-warning text-yellow"></i>
-                                                        <b>{{ $product->name }}</b> — hampir habis, stock <span class="text-danger">{{ $product->stocks()->sum('qty_available') }}</span>/{{ $product->min_stock }}
+                                                        <b>{{ $product->name }}</b> — hampir habis, stock <span class="text-danger">{{ $product->available_stock_qty }}</span>/{{ $product->effective_min_qty }}
                                                     </a>
                                                 </li>
                                             @endforeach

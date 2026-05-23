@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Product;
+use App\Models\ProductMinimumAdjustment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
@@ -41,24 +42,41 @@ class AppServiceProvider extends ServiceProvider
             $view->with('companyLogo', $loadCompanyLogo());
             if (Auth::check()) {
                 $today = now()->toDateString();
-                $activeAdjs = \App\Models\ProductMinimumAdjustment::activeOn($today)
+                $activeAdjs = ProductMinimumAdjustment::activeOn($today)
                     ->orderByDesc('active_from')
                     ->orderByDesc('id')
                     ->get()
                     ->keyBy('product_id');
 
-                $lowStockProducts = Product::withSum('stocks', 'qty_available')
+                $lowStockCandidates = Product::query()
+                    ->select('id', 'name', 'min_stock')
+                    ->where(function ($query) use ($activeAdjs) {
+                        $query->where('min_stock', '>', 0);
+
+                        if ($activeAdjs->isNotEmpty()) {
+                            $query->orWhereIn('id', $activeAdjs->keys());
+                        }
+                    })
+                    ->withSum('stocks as available_stock_qty', 'qty_available')
                     ->get()
-                    ->filter(function ($product) use ($activeAdjs) {
-                        $current = (int) ($product->stocks_sum_qty_available ?? 0);
+                    ->map(function ($product) use ($activeAdjs) {
+                        $current = (int) ($product->available_stock_qty ?? 0);
                         $adj = $activeAdjs->get($product->id);
-                        $effectiveMin = $adj
+                        $product->effective_min_qty = $adj
                             ? (int) ceil($product->min_stock * (1 + $adj->adjustment_percentage / 100))
                             : (int) $product->min_stock;
+                        $product->available_stock_qty = $current;
 
-                        return $current <= $effectiveMin;
+                        return $product;
                     });
-                $view->with('lowStockProducts', $lowStockProducts);
+
+                $lowStockProducts = $lowStockCandidates
+                    ->filter(fn ($product) => $product->available_stock_qty <= $product->effective_min_qty)
+                    ->sortBy('name')
+                    ->values();
+
+                $view->with('lowStockCount', $lowStockProducts->count());
+                $view->with('lowStockProducts', $lowStockProducts->take(20));
             }
         });
     }

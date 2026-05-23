@@ -24,46 +24,76 @@ class ProductController extends Controller
         $statusFilter = $request->input('status_produk', 'sudah');
         $products = Product::query();
 
-        if ($request->search) {
-            $products = $products->where('name', 'LIKE', "%{$request->search}%")
-                ->orWhere('code', 'LIKE', "%{$request->search}%")
-                ->orWhere('harga_jual', 'LIKE', "%{$request->search}%")
-                ->orWhere('brand', 'LIKE', "%{$request->search}%")
-                ->orWhere('model', 'LIKE', "%{$request->search}%")
-                ->orWhereHas('stocks', function ($query) use ($request) {
-                    $query->where('serial_number', 'LIKE', "%{$request->search}%")
-                        ->orWhere('status', 'LIKE', "%{$request->search}%");
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $products = $products->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%")
+                    ->orWhere('harga_jual', 'LIKE', "%{$search}%")
+                    ->orWhere('brand', 'LIKE', "%{$search}%")
+                    ->orWhere('model', 'LIKE', "%{$search}%")
+                    ->orWhereHas('stocks', function ($stockQuery) use ($search) {
+                        $stockQuery->where('serial_number', 'LIKE', "%{$search}%")
+                            ->orWhere('status', 'LIKE', "%{$search}%");
+                    });
                 });
         }
 
-        if ($request->has('outlet_id')) {
+        if ($request->filled('outlet_id')) {
             $products = $products->where('outlet_id', $request->outlet_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $products = $products->where('category_id', $request->integer('category_id'));
+        }
+
+        if ($request->filled('lokasi')) {
+            $products = $products->where('lokasi', $request->lokasi);
         }
 
         if ($statusFilter !== 'all') {
             $products = $products->where('status_produk', $statusFilter);
         }
 
-        $products = $products->orderBy('code')
+        if (request()->wantsJson()) {
+            $products = $products
+                ->with(['category', 'stocks' => function ($query) {
+                    $query->where('qty', '>', 0)
+                        ->orderBy('status')
+                        ->orderBy('serial_number');
+                }])
+                ->latest()
+                ->paginate(10);
+
+            return ProductResource::collection($products);
+        }
+
+        $products = $products
+            ->with('category:id,name')
+            ->withSum('ownerStocks as owner_stock_qty', 'qty')
+            ->withSum('stocks as reserved_stock_qty', 'qty_reserved')
+            ->withSum('stocks as available_stock_qty', 'qty_available')
             ->withSum([
                 'stockPembelians as approved_stock_pembelians_qty' => function ($query) {
                     $query->whereHas('pembelian', fn ($pembelian) => $pembelian->where('owner_approval_status', 'approved'));
                 },
             ], 'qty')
-            ->with(['category', 'stocks' => function ($query) {
-                $query->where('qty', '>', 0)
-                    ->orderBy('status')
-                    ->orderBy('serial_number');
-            }]);
-
-        if (request()->wantsJson()) {
-            $products = $products->latest()->paginate(10);
-
-            return ProductResource::collection($products);
-        }
+            ->orderBy('code')
+            ->paginate(100)
+            ->withQueryString();
 
         return view('products.index', [
-            'products' => $products->get(),
+            'products' => $products,
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'locations' => Product::query()
+                ->whereNotNull('lokasi')
+                ->where('lokasi', '!=', '')
+                ->distinct()
+                ->orderBy('lokasi')
+                ->pluck('lokasi'),
+            'search' => $request->search,
+            'selectedCategoryId' => $request->input('category_id'),
+            'selectedLokasi' => $request->input('lokasi'),
             'statusProdukOptions' => Product::STATUS_PRODUK,
             'selectedStatusProduk' => $statusFilter,
         ]);
