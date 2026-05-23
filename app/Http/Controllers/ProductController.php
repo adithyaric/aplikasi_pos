@@ -8,11 +8,15 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Imports\ProductsImport;
 use App\Imports\ProductsMinStockImport;
+use App\Jobs\ProcessProductImportChunk;
 use App\Models\Category;
 use App\Models\Outlet;
 use App\Models\Product;
+use App\Models\ProductImport;
 use App\Models\Supplier;
+use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Activitylog\Models\Activity;
@@ -79,11 +83,16 @@ class ProductController extends Controller
                 },
             ], 'qty')
             ->orderBy('code')
-            ->paginate(100)
+            ->paginate(10)
             ->withQueryString();
 
         return view('products.index', [
             'products' => $products,
+            'recentImports' => ProductImport::query()
+                ->latest()
+                ->take(5)
+                ->get()
+                ->map(fn (ProductImport $productImport) => $this->formatProductImport($productImport)),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'locations' => Product::query()
                 ->whereNotNull('lokasi')
@@ -237,6 +246,17 @@ class ProductController extends Controller
         return response()->json(['success' => true, 'data' => $activities]);
     }
 
+    public function importStatuses()
+    {
+        $imports = ProductImport::query()
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn (ProductImport $productImport) => $this->formatProductImport($productImport));
+
+        return response()->json(['data' => $imports]);
+    }
+
     ///-----------------------------------------------------------------------------------------------
 
     public function export()
@@ -252,9 +272,72 @@ class ProductController extends Controller
     public function import(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new ProductsImport(), $request->file('file'));
+        $file = $request->file('file');
+        $storedFilePath = $file->store('imports/products');
+        $absoluteFilePath = Storage::disk('local')->path($storedFilePath);
+        $chunkSize = 100;
+        $productsImport = app(ProductsImport::class);
+        $totalRows = $productsImport->countDataRows($absoluteFilePath);
 
-        return redirect()->back()->with('toast_success', 'Berhasil Import Data!');
+        if ($totalRows === 0) {
+            Storage::disk('local')->delete($storedFilePath);
+
+            return redirect()->back()->with('toast_error', 'File import kosong atau hanya berisi header.');
+        }
+
+        $productImport = ProductImport::create([
+            'original_file_name' => $file->getClientOriginalName(),
+            'stored_file_path' => $storedFilePath,
+            'status' => ProductImport::STATUS_QUEUED,
+            'total_rows' => $totalRows,
+            'chunk_size' => $chunkSize,
+            'total_chunks' => (int) ceil($totalRows / $chunkSize),
+            'requested_by' => auth()->id(),
+        ]);
+
+        $jobs = [];
+        for ($startRow = 2; $startRow < $totalRows + 2; $startRow += $chunkSize) {
+            $jobs[] = new ProcessProductImportChunk($productImport->id, $startRow, $chunkSize);
+        }
+
+        $productImportId = $productImport->id;
+
+        $batch = Bus::batch($jobs)
+            ->name('Product import #' . $productImportId)
+            ->onQueue('imports')
+            ->allowFailures()
+            ->finally(function (Batch $batch) use ($productImportId) {
+                $productImport = ProductImport::find($productImportId);
+
+                if (! $productImport) {
+                    return;
+                }
+
+                $status = match (true) {
+                    $batch->cancelled() => ProductImport::STATUS_CANCELLED,
+                    $batch->failedJobs > 0 || $productImport->failed_rows > 0 => ProductImport::STATUS_COMPLETED_WITH_ERRORS,
+                    default => ProductImport::STATUS_COMPLETED,
+                };
+
+                if ($batch->failedJobs > 0 && $productImport->processed_chunks === 0 && $productImport->successful_rows === 0) {
+                    $status = ProductImport::STATUS_FAILED;
+                }
+
+                $productImport->forceFill([
+                    'status' => $status,
+                    'finished_at' => now(),
+                    'error_message' => $batch->failedJobs > 0
+                        ? 'Sebagian chunk gagal diproses. Cek failed rows / queue failures.'
+                        : null,
+                ])->save();
+            })
+            ->dispatch();
+
+        $productImport->forceFill([
+            'batch_id' => $batch->id,
+        ])->save();
+
+        return redirect()->back()->with('toast_success', 'Import produk #' . $productImport->id . ' berhasil di-queue.');
     }
 
     public function exportMinStock()
@@ -273,5 +356,42 @@ class ProductController extends Controller
         Excel::import(new ProductsMinStockImport(), $request->file('file'));
 
         return redirect()->back()->with('toast_success', 'Berhasil Import Min Stock!');
+    }
+
+    private function formatProductImport(ProductImport $productImport): array
+    {
+        $batch = $productImport->batch();
+
+        return [
+            'id' => $productImport->id,
+            'original_file_name' => $productImport->original_file_name,
+            'status' => $productImport->status,
+            'status_label' => $this->productImportStatusLabel($productImport->status),
+            'progress' => $batch?->progress() ?? $productImport->progressPercentage(),
+            'processed_rows' => $productImport->processed_rows,
+            'total_rows' => $productImport->total_rows,
+            'successful_rows' => $productImport->successful_rows,
+            'failed_rows' => $productImport->failed_rows,
+            'processed_chunks' => $productImport->processed_chunks,
+            'total_chunks' => $productImport->total_chunks,
+            'failed_jobs' => $batch?->failedJobs ?? 0,
+            'created_at' => optional($productImport->created_at)->format('d M Y H:i'),
+            'started_at' => optional($productImport->started_at)->format('d M Y H:i'),
+            'finished_at' => optional($productImport->finished_at)->format('d M Y H:i'),
+            'error_message' => $productImport->error_message,
+        ];
+    }
+
+    private function productImportStatusLabel(string $status): string
+    {
+        return match ($status) {
+            ProductImport::STATUS_QUEUED => 'Queued',
+            ProductImport::STATUS_PROCESSING => 'Processing',
+            ProductImport::STATUS_COMPLETED => 'Completed',
+            ProductImport::STATUS_COMPLETED_WITH_ERRORS => 'Completed with errors',
+            ProductImport::STATUS_FAILED => 'Failed',
+            ProductImport::STATUS_CANCELLED => 'Cancelled',
+            default => ucfirst(str_replace('_', ' ', $status)),
+        };
     }
 }

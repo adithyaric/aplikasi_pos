@@ -191,6 +191,7 @@ Route::middleware(['role:admin-gudang|staff-outlet|owner|superadmin'])->group(fu
     Route::get('products/export', [ProductController::class, 'export'])->name('product.export');
     Route::get('products/export-template', [ProductController::class, 'exportTemplate'])->name('product.export.template');
     Route::post('products/import', [ProductController::class, 'import'])->name('product.import');
+    Route::get('products/import-statuses', [ProductController::class, 'importStatuses'])->name('product.import-statuses');
     Route::get('products/min-stock/export', [ProductController::class, 'exportMinStock'])->name('product.min-stock.export');
     Route::get('products/min-stock/export-template', [ProductController::class, 'exportMinStockTemplate'])->name('product.min-stock.export.template');
     Route::post('products/min-stock/import', [ProductController::class, 'importMinStock'])->name('product.min-stock.import');

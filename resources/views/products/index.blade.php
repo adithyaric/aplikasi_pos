@@ -137,6 +137,53 @@
                             </div>
                         </div>
                     </div>
+                    <div class="box-body">
+                        <h4 style="margin-top:0;">Progress Import Produk</h4>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>File</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>Rows</th>
+                                        <th>Success</th>
+                                        <th>Failed</th>
+                                        <th>Chunks</th>
+                                        <th>Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-import-status-body">
+                                    @forelse ($recentImports as $import)
+                                        <tr>
+                                            <td>#{{ $import['id'] }}</td>
+                                            <td>{{ $import['original_file_name'] }}</td>
+                                            <td>{{ $import['status_label'] }}</td>
+                                            <td>{{ $import['progress'] }}%</td>
+                                            <td>{{ $import['processed_rows'] }}/{{ $import['total_rows'] }}</td>
+                                            <td>{{ $import['successful_rows'] }}</td>
+                                            <td>
+                                                {{ $import['failed_rows'] }}
+                                                @if ($import['failed_jobs'] > 0)
+                                                    <span class="label label-danger">{{ $import['failed_jobs'] }} job</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $import['processed_chunks'] }}/{{ $import['total_chunks'] }}</td>
+                                            <td>{{ $import['finished_at'] ?? $import['started_at'] ?? $import['created_at'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted">Belum ada import produk.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="help-block" style="margin-bottom:0;">
+                            Chunk size import produk sekarang 100 baris. Baris gagal akan diskip, dan progress batch diperbarui otomatis.
+                        </p>
+                    </div>
                     <div class="box-body table-responsive text-nowrap">
                         <table id="products-table" class="table table-bordered table-striped">
                             <thead>
@@ -269,6 +316,44 @@
                 allowClear: true,
                 width: 'style'
             });
+
+            function renderImportRows(imports) {
+                if (!imports.length) {
+                    return '<tr><td colspan="9" class="text-center text-muted">Belum ada import produk.</td></tr>';
+                }
+
+                return imports.map(function(item) {
+                    var failedJobs = item.failed_jobs > 0
+                        ? ' <span class="label label-danger">' + item.failed_jobs + ' job</span>'
+                        : '';
+                    var updatedAt = item.finished_at || item.started_at || item.created_at || '-';
+
+                    return '<tr>' +
+                        '<td>#' + item.id + '</td>' +
+                        '<td>' + item.original_file_name + '</td>' +
+                        '<td>' + item.status_label + '</td>' +
+                        '<td>' + item.progress + '%</td>' +
+                        '<td>' + item.processed_rows + '/' + item.total_rows + '</td>' +
+                        '<td>' + item.successful_rows + '</td>' +
+                        '<td>' + item.failed_rows + failedJobs + '</td>' +
+                        '<td>' + item.processed_chunks + '/' + item.total_chunks + '</td>' +
+                        '<td>' + updatedAt + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            function refreshImportStatuses() {
+                $.ajax({
+                    url: '{{ route('product.import-statuses') }}',
+                    method: 'GET',
+                    success: function(res) {
+                        $('#product-import-status-body').html(renderImportRows(res.data || []));
+                    }
+                });
+            }
+
+            refreshImportStatuses();
+            setInterval(refreshImportStatuses, 10000);
 
             // Price history modal (unchanged)
             $('#priceHistoryModal').on('show.bs.modal', function(event) {
